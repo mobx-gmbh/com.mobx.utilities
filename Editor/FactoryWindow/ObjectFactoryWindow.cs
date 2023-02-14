@@ -9,7 +9,7 @@ using UnityEditorInternal;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace MobX.Utilities.Editor
+namespace MobX.Utilities.Editor.FactoryWindow
 {
     public class ObjectFactoryWindow : EditorWindow
     {

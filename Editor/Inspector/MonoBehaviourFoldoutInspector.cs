@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace MobX.Utilities.Editor
+namespace MobX.Utilities.Editor.Inspector
 {
 #if !DISABLE_CUSTOM_INSPECTOR
     [UnityEditor.CustomEditor(typeof(MonoBehaviour), true)]

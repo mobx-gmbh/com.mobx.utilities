@@ -1,4 +1,3 @@
-using MobX.Utilities.Editor.InspectorFields;
 using MobX.Utilities.Inspector;
 using MobX.Utilities.Reflection;
 using System;
@@ -11,7 +10,7 @@ using UnityEngine;
 using UnityEngine.Pool;
 using Object = UnityEngine.Object;
 
-namespace MobX.Utilities.Editor
+namespace MobX.Utilities.Editor.Inspector
 {
     public class OverrideInspector<TObject> : StyledInspector<TObject> where TObject : Object
     {

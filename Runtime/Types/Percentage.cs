@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Runtime.InteropServices;
 
-namespace MobX.Utilities
+namespace MobX.Utilities.Types
 {
     [StructLayout(LayoutKind.Auto, Size = 8)]
     public struct Percentage : IComparable<Percentage>, IComparer<Percentage>, IEquatable<Percentage>,

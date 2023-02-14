@@ -4,7 +4,7 @@ using System.Reflection;
 using UnityEditor;
 using UnityEngine;
 
-namespace MobX.Utilities.Editor.PropertyDrawer
+namespace MobX.Utilities.Editor.Inspector
 {
     [CustomPropertyDrawer(typeof(Map<,>))]
     public class MapPropertyDrawer : UnityEditor.PropertyDrawer

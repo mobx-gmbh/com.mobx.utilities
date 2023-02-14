@@ -1,10 +1,14 @@
 using MobX.Utilities.Collections;
 using MobX.Utilities.Inspector;
+using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.Assertions;
+using Object = UnityEngine.Object;
 
 namespace MobX.Utilities.Singleton
 {
-    public class SingletonRegistry : ScriptableObject
+    public sealed class SingletonRegistry : ScriptableObject
     {
         #region Data
 
@@ -19,7 +23,19 @@ namespace MobX.Utilities.Singleton
 
         #region Public
 
-        public static void Register<T>(T instance) where T : Object
+        public static async void Register<T>(T instance) where T : Object
+        {
+            if (await InitializeAsync())
+            {
+                RegisterInternal(instance);
+            }
+            else
+            {
+                Debug.Log(":(");
+            }
+        }
+
+        private static void RegisterInternal<T>(T instance) where T : Object
         {
             Singleton.registryMap.AddOrUpdate(Key<T>(), instance);
         }
@@ -31,7 +47,7 @@ namespace MobX.Utilities.Singleton
                 return value as T;
             }
 
-            Debug.LogError("Singleton", $"No singleton instance of type {typeof(T)} registered! {Singleton.registryMap.Count}");
+            Debug.LogError("Singleton", $"No singleton instance of type {typeof(T)} registered!");
             Debug.Log(Singleton.registryMap);
             return null;
         }
@@ -43,12 +59,7 @@ namespace MobX.Utilities.Singleton
                 return false;
             }
 
-            if (value != null)
-            {
-                return true;
-            }
-
-            return false;
+            return value != null;
         }
 
         #endregion
@@ -58,9 +69,42 @@ namespace MobX.Utilities.Singleton
 
         private static SingletonRegistry singleton;
 
-        private static SingletonRegistry Singleton
+        public static SingletonRegistry Singleton
         {
+            [MethodImpl(MethodImplOptions.Synchronized)]
             get
+            {
+                if (singleton == null)
+                {
+#if UNITY_EDITOR
+                    UnityEditor.AssetDatabase.Refresh();
+                    UnityEditor.AssetDatabase.SaveAssets();
+#endif
+                    singleton = Resources.Load<SingletonRegistry>("Singletons");
+                }
+
+                if (singleton == null)
+                {
+#if UNITY_EDITOR
+                    UnityEditor.AssetDatabase.Refresh(UnityEditor.ImportAssetOptions.ForceSynchronousImport);
+                    singleton = UnityEditor.AssetDatabase.LoadAssetAtPath<SingletonRegistry>("Assets/Resources/Singletons.asset");
+#endif
+                    Assert.IsNotNull(singleton);
+                }
+
+                if (singleton == null)
+                {
+                    Debug.LogError("Singleton", "No singleton registry found! Please create a new registry!");
+                }
+
+                return singleton;
+            }
+        }
+
+        private static async Task<bool> InitializeAsync()
+        {
+            var attempts = 0;
+            do
             {
                 if (singleton == null)
                 {
@@ -69,11 +113,22 @@ namespace MobX.Utilities.Singleton
 
                 if (singleton == null)
                 {
-                    Create();
+    #if UNITY_EDITOR
+                    UnityEditor.AssetDatabase.Refresh(UnityEditor.ImportAssetOptions.ForceSynchronousImport);
+                    singleton = UnityEditor.AssetDatabase.LoadAssetAtPath<SingletonRegistry>("Assets/Resources/Singletons.asset");
+    #endif
                 }
 
-                return singleton;
+                if (singleton != null)
+                {
+                    return true;
+                }
+
+                await Task.Delay(25);
             }
+            while (attempts++ < 10);
+
+            return false;
         }
 
         #endregion
@@ -82,22 +137,6 @@ namespace MobX.Utilities.Singleton
         #region Helper
 
         private static string Key<T>() => typeof(T).FullName!;
-
-        private static void Create()
-        {
-            Debug.Log("Singleton", "Creating new singleton registry!");
-            singleton = CreateInstance<SingletonRegistry>();
-
-#if UNITY_EDITOR
-            if (!UnityEditor.AssetDatabase.IsValidFolder("Assets/Resources"))
-            {
-                UnityEditor.AssetDatabase.CreateFolder("Assets", "Resources");
-            }
-
-            UnityEditor.AssetDatabase.CreateAsset(singleton, "Assets/Resources/Singletons.asset");
-            UnityEditor.AssetDatabase.SaveAssets();
-#endif
-        }
 
         #endregion
     }

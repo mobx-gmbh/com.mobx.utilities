@@ -1,5 +1,5 @@
 
-namespace MobX.Utilities
+namespace MobX.Utilities.Types
 {
     /// <summary>
     /// User message types

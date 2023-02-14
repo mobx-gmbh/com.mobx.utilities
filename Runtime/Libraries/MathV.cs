@@ -1,0 +1,111 @@
+﻿using UnityEngine;
+
+namespace MobX.Utilities
+{
+    /// <summary>
+    /// Class containing the vector equivalent operations of <see cref="Mathf"/>
+    /// </summary>
+    public struct MathV
+    {
+        public static Vector3 Abs(Vector3 v)
+        {
+            return new Vector3(Mathf.Abs(v.x), Mathf.Abs(v.y), Mathf.Abs(v.z));
+        }
+
+        public static Vector3 Sqrt(Vector3 v)
+        {
+            return new Vector3(Mathf.Sqrt(v.x), Mathf.Sqrt(v.y), Mathf.Sqrt(v.z));
+        }
+
+        public static Vector3 Sqr(Vector3 v)
+        {
+            return new Vector3(v.x * v.x, v.y * v.y, v.z * v.z);
+        }
+
+        public static Vector3 Round(Vector3 v)
+        {
+            return new Vector3(Mathf.Round(v.x), Mathf.Round(v.y), Mathf.Round(v.z));
+        }
+
+        public static Vector3Int RoundToInt(Vector3 v)
+        {
+            return new Vector3Int(Mathf.RoundToInt(v.x), Mathf.RoundToInt(v.y), Mathf.RoundToInt(v.z));
+        }
+
+        public static Vector3 Min(Vector3 a, Vector3 b)
+        {
+            return new Vector3(Mathf.Min(a.x, b.x), Mathf.Min(a.y, b.y), Mathf.Min(a.z, b.z));
+        }
+
+        public static Vector3 Max(Vector3 a, Vector3 b)
+        {
+            return new Vector3(Mathf.Max(a.x, b.x), Mathf.Max(a.y, b.y), Mathf.Max(a.z, b.z));
+        }
+
+        public static Vector3 Max(Vector3 a, float b)
+        {
+            return new Vector3(Mathf.Max(a.x, b), Mathf.Max(a.y, b), Mathf.Max(a.z, b));
+        }
+
+        public static float Max(Vector3 v)
+        {
+            return Mathf.Max(v.x, Mathf.Max(v.y, v.z));
+        }
+
+        public static Vector2 Clamp(Vector2 v, Vector2 min, Vector2 max)
+        {
+            return new Vector2(Mathf.Clamp(v.x, min.x, max.x), Mathf.Clamp(v.y, min.y, max.y));
+        }
+
+        public static Vector3 Clamp(Vector3 v, Vector3 min, Vector3 max)
+        {
+            return new Vector3(Mathf.Clamp(v.x, min.x, max.x),
+                Mathf.Clamp(v.y, min.y, max.y), Mathf.Clamp(v.z, min.z, max.z));
+        }
+
+        public static Vector3 Random(Vector3 range)
+        {
+            var randomX = RNG.Float(0, range.x);
+            var randomY = RNG.Float(0, range.y);
+            var randomZ = RNG.Float(0, range.z);
+            return new Vector3(randomX, randomY, randomZ);
+        }
+
+        public static (float, float) MinMax(float a, float b)
+        {
+            return a <= b ? (a, b) : (b, a);
+        }
+
+        public static float Sqr(float v)
+        {
+            return v * v;
+        }
+
+        /// <summary>
+        /// Quaternion equivalent for Vector3.SmoothDamp
+        /// </summary>
+        public static Quaternion QuaternionSmoothDamp(Quaternion current, Quaternion target, ref float currentAngularSpeed, float smoothTime)
+        {
+            var delta = Quaternion.Angle(current, target);
+            if (delta > 0.0f)
+            {
+                var t = Mathf.SmoothDampAngle(delta, 0.0f, ref currentAngularSpeed, smoothTime);
+                t = 1.0f - t / delta;
+                return Quaternion.Slerp(current, target, t);
+            }
+
+            return target;
+        }
+
+        /// <summary>
+        /// Decomposes a vector into a normalized direction and its magnitude
+        /// </summary>
+        /// <param name="vector">The vector to decompose</param>
+        /// <returns>(vector.normalized, vector.magnitude) equivalent</returns>
+        public static (Vector3, float) Decompose(Vector3 vector)
+        {
+            var mag = vector.magnitude;
+            return mag > Vector3.kEpsilon ? (vector / mag, mag) : (Vector3.zero, 0f);
+        }
+    }
+}

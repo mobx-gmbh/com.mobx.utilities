@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
-namespace MobX.Utilities
+namespace MobX.Utilities.Types
 {
     [StructLayout(LayoutKind.Auto)]
     public struct Loop

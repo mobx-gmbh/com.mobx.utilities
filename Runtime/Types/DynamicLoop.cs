@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace MobX.Utilities
+namespace MobX.Utilities.Types
 {
     public struct DynamicLoop
     {

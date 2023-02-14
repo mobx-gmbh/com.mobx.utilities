@@ -1,7 +1,7 @@
 using System;
 using static UnityEngine.Random;
 
-namespace MobX.Utilities.Random
+namespace MobX.Utilities
 {
     public static class RNG
     {
@@ -22,7 +22,7 @@ namespace MobX.Utilities.Random
 
         public static long Integer64()
         {
-            return Range(int.MinValue, int.MaxValue) + (long)Range(int.MinValue, int.MaxValue);
+            return Range(int.MinValue, int.MaxValue) + (long) Range(int.MinValue, int.MaxValue);
         }
 
         public static int Integer(Range range)

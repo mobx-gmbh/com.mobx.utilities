@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -24,6 +25,24 @@ namespace MobX.Utilities.Collections
 
             result = default;
             return false;
+        }
+
+        public int IndexOf(TKey key)
+        {
+            var index = 0;
+            var comparer = EqualityComparer<TKey>.Default;
+
+            foreach (var keyEntry in Keys)
+            {
+                if (comparer.Equals(key, keyEntry))
+                {
+                    return index;
+                }
+
+                index++;
+            }
+
+            return -1;
         }
 
         public bool RemoveElementAtIndex(int index)

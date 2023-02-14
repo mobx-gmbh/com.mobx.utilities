@@ -1,7 +1,8 @@
-﻿using UnityEditor;
+﻿using MobX.Utilities.Types;
+using UnityEditor;
 using UnityEngine;
 
-namespace MobX.Utilities.Editor.PropertyDrawer
+namespace MobX.Utilities.Editor.Inspector
 {
     [CustomPropertyDrawer(typeof(OptionalValue<>))]
     public class OptionalValuePropertyDrawer : UnityEditor.PropertyDrawer

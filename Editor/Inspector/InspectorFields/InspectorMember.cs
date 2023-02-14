@@ -1,5 +1,4 @@
-﻿using MobX.Utilities.Editor.PropertyDrawer;
-using MobX.Utilities.Inspector;
+﻿using MobX.Utilities.Inspector;
 using System;
 using System.Diagnostics;
 using System.Linq;
@@ -8,7 +7,7 @@ using System.Runtime.CompilerServices;
 using UnityEditor;
 using UnityEngine;
 
-namespace MobX.Utilities.Editor.InspectorFields
+namespace MobX.Utilities.Editor.Inspector
 {
     public abstract class InspectorMember
     {

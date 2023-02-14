@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace MobX.Utilities
+namespace MobX.Utilities.Types
 {
     /// <summary>
     /// Wrap a value <see cref="T"/> in this struct to make accessing it conditional.

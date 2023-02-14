@@ -3,7 +3,7 @@ using System;
 using System.Reflection;
 using UnityEngine;
 
-namespace MobX.Utilities.Editor.InspectorFields
+namespace MobX.Utilities.Editor.Inspector
 {
     public class NonSerializedReadonlyFieldInspector : InspectorMember
     {

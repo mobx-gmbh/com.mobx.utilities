@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace MobX.Utilities.Editor.PropertyDrawer
+namespace MobX.Utilities.Editor.Inspector
 {
     public static class ConditionalShowValidator
     {

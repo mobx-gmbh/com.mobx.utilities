@@ -2,7 +2,7 @@
 using UnityEditor;
 using UnityEngine;
 
-namespace MobX.Utilities.Editor.PropertyDrawer
+namespace MobX.Utilities.Editor.Inspector
 {
     [CustomPropertyDrawer(typeof(LockableFieldAttribute))]
     internal class LockableFieldDrawer : UnityEditor.PropertyDrawer

@@ -1,3 +1,5 @@
+using MobX.Utilities.Editor.FactoryWindow;
+using MobX.Utilities.Types;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -9,7 +11,7 @@ using UnityEngine;
 using UnityEngine.Pool;
 using Object = UnityEngine.Object;
 
-namespace MobX.Utilities.Editor
+namespace MobX.Utilities.Editor.Inspector
 {
     public abstract class AssetCollectionWindow : EditorWindow
     {

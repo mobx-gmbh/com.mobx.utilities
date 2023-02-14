@@ -1,7 +1,7 @@
 ﻿using System.Reflection;
 using UnityEditor;
 
-namespace MobX.Utilities.Editor.InspectorFields
+namespace MobX.Utilities.Editor.Inspector
 {
     public class HelpBoxInspectorMember : InspectorMember
     {

@@ -102,10 +102,10 @@ namespace MobX.Utilities.Editor
         {
             switch (style)
             {
-                case Inspector.BoxStyle.GrayBox:
+                case Utilities.Inspector.BoxStyle.GrayBox:
                     EditorGUILayout.BeginVertical(BoxStyle);
                     break;
-                case Inspector.BoxStyle.HelpBox:
+                case Utilities.Inspector.BoxStyle.HelpBox:
                     EditorGUILayout.BeginVertical(HelpBoxStyle);
                     break;
                 default:

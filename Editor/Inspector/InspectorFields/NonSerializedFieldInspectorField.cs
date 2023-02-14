@@ -3,14 +3,13 @@ using System;
 using System.Reflection;
 using UnityEngine;
 
-namespace MobX.Utilities.Editor.InspectorFields
+namespace MobX.Utilities.Editor.Inspector
 {
     public class NonSerializedFieldInspector : InspectorMember
     {
         private readonly FieldInfo _fieldInfo;
         private readonly object _target;
         private readonly Func<object, object> _editor;
-
 
         public NonSerializedFieldInspector(FieldInfo fieldInfo, object target) : base(fieldInfo, target)
         {

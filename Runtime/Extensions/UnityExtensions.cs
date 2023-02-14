@@ -6,6 +6,66 @@ namespace MobX.Utilities
 {
     public static class UnityExtensions
     {
+        #region Transform
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static float AnchorX(this RectTransform rectTransform)
+        {
+            return rectTransform.anchoredPosition.x;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static float AnchorY(this RectTransform rectTransform)
+        {
+            return rectTransform.anchoredPosition.y;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void KillChildObjects(this Transform transform)
+        {
+            foreach (Transform child in transform)
+            {
+                Object.Destroy(child.gameObject);
+            }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void SetPositionAndRotation(this Transform transform, Transform target)
+        {
+            transform.SetPositionAndRotation(target.position, target.rotation);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void SetLocalPositionAndRotation(this Transform transform, Transform target)
+        {
+            transform.localPosition = target.localPosition;
+            transform.localRotation = target.localRotation;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void SetPositionAndViewDirection(this Transform transform, Vector3 position, Vector3 viewDirection)
+        {
+            if (viewDirection == Vector3.zero)
+            {
+                transform.position = position;
+            }
+            else
+            {
+                transform.SetPositionAndRotation(position, Quaternion.LookRotation(viewDirection));
+            }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void MoveTowards(this Transform transform, Transform target, float maxDistanceDelta, float maxDegreesDelta)
+        {
+            var position = Vector3.MoveTowards(transform.position, target.position, maxDistanceDelta);
+            var rotation = Quaternion.RotateTowards(transform.rotation, target.rotation, maxDegreesDelta);
+            transform.SetPositionAndRotation(position, rotation);
+        }
+
+        #endregion
+
+
         #region Component
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -72,6 +132,19 @@ namespace MobX.Utilities
             return components.IsNotNullOrEmpty();
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool TryGetComponentInChildren<T>(this Component target, out T component, bool includeInactive = false) where T : Component
+        {
+            component = target.GetComponentInChildren<T>(includeInactive);
+            return component != null;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static T GetOrCreateComponent<T>(this Component target) where T : Component
+        {
+            return target.gameObject.GetOrCreateComponent<T>();
+        }
+
         #endregion
 
 
@@ -92,6 +165,17 @@ namespace MobX.Utilities
         public static bool IsPrefab(this GameObject gameObject)
         {
             return gameObject.scene.rootCount == 0;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static T GetOrCreateComponent<T>(this GameObject target) where T : Component
+        {
+            if (!target.TryGetComponent<T>(out var component))
+            {
+                component = target.AddComponent<T>();
+            }
+
+            return component;
         }
 
         #endregion

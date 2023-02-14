@@ -5,7 +5,7 @@ using UnityEditor;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace MobX.Utilities.Editor.InspectorFields
+namespace MobX.Utilities.Editor.Inspector
 {
     public class ReadonlyPropertyInspector : InspectorMember
     {

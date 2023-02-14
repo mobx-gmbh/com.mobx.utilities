@@ -2,7 +2,7 @@ using JetBrains.Annotations;
 using System;
 using UnityEngine;
 
-namespace MobX.Utilities
+namespace MobX.Utilities.Types
 {
     [Serializable]
     public class Prefab

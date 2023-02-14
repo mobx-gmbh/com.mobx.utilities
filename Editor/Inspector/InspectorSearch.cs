@@ -1,4 +1,4 @@
-﻿namespace MobX.Utilities.Editor
+﻿namespace MobX.Utilities.Editor.Inspector
 {
     public static class InspectorSearch
     {

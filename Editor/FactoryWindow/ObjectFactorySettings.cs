@@ -1,9 +1,10 @@
-﻿using System;
+﻿using MobX.Utilities.Editor.Inspector;
+using System;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
-namespace MobX.Utilities.Editor
+namespace MobX.Utilities.Editor.FactoryWindow
 {
     [Flags]
     public enum SearchOptions

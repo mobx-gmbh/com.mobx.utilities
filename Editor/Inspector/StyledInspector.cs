@@ -2,7 +2,7 @@ using System;
 using System.Reflection;
 using UnityEditor;
 
-namespace MobX.Utilities.Editor
+namespace MobX.Utilities.Editor.Inspector
 {
     public class StyledInspector<T> : UnityEditor.Editor where T : UnityEngine.Object
     {

@@ -3,7 +3,7 @@ using System.Collections;
 using UnityEditor;
 using UnityEngine;
 
-namespace MobX.Utilities.Editor
+namespace MobX.Utilities.Editor.Inspector
 {
     public interface ICollectionInspector
     {

@@ -1,9 +1,10 @@
+using MobX.Utilities.Editor.Inspector;
 using System;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-namespace MobX.Utilities.Editor
+namespace MobX.Utilities.Editor.Windows
 {
     public abstract class ConfigurationsEditorWindow : EditorWindow
     {
@@ -11,7 +12,6 @@ namespace MobX.Utilities.Editor
 
         // Window State
         private FoldoutHandler Foldout { get; set; }
-        private UnityEngine.Object Target { get; set; }
         private Vector2 _scrollPosition;
         private readonly List<Action> _headerInstructions = new List<Action>(8);
         private readonly List<Action> _footerInstructions = new List<Action>(8);
@@ -158,11 +158,6 @@ namespace MobX.Utilities.Editor
                 InitializeEditor();
             }
 
-            if (GUIHelper.SelectButton())
-            {
-                Selection.activeObject = Target;
-            }
-
             GUILayout.EndHorizontal();
 
             if (DrawOptions)
@@ -221,11 +216,6 @@ namespace MobX.Utilities.Editor
 
 
         #region Editor Setup & Cache
-
-        protected void AddTarget(UnityEngine.Object obj)
-        {
-            Target = obj;
-        }
 
         protected void AddHeaderInstruction(Action instruction)
         {

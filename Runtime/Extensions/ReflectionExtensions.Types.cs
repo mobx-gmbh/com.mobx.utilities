@@ -153,6 +153,12 @@ namespace MobX.Utilities
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool IsQueue(this Type type)
+        {
+            return type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Queue<>);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsIEnumerable(this Type type, bool excludeStrings = false)
         {
             return excludeStrings

@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace MobX.Utilities
+namespace MobX.Utilities.Types
 {
     public readonly struct Rational : IEquatable<Rational>, IComparable<Rational>, IEqualityComparer<Rational>
     {

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-namespace MobX.Utilities.Editor.PropertyDrawer
+namespace MobX.Utilities.Editor.Inspector
 {
     [CustomPropertyDrawer(typeof(InlineInspectorAttribute))]
     internal class InlineInspectorDrawer : UnityEditor.PropertyDrawer

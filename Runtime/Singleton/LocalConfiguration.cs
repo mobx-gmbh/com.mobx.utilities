@@ -85,17 +85,6 @@ namespace MobX.Utilities.Singleton
             private set => SingletonRegistry.Register(value);
         }
 
-        private void OnEnable()
-        {
-            if (SingletonRegistry.Exists<T>())
-            {
-                return;
-            }
-
-            Debug.Log("Singleton", $"No instance of type {typeof(T).FullName} found! Settings this as global instance!", this);
-            Global = (T) this;
-        }
-
 #if UNITY_EDITOR
 
         private bool IsLocal()

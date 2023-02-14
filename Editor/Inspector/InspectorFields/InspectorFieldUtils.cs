@@ -5,7 +5,7 @@ using System.Reflection;
 using UnityEditor;
 using UnityEngine;
 
-namespace MobX.Utilities.Editor.InspectorFields
+namespace MobX.Utilities.Editor.Inspector
 {
     public static class InspectorFieldUtils
     {
@@ -37,6 +37,7 @@ namespace MobX.Utilities.Editor.InspectorFields
 
             return list.ToArray();
         }
+
 
         #region Methods
 
@@ -169,13 +170,15 @@ namespace MobX.Utilities.Editor.InspectorFields
             var showInInspector = fieldInfo.HasAttribute<ShowInInspectorAttribute>();
             var isReadonly = fieldInfo.HasAttribute<ReadonlyAttribute>();
             var conditionalDraw = fieldInfo.HasAttribute<ConditionalDrawerAttribute>();
+            var isCollection = fieldInfo.FieldType.IsDictionary() || fieldInfo.FieldType.IsHashSet() ||
+                               fieldInfo.FieldType.IsStack() || fieldInfo.FieldType.IsQueue();
 
             if (!showInInspector && !isReadonly && !conditionalDraw)
             {
                 return;
             }
 
-            if (isReadonly)
+            if (isReadonly || isCollection)
             {
                 list.Add(new NonSerializedReadonlyFieldInspector(fieldInfo, target.targetObject));
                 return;
