@@ -5,27 +5,27 @@ namespace MobX.Utilities
 {
     public static class RNG
     {
-        public static bool Boolean()
+        public static bool Bool()
         {
             return value > .5f;
         }
 
-        public static bool Boolean(float percentage)
+        public static bool Bool(float percentage)
         {
             return value < percentage * .01f;
         }
 
-        public static int Integer(int min = int.MinValue, int max = int.MaxValue)
+        public static int Int(int min = int.MinValue, int max = int.MaxValue)
         {
             return Range(min, max);
         }
 
-        public static long Integer64()
+        public static long Int64()
         {
-            return Range(int.MinValue, int.MaxValue) + (long) Range(int.MinValue, int.MaxValue);
+            return (long) Range(int.MinValue, int.MaxValue) + Range(int.MinValue, int.MaxValue);
         }
 
-        public static int Integer(Range range)
+        public static int Int(Range range)
         {
             return Range(range.Start.Value, range.End.Value);
         }

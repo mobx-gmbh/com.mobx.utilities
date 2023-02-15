@@ -93,6 +93,7 @@ namespace MobX.Utilities
                     list.RemoveAt(i);
                 }
             }
+
             HashSetPool<T>.Release(set);
         }
 
@@ -179,18 +180,51 @@ namespace MobX.Utilities
             target.Add(key, value);
         }
 
+        /// <summary>
+        /// Remove all null objects from a dictionary.
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void RemoveNullItems<TKey, TValue>(this IDictionary<TKey, TValue> target) where TValue : class
+        {
+            var invalidKeys = ListPool<TKey>.Get();
+            foreach (var (key, value) in target)
+            {
+                if (value.IsNull())
+                {
+                    invalidKeys.Add(key);
+                }
+            }
+
+            foreach (var invalidKey in invalidKeys)
+            {
+                target.Remove(invalidKey);
+            }
+
+            ListPool<TKey>.Release(invalidKeys);
+        }
+
+        /// <summary>
+        /// Adds an object to a list and returns the same list. This allows method chaining.
+        /// <example>list.Append(item1).Append(item2);</example>
+        /// </summary>
         public static List<T> Append<T>(this List<T> list, T value)
         {
             list.Add(value);
             return list;
         }
 
+        /// <summary>
+        /// Returns true if the enumeration contains no elements.
+        /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool None<T>(this IEnumerable<T> enumerable)
         {
             return !enumerable.Any();
         }
 
+        /// <summary>
+        /// Returns a string, appending string representation of every element in the collection.
+        /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static string ToCollectionString<T>(this IEnumerable<T> enumerable)
         {

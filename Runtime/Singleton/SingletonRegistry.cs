@@ -16,7 +16,12 @@ namespace MobX.Utilities.Singleton
         [ShowInInspector] private bool _enableEditing;
 
         [ConditionalShow(nameof(_enableEditing), ReadOnly = true)]
-        [SerializeField] private Map<string, Object> registryMap;
+        [SerializeField] private Map<string, Object> registry;
+
+        [Button]
+        [SpaceBefore]
+        [Tooltip("Remove null objects from the registry")]
+        private void ClearInvalid() => registry.RemoveNullItems();
 
         #endregion
 
@@ -29,32 +34,28 @@ namespace MobX.Utilities.Singleton
             {
                 RegisterInternal(instance);
             }
-            else
-            {
-                Debug.Log(":(");
-            }
         }
 
         private static void RegisterInternal<T>(T instance) where T : Object
         {
-            Singleton.registryMap.AddOrUpdate(Key<T>(), instance);
+            Singleton.registry.AddOrUpdate(Key<T>(), instance);
         }
 
         public static T Resolve<T>() where T : Object
         {
-            if (Singleton.registryMap.TryGetValue(Key<T>(), out var value))
+            if (Singleton.registry.TryGetValue(Key<T>(), out var value))
             {
                 return value as T;
             }
 
             Debug.LogError("Singleton", $"No singleton instance of type {typeof(T)} registered!");
-            Debug.Log(Singleton.registryMap);
+            Debug.Log(Singleton.registry);
             return null;
         }
 
         public static bool Exists<T>()
         {
-            if (!Singleton.registryMap.TryGetValue(Key<T>(), out var value))
+            if (!Singleton.registry.TryGetValue(Key<T>(), out var value))
             {
                 return false;
             }

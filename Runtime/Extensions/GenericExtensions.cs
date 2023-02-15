@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -84,34 +85,39 @@ namespace MobX.Utilities
         #region Equals All
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool EqualsAll<T>(this T target, params T[] other) where T : class
+        public static bool EqualsAll<T>(this T target, params T[] other)
         {
+            var comparer = EqualityComparer<T>.Default;
             foreach (var obj in other)
             {
-                if (!target.Equals(obj))
+                if (!comparer.Equals(target, obj))
                 {
                     return false;
                 }
             }
+
             return true;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool EqualsAll<T>(this T target, T otherA, T otherB, T otherC) where T : class
+        public static bool EqualsAll<T>(this T target, T otherA, T otherB, T otherC)
         {
-            return target.Equals(otherA) && target.Equals(otherB) && target.Equals(otherC);
+            var comparer = EqualityComparer<T>.Default;
+            return comparer.Equals(target, otherA) && comparer.Equals(target, otherB) && comparer.Equals(target, otherC);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool EqualsAll<T>(this T target, T otherA, T otherB) where T : class
+        public static bool EqualsAll<T>(this T target, T otherA, T otherB)
         {
-            return target.Equals(otherA) && target.Equals(otherB);
+            var comparer = EqualityComparer<T>.Default;
+            return comparer.Equals(target, otherA) && comparer.Equals(target, otherB);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool EqualsAll<T>(this T target, T otherA) where T : class
+        public static bool EqualsAll<T>(this T target, T otherA)
         {
-            return target.Equals(otherA);
+            var comparer = EqualityComparer<T>.Default;
+            return comparer.Equals(target, otherA);
         }
 
         #endregion
@@ -176,34 +182,49 @@ namespace MobX.Utilities
 
         #region Null Checks
 
+        /// <summary>
+        /// Unity object sensitive null check.
+        /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsNull<T>(this T target) where T : class
+        {
+            return target is Object obj ? obj == null : target == null;
+        }
+
+        /// <summary>
+        /// Unity object sensitive null check.
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool IsNotNull<T>(this T target) where T : class
+        {
+            return target is Object obj ? obj != null : target != null;
+        }
+
+        /// <summary>
+        /// Unity object sensitive null check.
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool IsNull(this Object target)
         {
             return target == null;
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool IsNotNull<T>(this T target) where T : class
-        {
-            return target != null;
-        }
-
+        /// <summary>
+        /// Unity object sensitive null check.
+        /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsNotNull(this Object target)
         {
             return target != null;
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool IsNotNull(this GameObject target)
-        {
-            return target != null;
-        }
-
+        /// <summary>
+        /// Returns the targets string representation or a string indicating that the target is null.
+        /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static string ToNullString<T>(this T target) where T : class
         {
-            return target == null ? "null" : target.ToString();
+            return target.IsNull() ? "null" : target.ToString();
         }
 
         #endregion
