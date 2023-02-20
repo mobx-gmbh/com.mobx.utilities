@@ -116,6 +116,14 @@ namespace MobX.Utilities.Editor.Inspector
                     case EndBoxAttribute:
                         _postDraw += GUIHelper.EndBox;
                         break;
+
+                    case BeginHorizontalAttribute:
+                        _preDraw += () => EditorGUILayout.BeginHorizontal();
+                        break;
+
+                    case EndHorizontalAttribute:
+                        _postDraw += EditorGUILayout.EndHorizontal;
+                        break;
                 }
             }
 

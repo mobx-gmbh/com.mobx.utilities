@@ -305,7 +305,7 @@ namespace MobX.Utilities.Editor.Windows
             });
         }
 
-        protected void AddEditor<T>(T target, string editorTitle) where T : ScriptableObject
+        protected void AddEditor<T>(T target, string editorTitle) where T : UnityEngine.Object
         {
             if (target == null)
             {
@@ -362,7 +362,7 @@ namespace MobX.Utilities.Editor.Windows
         }
 
         protected void AddOptionalEditor<T>(T target, string editorTitle, string optionName, string tooltip = null,
-            bool showByDefault = false) where T : ScriptableObject
+            bool showByDefault = false) where T : UnityEngine.Object
         {
             var editor = UnityEditor.Editor.CreateEditor(target);
             _editorCache.Add(editor);

@@ -186,7 +186,7 @@ namespace MobX.Utilities
         /// Unity object sensitive null check.
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool IsNull<T>(this T target) where T : class
+        public static bool IsNull<T>(this T target)
         {
             return target is Object obj ? obj == null : target == null;
         }

@@ -1,5 +1,5 @@
-using MobX.Utilities.Collections;
 using MobX.Utilities.Inspector;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -8,20 +8,30 @@ using Object = UnityEngine.Object;
 
 namespace MobX.Utilities.Singleton
 {
-    public sealed class SingletonRegistry : ScriptableObject
+    public sealed class SingletonRegistry : ScriptableObject, ISerializationCallbackReceiver
     {
         #region Data
 
-        [Annotation("Map contains references to singleton assets. Do not modify manually!")]
-        [ShowInInspector] private bool _enableEditing;
+#pragma warning disable 414
+        private bool _enableEditing;
+#pragma warning restore
 
         [ConditionalShow(nameof(_enableEditing), ReadOnly = true)]
-        [SerializeField] private Map<string, Object> registry;
+        [ListOptions]
+        [SerializeField] private List<Object> registry;
 
         [Button]
         [SpaceBefore]
         [Tooltip("Remove null objects from the registry")]
-        private void ClearInvalid() => registry.RemoveNullItems();
+        private void ClearInvalid() => registry.RemoveNull();
+
+        [Button]
+        [ConditionalShow(nameof(_enableEditing), false)]
+        private void EnableEdit() => _enableEditing = true;
+
+        [Button]
+        [ConditionalShow(nameof(_enableEditing))]
+        private void DisableEdit() => _enableEditing = false;
 
         #endregion
 
@@ -38,14 +48,26 @@ namespace MobX.Utilities.Singleton
 
         private static void RegisterInternal<T>(T instance) where T : Object
         {
-            Singleton.registry.AddOrUpdate(Key<T>(), instance);
+            for (var i = 0; i < Singleton.registry.Count; i++)
+            {
+                if (Singleton.registry[i].GetType() == typeof(T))
+                {
+                    Singleton.registry[i] = instance;
+                    return;
+                }
+            }
+
+            Singleton.registry.Add(instance);
         }
 
         public static T Resolve<T>() where T : Object
         {
-            if (Singleton.registry.TryGetValue(Key<T>(), out var value))
+            for (var i = 0; i < Singleton.registry.Count; i++)
             {
-                return value as T;
+                if (Singleton.registry[i].GetType() == typeof(T))
+                {
+                    return (T) Singleton.registry[i];
+                }
             }
 
             Debug.LogError("Singleton", $"No singleton instance of type {typeof(T)} registered!");
@@ -55,12 +77,15 @@ namespace MobX.Utilities.Singleton
 
         public static bool Exists<T>()
         {
-            if (!Singleton.registry.TryGetValue(Key<T>(), out var value))
+            for (var i = 0; i < Singleton.registry.Count; i++)
             {
-                return false;
+                if (Singleton.registry[i].GetType() == typeof(T))
+                {
+                    return Singleton.registry[i];
+                }
             }
 
-            return value != null;
+            return false;
         }
 
         #endregion
@@ -138,6 +163,20 @@ namespace MobX.Utilities.Singleton
         #region Helper
 
         private static string Key<T>() => typeof(T).FullName!;
+
+        #endregion
+
+
+        #region Serialization
+
+        public void OnAfterDeserialize()
+        {
+            singleton = this;
+        }
+
+        public void OnBeforeSerialize()
+        {
+        }
 
         #endregion
     }

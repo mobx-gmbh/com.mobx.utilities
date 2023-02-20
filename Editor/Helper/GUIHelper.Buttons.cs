@@ -87,5 +87,22 @@ namespace MobX.Utilities.Editor
             GUILayout.EndHorizontal();
             return false;
         }
+
+        public static bool ButtonCenter(string label, int width = 150, int height = 30)
+        {
+            GUILayout.BeginHorizontal();
+            GUILayout.FlexibleSpace();
+
+            if (GUILayout.Button(label, GUILayout.Width(width), GUILayout.Height(30)))
+            {
+                GUILayout.FlexibleSpace();
+                GUILayout.EndHorizontal();
+                return true;
+            }
+
+            GUILayout.FlexibleSpace();
+            GUILayout.EndHorizontal();
+            return false;
+        }
     }
 }

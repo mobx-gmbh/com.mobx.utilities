@@ -37,7 +37,9 @@ namespace MobX.Utilities.Editor.FactoryWindow
 
         #endregion
 
+
         //--------------------------------------------------------------------------------------------------------------
+
 
         #region Setup
 
@@ -57,7 +59,8 @@ namespace MobX.Utilities.Editor.FactoryWindow
 
         private void OnEnable()
         {
-            _searchFilter = EditorPrefs.GetString($"{nameof(ObjectFactoryWindow)}{nameof(_searchFilter)}", _searchFilter);
+            _searchFilter =
+                EditorPrefs.GetString($"{nameof(ObjectFactoryWindow)}{nameof(_searchFilter)}", _searchFilter);
             ObjectFactorySettings.SettingsChanged += OnSettingsChanged;
             Initialize();
         }
@@ -71,9 +74,10 @@ namespace MobX.Utilities.Editor.FactoryWindow
 
         #endregion
 
+
         #region Setup Profiling
 
-          private void OnSettingsChanged(bool refresh)
+        private void OnSettingsChanged(bool refresh)
         {
             if (refresh)
             {
@@ -91,7 +95,8 @@ namespace MobX.Utilities.Editor.FactoryWindow
             {
                 _isReady = false;
                 _amountToCreate = MIN_AMOUNT;
-                _displayedList = new ReorderableList(new List<CreatableObject>(), typeof(CreatableObject), false, false, false, false);
+                _displayedList = new ReorderableList(new List<CreatableObject>(), typeof(CreatableObject), false, false,
+                    false, false);
                 _displayedList.drawElementCallback += DrawElementCallback;
                 _displayedList.onSelectCallback += OnSelectCallback;
                 _displayedList.multiSelect = true;
@@ -131,7 +136,8 @@ namespace MobX.Utilities.Editor.FactoryWindow
 
         private static async ValueTask<List<CreatableObject>> ProfileAssemblies()
         {
-            var assemblies = AssemblyProfiler.GetFilteredAssemblies(null, ObjectFactorySettings.GetIgnoredAssemblyPrefixes());
+            var assemblies =
+                AssemblyProfiler.GetFilteredAssemblies(null, ObjectFactorySettings.GetIgnoredAssemblyPrefixes());
             var ignoreNames = ObjectFactorySettings.GetIgnoredNames();
 
             var result = await Task.Run(() =>
@@ -142,8 +148,11 @@ namespace MobX.Utilities.Editor.FactoryWindow
                     var assembly = assemblies[i];
                     var assemblyTypes = assembly.GetTypes();
 
-                    creatable.AddRange(from type in assemblyTypes where IsTypeValidForCreation(type, ignoreNames) select new CreatableObject(type));
+                    creatable.AddRange(from type in assemblyTypes
+                        where IsTypeValidForCreation(type, ignoreNames)
+                        select new CreatableObject(type));
                 }
+
                 return creatable;
             });
 
@@ -156,36 +165,45 @@ namespace MobX.Utilities.Editor.FactoryWindow
             {
                 return false;
             }
+
             if (type.IsAbstract)
             {
                 return false;
             }
+
             if (type.IsGenericType)
             {
                 return false;
             }
+
             if (type.IsSubclassOrAssignable(typeof(EditorWindow)))
             {
                 return false;
             }
+
             if (type.IsSubclassOrAssignable(typeof(UnityEditor.Editor)))
             {
                 return false;
             }
+
             if (type.HasAttribute<ExcludeFromObjectFactoryAttribute>())
             {
                 return false;
             }
+
             if (ignoreNames.Contains(type.Name))
             {
                 return false;
             }
+
             return true;
         }
 
         #endregion
 
+
         //--------------------------------------------------------------------------------------------------------------
+
 
         #region GUI List
 
@@ -261,6 +279,7 @@ namespace MobX.Utilities.Editor.FactoryWindow
 
         #endregion
 
+
         #region GUI
 
         private void OnGUI()
@@ -280,6 +299,7 @@ namespace MobX.Utilities.Editor.FactoryWindow
                     _displayedList.Select(0);
                     OnSelectCallback(_displayedList);
                 }
+
                 _resetFocusBuffer = false;
             }
         }
@@ -362,7 +382,7 @@ namespace MobX.Utilities.Editor.FactoryWindow
         private async void SetInputTimeout()
         {
             _enableInputCheck = false;
-            await Task.Delay(25);
+            await Task.Delay(35);
             _enableInputCheck = true;
             Repaint();
         }
@@ -453,7 +473,8 @@ namespace MobX.Utilities.Editor.FactoryWindow
                 }
             }
 
-            return creatableObject.Create(path, _isMultiSelect ? creatableObject.DefaultFileName : _fileName, _amountToCreate);
+            return creatableObject.Create(path, _isMultiSelect ? creatableObject.DefaultFileName : _fileName,
+                _amountToCreate);
         }
 
         private void DrawHeader()
@@ -486,7 +507,6 @@ namespace MobX.Utilities.Editor.FactoryWindow
 
             EditorGUILayout.EndHorizontal();
         }
-
 
         private void DrawFooter()
         {

@@ -102,7 +102,7 @@ namespace MobX.Utilities
         {
             for (var i = list.Count - 1; i >= 0; i--)
             {
-                if (list[i] == null)
+                if (list[i].IsNull())
                 {
                     list.RemoveAt(i);
                 }
@@ -110,9 +110,9 @@ namespace MobX.Utilities
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool AddNullChecked<T>(this IList<T> list, T value)
+        public static bool AddNullChecked<T>(this IList<T> list, T value) where T : class
         {
-            if (value == null)
+            if (value.IsNull())
             {
                 return false;
             }

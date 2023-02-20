@@ -272,7 +272,7 @@ namespace MobX.Utilities
 
         #region Collections
 
-        public static string CombineToString(this IEnumerable<string> enumerable, char separator = ' ')
+        public static string CombineToString(this IEnumerable<string> enumerable, string separator = " ")
         {
             var stringBuilder = ConcurrentStringBuilderPool.Get();
             foreach (var argument in enumerable)
@@ -281,7 +281,7 @@ namespace MobX.Utilities
                 stringBuilder.Append(separator);
             }
 
-            return ConcurrentStringBuilderPool.Release(stringBuilder);
+            return ConcurrentStringBuilderPool.Release(stringBuilder).TrimEnd(separator.ToCharArray());
         }
 
         public static string[] RemoveNullOrWhiteSpace(this IEnumerable<string> enumerable, char separator = ' ')

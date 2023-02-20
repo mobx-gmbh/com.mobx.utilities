@@ -19,7 +19,6 @@ namespace MobX.Utilities.Singleton
 #else
                 if (local == null)
                 {
-                    //Debug.Log("Singleton", $"Loading local {typeof(T).Name} from AssetDatabase");
                     var guid = UnityEditor.EditorPrefs.GetString(typeof(T).FullName);
                     var path = UnityEditor.AssetDatabase.GUIDToAssetPath(guid);
                     var asset = UnityEditor.AssetDatabase.LoadAssetAtPath<T>(path);
