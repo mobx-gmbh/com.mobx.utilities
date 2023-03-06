@@ -4,6 +4,23 @@ namespace MobX.Utilities.Callbacks
 {
     public partial class EngineCallbacks
     {
+        #region Runtime Events
+
+        public static event Action BeginPlay
+        {
+            add => beginPlayDelegates.AddNullChecked(value);
+            remove => beginPlayDelegates.Remove(value);
+        }
+
+        public static event Action EndPlay
+        {
+            add => endPlayDelegates.AddNullChecked(value);
+            remove => endPlayDelegates.Remove(value);
+        }
+
+        #endregion
+
+
         #region Update Events
 
         public delegate void UpdateDelegate(float deltaTime);

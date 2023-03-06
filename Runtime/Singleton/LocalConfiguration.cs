@@ -69,7 +69,7 @@ namespace MobX.Utilities.Singleton
                 var path = UnityEditor.AssetDatabase.GetAssetPath(value);
                 var guid = UnityEditor.AssetDatabase.AssetPathToGUID(path);
                 UnityEditor.EditorPrefs.SetString(typeof(T).FullName, guid);
-                if (SingletonRegistry.Resolve<T>() == null)
+                if (Singletons.Resolve<T>() == null)
                 {
                     Global = value;
                 }
@@ -80,8 +80,8 @@ namespace MobX.Utilities.Singleton
 
         public static T Global
         {
-            get => SingletonRegistry.Resolve<T>();
-            private set => SingletonRegistry.Register(value);
+            get => Singletons.Resolve<T>();
+            private set => Singletons.Register(value);
         }
 
 #if UNITY_EDITOR

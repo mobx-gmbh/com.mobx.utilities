@@ -7,8 +7,60 @@ using Object = UnityEngine.Object;
 namespace MobX.Utilities.Callbacks
 {
     [InitializeOnLoad]
-    public partial class EngineCallbacks : AssetModificationProcessor
+    public sealed partial class EngineCallbacks : AssetModificationProcessor
     {
+        #region Initialization
+
+        static EngineCallbacks()
+        {
+            EditorApplication.playModeStateChanged -= EditorApplicationOnplayModeStateChanged;
+            EditorApplication.playModeStateChanged += EditorApplicationOnplayModeStateChanged;
+        }
+
+        #endregion
+
+
+        #region Asset Handling
+
+        private static AssetDeleteResult OnWillDeleteAsset(string assetPath, RemoveAssetOptions options)
+        {
+            var asset = AssetDatabase.LoadAssetAtPath<Object>(assetPath);
+
+            if (asset is not ICallbackInterface)
+            {
+                return AssetDeleteResult.DidNotDelete;
+            }
+
+            // ReSharper disable once SuspiciousTypeConversion.Global
+            if (asset is IOnExitPlayMode exitPlayModeCallback)
+            {
+                exitPlayModeListener.Remove(exitPlayModeCallback);
+            }
+
+            // ReSharper disable once SuspiciousTypeConversion.Global
+            if (asset is IOnEnterPlayMode enterPlayModeCallback)
+            {
+                enterPlayModeListener.Remove(enterPlayModeCallback);
+            }
+
+            // ReSharper disable once SuspiciousTypeConversion.Global
+            if (asset is IOnExitEditMode exitEditModeCallback)
+            {
+                exitEditModeListener.Remove(exitEditModeCallback);
+            }
+
+            // ReSharper disable once SuspiciousTypeConversion.Global
+            if (asset is IOnEnterEditMode enterEditModeCallback)
+            {
+                enterEditModeListener.Remove(enterEditModeCallback);
+            }
+
+            return AssetDeleteResult.DidNotDelete;
+        }
+
+        #endregion
+
+
         #region Fields
 
         private static readonly List<Action> exitPlayModeDelegate = new();
@@ -16,65 +68,54 @@ namespace MobX.Utilities.Callbacks
         private static readonly List<Action> exitEditModeDelegate = new();
         private static readonly List<Action> enterEditModeDelegate = new();
 
-        private static readonly List<IOnExitPlay> exitPlayModeListener = new();
-        private static readonly List<IOnEnterPlay> enterPlayModeListener = new();
-        private static readonly List<IOnExitEdit> exitEditModeListener = new();
-        private static readonly List<IOnEnterEdit> enterEditModeListener = new();
+        private static readonly List<IOnExitPlayMode> exitPlayModeListener = new();
+        private static readonly List<IOnEnterPlayMode> enterPlayModeListener = new();
+        private static readonly List<IOnExitEditMode> exitEditModeListener = new();
+        private static readonly List<IOnEnterEditMode> enterEditModeListener = new();
 
         #endregion
 
 
         #region Internal Subscribtions
 
-        private static void AddOnExitPlayInternal(IOnExitPlay listener)
+        private static void AddOnExitPlayInternal(IOnExitPlayMode listener)
         {
             exitPlayModeListener.AddNullChecked(listener);
         }
 
-        private static void RemoveOnExitPlayInternal(IOnExitPlay listener)
+        private static void RemoveOnExitPlayInternal(IOnExitPlayMode listener)
         {
             exitPlayModeListener.Remove(listener);
         }
 
-        private static void AddOnEnterPlayInternal(IOnEnterPlay listener)
+        private static void AddOnEnterPlayInternal(IOnEnterPlayMode listener)
         {
             enterPlayModeListener.AddNullChecked(listener);
         }
 
-        private static void RemoveOnEnterPlayInternal(IOnEnterPlay listener)
+        private static void RemoveOnEnterPlayInternal(IOnEnterPlayMode listener)
         {
             enterPlayModeListener.Remove(listener);
         }
 
-        private static void AddOnExitEditInternal(IOnExitEdit listener)
+        private static void AddOnExitEditInternal(IOnExitEditMode listener)
         {
             exitEditModeListener.AddNullChecked(listener);
         }
 
-        private static void RemoveOnExitEditInternal(IOnExitEdit listener)
+        private static void RemoveOnExitEditInternal(IOnExitEditMode listener)
         {
             exitEditModeListener.Remove(listener);
         }
 
-        private static void AddOnEnterEditInternal(IOnEnterEdit listener)
+        private static void AddOnEnterEditInternal(IOnEnterEditMode listener)
         {
             enterEditModeListener.AddNullChecked(listener);
         }
 
-        private static void RemoveOnEnterEditInternal(IOnEnterEdit listener)
+        private static void RemoveOnEnterEditInternal(IOnEnterEditMode listener)
         {
             enterEditModeListener.Remove(listener);
-        }
-
-        #endregion
-
-
-        #region Initialization
-
-        static EngineCallbacks()
-        {
-            EditorApplication.playModeStateChanged -= EditorApplicationOnplayModeStateChanged;
-            EditorApplication.playModeStateChanged += EditorApplicationOnplayModeStateChanged;
         }
 
         #endregion
@@ -156,41 +197,6 @@ namespace MobX.Utilities.Callbacks
             {
                 enterEditModeDelegate[i]();
             }
-        }
-
-        #endregion
-
-
-        #region Asset Handling
-
-        private static AssetDeleteResult OnWillDeleteAsset(string assetPath, RemoveAssetOptions options)
-        {
-            var asset = AssetDatabase.LoadAssetAtPath<Object>(assetPath);
-            // ReSharper disable once SuspiciousTypeConversion.Global
-            if (asset is IOnExitPlay exitPlayModeCallback)
-            {
-                exitPlayModeListener.Remove(exitPlayModeCallback);
-            }
-
-            // ReSharper disable once SuspiciousTypeConversion.Global
-            if (asset is IOnEnterPlay enterPlayModeCallback)
-            {
-                enterPlayModeListener.Remove(enterPlayModeCallback);
-            }
-
-            // ReSharper disable once SuspiciousTypeConversion.Global
-            if (asset is IOnExitEdit exitEditModeCallback)
-            {
-                exitEditModeListener.Remove(exitEditModeCallback);
-            }
-
-            // ReSharper disable once SuspiciousTypeConversion.Global
-            if (asset is IOnEnterEdit enterEditModeCallback)
-            {
-                enterEditModeListener.Remove(enterEditModeCallback);
-            }
-
-            return AssetDeleteResult.DidNotDelete;
         }
 
         #endregion

@@ -8,7 +8,7 @@ namespace MobX.Utilities.Types
     /// </summary>
     /// <typeparam name="T">Inner type wrapped by the optional value</typeparam>
     [Serializable]
-    public struct OptionalValue<T>
+    public struct Optional<T>
     {
         // Configuration
 
@@ -41,7 +41,7 @@ namespace MobX.Utilities.Types
         /// Get the inner value. Accessing this property does not assert that you are allowed to access the value.
         /// Use <see cref="ValueOrDefault()"/> or <see cref="TryGetValue"/> if you don't know if accessing the value is allowed.
         /// </summary>
-        public T ValueDiscrete => value;
+        public T GetValueDiscrete() => value;
 
         /// <summary>
         /// Get either the inner value or a default value, depending on whether or not <see cref="Enabled"/> is true.
@@ -71,28 +71,28 @@ namespace MobX.Utilities.Types
             return false;
         }
 
-        public static implicit operator T(OptionalValue<T> optionalValue)
+        public static implicit operator T(Optional<T> optional)
         {
-            return optionalValue.Value;
+            return optional.Value;
         }
 
-        public static implicit operator OptionalValue<T>(T value)
+        public static implicit operator Optional<T>(T value)
         {
-            return new OptionalValue<T>(value);
+            return new Optional<T>(value);
         }
 
-        public static implicit operator OptionalValue<T>((T value, bool enabled) tuple)
+        public static implicit operator Optional<T>((T value, bool enabled) tuple)
         {
-            return new OptionalValue<T>(tuple.value, tuple.enabled);
+            return new Optional<T>(tuple.value, tuple.enabled);
         }
 
-        public OptionalValue(T value)
+        public Optional(T value)
         {
             this.value = value;
             enabled = true;
         }
 
-        public OptionalValue(T value, bool enabled)
+        public Optional(T value, bool enabled)
         {
             this.value = value;
             this.enabled = enabled;

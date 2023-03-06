@@ -1,16 +1,17 @@
 using MobX.Utilities.Inspector;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Assertions;
 using Object = UnityEngine.Object;
 
 namespace MobX.Utilities.Singleton
 {
-    public sealed class SingletonRegistry : ScriptableObject, ISerializationCallbackReceiver
+    public sealed class Singletons : ScriptableObject, ISerializationCallbackReceiver
     {
         #region Data
+
+        public static bool IsLoaded => singleton != null;
 
 #pragma warning disable 414
         private bool _enableEditing;
@@ -38,15 +39,7 @@ namespace MobX.Utilities.Singleton
 
         #region Public
 
-        public static async void Register<T>(T instance) where T : Object
-        {
-            if (await InitializeAsync())
-            {
-                RegisterInternal(instance);
-            }
-        }
-
-        private static void RegisterInternal<T>(T instance) where T : Object
+        public static void Register<T>(T instance) where T : Object
         {
             for (var i = 0; i < Singleton.registry.Count; i++)
             {
@@ -93,76 +86,40 @@ namespace MobX.Utilities.Singleton
 
         #region Singleton
 
-        private static SingletonRegistry singleton;
+        private static Singletons singleton;
 
-        public static SingletonRegistry Singleton
+        public static Singletons Singleton
         {
             [MethodImpl(MethodImplOptions.Synchronized)]
             get
             {
+                // In the editor we load the singleton from the asset database.
+#if UNITY_EDITOR
                 if (singleton == null)
                 {
-#if UNITY_EDITOR
-                    UnityEditor.AssetDatabase.Refresh();
-                    UnityEditor.AssetDatabase.SaveAssets();
-#endif
-                    singleton = Resources.Load<SingletonRegistry>("Singletons");
-                }
+                    var guids = UnityEditor.AssetDatabase.FindAssets($"t:{typeof(Singletons)}");
+                    for (var i = 0; i < guids.Length; i++)
+                    {
+                        var path = UnityEditor.AssetDatabase.GUIDToAssetPath(guids[i]);
+                        singleton = UnityEditor.AssetDatabase.LoadAssetAtPath<Singletons>(path);
+                        if (singleton != null)
+                        {
+                            break;
+                        }
+                    }
 
-                if (singleton == null)
-                {
-#if UNITY_EDITOR
-                    UnityEditor.AssetDatabase.Refresh(UnityEditor.ImportAssetOptions.ForceSynchronousImport);
-                    singleton = UnityEditor.AssetDatabase.LoadAssetAtPath<SingletonRegistry>("Assets/Resources/Singletons.asset");
-#endif
                     Assert.IsNotNull(singleton);
                 }
+#endif
 
                 if (singleton == null)
                 {
-                    Debug.LogError("Singleton", "No singleton registry found! Please create a new registry!");
+                    Debug.LogError("Singleton", "No singleton registry found!");
                 }
 
                 return singleton;
             }
         }
-
-        private static async Task<bool> InitializeAsync()
-        {
-            var attempts = 0;
-            do
-            {
-                if (singleton == null)
-                {
-                    singleton = Resources.Load<SingletonRegistry>("Singletons");
-                }
-
-                if (singleton == null)
-                {
-    #if UNITY_EDITOR
-                    UnityEditor.AssetDatabase.Refresh(UnityEditor.ImportAssetOptions.ForceSynchronousImport);
-                    singleton = UnityEditor.AssetDatabase.LoadAssetAtPath<SingletonRegistry>("Assets/Resources/Singletons.asset");
-    #endif
-                }
-
-                if (singleton != null)
-                {
-                    return true;
-                }
-
-                await Task.Delay(25);
-            }
-            while (attempts++ < 10);
-
-            return false;
-        }
-
-        #endregion
-
-
-        #region Helper
-
-        private static string Key<T>() => typeof(T).FullName!;
 
         #endregion
 

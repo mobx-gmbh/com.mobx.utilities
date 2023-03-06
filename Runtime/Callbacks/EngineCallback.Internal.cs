@@ -8,13 +8,103 @@ namespace MobX.Utilities.Callbacks
     {
         #region Update Callbacks
 
-        private static readonly List<UpdateDelegate> updateDelegates = new(8);
-        private static readonly List<LateUpdateDelegate> lateUpdateDelegates = new(8);
-        private static readonly List<FixedUpdateDelegate> fixedUpdateDelegates = new(8);
+        private const int DefaultCapacity = 16;
 
-        private static readonly List<IOnUpdate> updateCallbacks = new(8);
-        private static readonly List<IOnLateUpdate> lateUpdateCallbacks = new(8);
-        private static readonly List<IOnFixedUpdate> fixedUpdateCallbacks = new(8);
+        private static readonly List<IOnUpdate> updateCallbacks = new(DefaultCapacity);
+        private static readonly List<IOnLateUpdate> lateUpdateCallbacks = new(DefaultCapacity);
+        private static readonly List<IOnFixedUpdate> fixedUpdateCallbacks = new(DefaultCapacity);
+
+        private static readonly List<UpdateDelegate> updateDelegates = new(DefaultCapacity);
+        private static readonly List<LateUpdateDelegate> lateUpdateDelegates = new(DefaultCapacity);
+        private static readonly List<FixedUpdateDelegate> fixedUpdateDelegates = new(DefaultCapacity);
+
+        private static readonly List<IOnBeginPlay> beginPlayCallbacks = new(DefaultCapacity);
+        private static readonly List<IOnEndPlay> endPlayCallbacks = new(DefaultCapacity);
+        private static readonly List<Action> beginPlayDelegates = new(DefaultCapacity);
+        private static readonly List<Action> endPlayDelegates = new(DefaultCapacity);
+
+        private static bool initialized;
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        private static void OnBeforeSceneLoad()
+        {
+#if DEBUG
+            foreach (var listener in beginPlayCallbacks)
+            {
+                try
+                {
+                    listener.OnBeginPlay();
+                }
+                catch (Exception exception)
+                {
+                    UnityEngine.Debug.LogException(exception);
+                }
+            }
+
+            foreach (var listener in beginPlayDelegates)
+            {
+                try
+                {
+                    listener();
+                }
+                catch (Exception exception)
+                {
+                    UnityEngine.Debug.LogException(exception);
+                }
+            }
+#else
+            foreach (var listener in beginPlayCallbacks)
+            {
+                listener.OnBeginPlay();
+            }
+
+            foreach (var listener in beginPlayDelegates)
+            {
+                listener();
+            }
+#endif
+            initialized = true;
+        }
+
+        private static void OnQuit()
+        {
+            initialized = false;
+#if DEBUG
+            foreach (var listener in endPlayCallbacks)
+            {
+                try
+                {
+                    listener.OnEndPlay();
+                }
+                catch (Exception exception)
+                {
+                    UnityEngine.Debug.LogException(exception);
+                }
+            }
+
+            foreach (var listener in endPlayDelegates)
+            {
+                try
+                {
+                    listener();
+                }
+                catch (Exception exception)
+                {
+                    UnityEngine.Debug.LogException(exception);
+                }
+            }
+#else
+            foreach (var listener in endPlayCallbacks)
+            {
+                listener.OnEndPlay();
+            }
+
+            foreach (var listener in endPlayDelegates)
+            {
+                listener();
+            }
+#endif
+        }
 
         private static void OnUpdate()
         {
@@ -142,7 +232,7 @@ namespace MobX.Utilities.Callbacks
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
         private static void SetupUpdateCallbacks()
         {
-            RuntimeCallbacks.Create(OnUpdate, OnLateUpdate, OnFixedUpdate);
+            RuntimeHook.Create(OnUpdate, OnLateUpdate, OnFixedUpdate, OnQuit);
         }
 
         #endregion

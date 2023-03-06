@@ -22,11 +22,22 @@ namespace MobX.Utilities.Callbacks
             {
                 AddFixedUpdateListener(onFixedUpdate);
             }
+
+            if (listener is IOnBeginPlay onBeginPlay)
+            {
+                AddBeginPlayListener(onBeginPlay);
+            }
+
+            if (listener is IOnEndPlay onEndPlay)
+            {
+                AddEndPlayListener(onEndPlay);
+            }
+
 #if UNITY_EDITOR
-            AddOnExitPlayInternal(listener as IOnExitPlay);
-            AddOnEnterPlayInternal(listener as IOnEnterPlay);
-            AddOnExitEditInternal(listener as IOnExitEdit);
-            AddOnEnterEditInternal(listener as IOnEnterEdit);
+            AddOnExitPlayInternal(listener as IOnExitPlayMode);
+            AddOnEnterPlayInternal(listener as IOnEnterPlayMode);
+            AddOnExitEditInternal(listener as IOnExitEditMode);
+            AddOnEnterEditInternal(listener as IOnEnterEditMode);
 #endif
         }
 
@@ -46,38 +57,74 @@ namespace MobX.Utilities.Callbacks
             {
                 RemoveFixedUpdateListener(onFixedUpdate);
             }
+
+            if (listener is IOnBeginPlay onBeginPlay)
+            {
+                RemoveBeginPlayListener(onBeginPlay);
+            }
+
+            if (listener is IOnEndPlay onEndPlay)
+            {
+                RemoveEndPlayListener(onEndPlay);
+            }
+
 #if UNITY_EDITOR
-            RemoveOnExitPlayInternal(listener as IOnExitPlay);
-            RemoveOnEnterPlayInternal(listener as IOnEnterPlay);
-            RemoveOnExitEditInternal(listener as IOnExitEdit);
-            RemoveOnEnterEditInternal(listener as IOnEnterEdit);
+            RemoveOnExitPlayInternal(listener as IOnExitPlayMode);
+            RemoveOnEnterPlayInternal(listener as IOnEnterPlayMode);
+            RemoveOnExitEditInternal(listener as IOnExitEditMode);
+            RemoveOnEnterEditInternal(listener as IOnEnterEditMode);
 #endif
         }
 
         #endregion
 
 
-        #region Add Update Callbacks
+        #region Runtime Callbacks
 
-        public static void AddUpdateListener<T>(T listener) where T : class, IOnUpdate
+        public static void AddBeginPlayListener<T>(T listener) where T : class, IOnBeginPlay
         {
-            updateCallbacks.AddNullChecked(listener);
+            if (initialized)
+            {
+                listener.OnBeginPlay();
+            }
+
+            beginPlayCallbacks.AddUnique(listener, true);
         }
 
-        public static void AddLateUpdateListener<T>(T listener) where T : class, IOnLateUpdate
+        public static void RemoveBeginPlayListener<T>(T listener) where T : class, IOnBeginPlay
         {
-            lateUpdateCallbacks.AddNullChecked(listener);
+            beginPlayCallbacks.Remove(listener);
         }
 
-        public static void AddFixedUpdateListener<T>(T listener) where T : class, IOnFixedUpdate
+        public static void AddEndPlayListener<T>(T listener) where T : class, IOnEndPlay
         {
-            fixedUpdateCallbacks.AddNullChecked(listener);
+            endPlayCallbacks.AddUnique(listener, true);
+        }
+
+        public static void RemoveEndPlayListener<T>(T listener) where T : class, IOnEndPlay
+        {
+            endPlayCallbacks.Remove(listener);
         }
 
         #endregion
 
 
-        #region Remove Update Callbacks
+        #region Update Callbacks
+
+        public static void AddUpdateListener<T>(T listener) where T : class, IOnUpdate
+        {
+            updateCallbacks.AddUnique(listener, true);
+        }
+
+        public static void AddLateUpdateListener<T>(T listener) where T : class, IOnLateUpdate
+        {
+            lateUpdateCallbacks.AddUnique(listener, true);
+        }
+
+        public static void AddFixedUpdateListener<T>(T listener) where T : class, IOnFixedUpdate
+        {
+            fixedUpdateCallbacks.AddUnique(listener, true);
+        }
 
         public static void RemoveUpdateListener<T>(T listener) where T : class, IOnUpdate
         {
@@ -100,7 +147,7 @@ namespace MobX.Utilities.Callbacks
         #region Add State Callbacks
 
         [Conditional("UNITY_EDITOR")]
-        public static void AddExitPlayModeListener<T>(T listener) where T : class, IOnExitPlay
+        public static void AddExitPlayModeListener<T>(T listener) where T : class, IOnExitPlayMode
         {
 #if UNITY_EDITOR
             AddOnExitPlayInternal(listener);
@@ -108,7 +155,7 @@ namespace MobX.Utilities.Callbacks
         }
 
         [Conditional("UNITY_EDITOR")]
-        public static void AddEnterPlayModeListener<T>(T listener) where T : class, IOnEnterPlay
+        public static void AddEnterPlayModeListener<T>(T listener) where T : class, IOnEnterPlayMode
         {
 #if UNITY_EDITOR
             AddOnEnterPlayInternal(listener);
@@ -116,7 +163,7 @@ namespace MobX.Utilities.Callbacks
         }
 
         [Conditional("UNITY_EDITOR")]
-        public static void AddExitEditModeListener<T>(T listener) where T : class, IOnExitEdit
+        public static void AddExitEditModeListener<T>(T listener) where T : class, IOnExitEditMode
         {
 #if UNITY_EDITOR
             AddOnExitEditInternal(listener);
@@ -124,20 +171,15 @@ namespace MobX.Utilities.Callbacks
         }
 
         [Conditional("UNITY_EDITOR")]
-        public static void AddEnterEditModeListener<T>(T listener) where T : class, IOnEnterEdit
+        public static void AddEnterEditModeListener<T>(T listener) where T : class, IOnEnterEditMode
         {
 #if UNITY_EDITOR
             AddOnEnterEditInternal(listener);
 #endif
         }
 
-        #endregion
-
-
-        #region Remove State Callbacks
-
         [Conditional("UNITY_EDITOR")]
-        public static void RemoveExitPlaymodeListener<T>(T listener) where T : class, IOnExitPlay
+        public static void RemoveExitPlaymodeListener<T>(T listener) where T : class, IOnExitPlayMode
         {
 #if UNITY_EDITOR
             RemoveOnExitPlayInternal(listener);
@@ -145,7 +187,7 @@ namespace MobX.Utilities.Callbacks
         }
 
         [Conditional("UNITY_EDITOR")]
-        public static void RemoveEnterPlaymodeListener<T>(T listener) where T : class, IOnEnterPlay
+        public static void RemoveEnterPlaymodeListener<T>(T listener) where T : class, IOnEnterPlayMode
         {
 #if UNITY_EDITOR
             RemoveOnEnterPlayInternal(listener);
@@ -153,7 +195,7 @@ namespace MobX.Utilities.Callbacks
         }
 
         [Conditional("UNITY_EDITOR")]
-        public static void RemoveExitEditModeListener<T>(T listener) where T : class, IOnExitEdit
+        public static void RemoveExitEditModeListener<T>(T listener) where T : class, IOnExitEditMode
         {
 #if UNITY_EDITOR
             RemoveOnExitEditInternal(listener);
@@ -161,7 +203,7 @@ namespace MobX.Utilities.Callbacks
         }
 
         [Conditional("UNITY_EDITOR")]
-        public static void RemoveEnterEditModeListener<T>(T listener) where T : class, IOnEnterEdit
+        public static void RemoveEnterEditModeListener<T>(T listener) where T : class, IOnEnterEditMode
         {
 #if UNITY_EDITOR
             RemoveOnEnterEditInternal(listener);

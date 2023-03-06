@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace MobX.Utilities.Editor.Inspector
 {
-    [CustomPropertyDrawer(typeof(OptionalValue<>))]
+    [CustomPropertyDrawer(typeof(Optional<>))]
     public class OptionalValuePropertyDrawer : UnityEditor.PropertyDrawer
     {
         private readonly GUIContent _whiteSpace = new GUIContent("   ");
