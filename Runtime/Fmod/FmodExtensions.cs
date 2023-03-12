@@ -1,22 +1,21 @@
-using FMOD;
 using FMOD.Studio;
 using FMODUnity;
 using System;
 using System.Runtime.CompilerServices;
 using UnityEngine;
-using Debug = UnityEngine.Debug;
+using STOP_MODE = FMOD.Studio.STOP_MODE;
 
 namespace MobX.Utilities.Fmod
 {
     public static class FmodExtensions
     {
         /// <summary>
-        /// Starts playback if not already playing
+        ///     Starts playback if not already playing
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Play(this EventInstance eventInstance)
         {
-            eventInstance.getPlaybackState(out var state);
+            eventInstance.getPlaybackState(out PLAYBACK_STATE state);
             if (state != PLAYBACK_STATE.PLAYING)
             {
                 eventInstance.start();
@@ -132,6 +131,38 @@ namespace MobX.Utilities.Fmod
             }
             EventInstance eventInstance = RuntimeManager.CreateInstance(eventReference);
             RuntimeManager.AttachInstanceToGameObject(eventInstance, target);
+            return eventInstance;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void StopInstance(this EventInstance eventInstance, STOP_MODE stopMode = STOP_MODE.IMMEDIATE)
+        {
+            if (eventInstance.isValid())
+            {
+                eventInstance.stop(stopMode);
+            }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static EventInstance PlayGlobal(this EventReference eventReference)
+        {
+            EventInstance eventInstance = eventReference.CreateGlobalInstance();
+            if (eventInstance.isValid())
+            {
+                eventInstance.start();
+            }
+            return eventInstance;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static EventInstance CreateGlobalInstance(this EventReference eventReference)
+        {
+            if (eventReference.IsNull)
+            {
+                Debug.LogError("Provided Event Instance for Target was null");
+                return new EventInstance();
+            }
+            EventInstance eventInstance = RuntimeManager.CreateInstance(eventReference);
             return eventInstance;
         }
     }

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Text;
 using UnityEngine;
+using UnityEngine.Pool;
 
 namespace MobX.Utilities
 {
@@ -20,7 +21,7 @@ namespace MobX.Utilities
          */
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool IsNullOrWhiteSpace(this string input)
+        public static bool IsNullOrWhitespace(this string input)
         {
             return string.IsNullOrWhiteSpace(input);
         }
@@ -184,7 +185,7 @@ namespace MobX.Utilities
 
             target = target.Replace('_', ' ');
 
-            var chars = UnityEngine.Pool.ListPool<char>.Get();
+            List<char> chars = ListPool<char>.Get();
 
             for (var i = 0; i < target.Length; i++)
             {
@@ -211,7 +212,7 @@ namespace MobX.Utilities
             }
 
             var array = chars.ToArray();
-            UnityEngine.Pool.ListPool<char>.Release(chars);
+            ListPool<char>.Release(chars);
             return new string(array).ReduceWhitespace();
 
             // nested methods
@@ -234,7 +235,7 @@ namespace MobX.Utilities
 
         public static string ReduceWhitespace(this string value)
         {
-            var sb = ConcurrentStringBuilderPool.Get();
+            StringBuilder sb = ConcurrentStringBuilderPool.Get();
             var previousIsWhitespaceFlag = false;
             for (var i = 0; i < value.Length; i++)
             {
@@ -274,7 +275,7 @@ namespace MobX.Utilities
 
         public static string CombineToString(this IEnumerable<string> enumerable, string separator = " ")
         {
-            var stringBuilder = ConcurrentStringBuilderPool.Get();
+            StringBuilder stringBuilder = ConcurrentStringBuilderPool.Get();
             foreach (var argument in enumerable)
             {
                 stringBuilder.Append(argument);
@@ -286,7 +287,7 @@ namespace MobX.Utilities
 
         public static string[] RemoveNullOrWhiteSpace(this IEnumerable<string> enumerable, char separator = ' ')
         {
-            var list = ConcurrentListPool<string>.Get();
+            List<string> list = ConcurrentListPool<string>.Get();
 
             foreach (var value in enumerable)
             {

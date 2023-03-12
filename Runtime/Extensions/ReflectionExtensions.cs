@@ -6,6 +6,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
+using System.Text;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.Pool;
@@ -30,11 +31,11 @@ namespace MobX.Utilities
                 return Array.Empty<string>();
             }
 
-            var list = ListPool<string>.Get();
+            List<string> list = ListPool<string>.Get();
 
             if (target is GameObject gameObject)
             {
-                var components = gameObject.GetComponents<MonoBehaviour>();
+                MonoBehaviour[] components = gameObject.GetComponents<MonoBehaviour>();
                 for (var i = 0; i < components.Length; i++)
                 {
                     list.AddRange(GetNamesOfGenericInterfaceSubtypesInObject<TInterface>(components[i]));
@@ -46,7 +47,7 @@ namespace MobX.Utilities
             }
             else
             {
-                var interfaces = target.GetType().GetInterfaces();
+                Type[] interfaces = target.GetType().GetInterfaces();
                 for (var i = 0; i < interfaces.Length; i++)
                 {
                     if (interfaces[i].HasInterfaceWithGenericTypeDefinition(typeof(TInterface)))
@@ -119,8 +120,8 @@ namespace MobX.Utilities
         #region Set Value
 
         private const BindingFlags INTERFACE_FLAGS = BindingFlags.Static | BindingFlags.Public |
-                                                     BindingFlags.NonPublic | BindingFlags.DeclaredOnly |
-                                                     BindingFlags.FlattenHierarchy;
+            BindingFlags.NonPublic | BindingFlags.DeclaredOnly |
+            BindingFlags.FlattenHierarchy;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void SetInterfacePropertyValue(this Type type, string propertyName, object value,
@@ -128,14 +129,14 @@ namespace MobX.Utilities
         {
             Assert.IsTrue(type.IsInterface);
 
-            var property = type.GetProperty(propertyName, flags);
+            PropertyInfo property = type.GetProperty(propertyName, flags);
             if (property != null)
             {
                 property.SetValue(target, value);
                 return;
             }
 
-            var interfaces = type.GetInterfaces();
+            Type[] interfaces = type.GetInterfaces();
             for (var i = 0; i < interfaces.Length; i++)
             {
                 property = interfaces[i].GetProperty(propertyName, flags);
@@ -157,13 +158,16 @@ namespace MobX.Utilities
         {
             if (field.IsLiteral)
             {
-                return (target) => (TResult) field.GetValue(target);
+                return target => (TResult)field.GetValue(target);
                 ;
             }
 
             var methodName = $"{field!.ReflectedType!.FullName}.get_{field.Name}";
-            var setterMethod = new DynamicMethod(methodName, typeof(TResult), new[] {typeof(TTarget)}, true);
-            var gen = setterMethod.GetILGenerator();
+            var setterMethod = new DynamicMethod(methodName, typeof(TResult), new[]
+            {
+                typeof(TTarget)
+            }, true);
+            ILGenerator gen = setterMethod.GetILGenerator();
             if (field.IsStatic)
             {
                 gen.Emit(OpCodes.Ldsfld, field);
@@ -175,14 +179,17 @@ namespace MobX.Utilities
             }
 
             gen.Emit(OpCodes.Ret);
-            return (Func<TTarget, TResult>) setterMethod.CreateDelegate(typeof(Func<TTarget, TResult>));
+            return (Func<TTarget, TResult>)setterMethod.CreateDelegate(typeof(Func<TTarget, TResult>));
         }
 
         public static Action<TTarget, TValue> CreateSetter<TTarget, TValue>(this FieldInfo field)
         {
             var methodName = $"{field!.ReflectedType!.FullName}.set_{field.Name}";
-            var setterMethod = new DynamicMethod(methodName, null, new[] {typeof(TTarget), typeof(TValue)}, true);
-            var gen = setterMethod.GetILGenerator();
+            var setterMethod = new DynamicMethod(methodName, null, new[]
+            {
+                typeof(TTarget), typeof(TValue)
+            }, true);
+            ILGenerator gen = setterMethod.GetILGenerator();
             if (field.IsStatic)
             {
                 gen.Emit(OpCodes.Ldarg_1);
@@ -196,7 +203,7 @@ namespace MobX.Utilities
             }
 
             gen.Emit(OpCodes.Ret);
-            return (Action<TTarget, TValue>) setterMethod.CreateDelegate(typeof(Action<TTarget, TValue>));
+            return (Action<TTarget, TValue>)setterMethod.CreateDelegate(typeof(Action<TTarget, TValue>));
         }
 #else
         public static Func<TTarget, TResult> CreateGetter<TTarget, TResult>(this FieldInfo field)
@@ -212,7 +219,7 @@ namespace MobX.Utilities
 
         public static Func<TResult> CreateStaticGetter<TResult>(this FieldInfo field)
         {
-            return () => (TResult) field.GetValue(null);
+            return () => (TResult)field.GetValue(null);
         }
 
         #endregion
@@ -221,7 +228,7 @@ namespace MobX.Utilities
         #region MemberInfo Casting
 
         private const BindingFlags EVENT_FLAGS = BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Instance |
-                                                 BindingFlags.Public | BindingFlags.FlattenHierarchy;
+            BindingFlags.Public | BindingFlags.FlattenHierarchy;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static FieldInfo AsFieldInfo(this EventInfo eventInfo)
@@ -240,7 +247,7 @@ namespace MobX.Utilities
 
             var isVoid = methodInfo.ReturnType == typeof(void);
             var isStatic = methodInfo.IsStatic;
-            var types = methodInfo.GetParameters().Select(p => p.ParameterType);
+            IEnumerable<Type> types = methodInfo.GetParameters().Select(p => p.ParameterType);
 
             if (isVoid)
             {
@@ -249,7 +256,10 @@ namespace MobX.Utilities
             else
             {
                 getType = Expression.GetFuncType;
-                types = types.Concat(new[] {methodInfo.ReturnType});
+                types = types.Concat(new[]
+                {
+                    methodInfo.ReturnType
+                });
             }
 
             return isStatic
@@ -262,7 +272,7 @@ namespace MobX.Utilities
             Func<Type[], Type> getType;
 
             var isVoid = methodInfo.ReturnType == typeof(void);
-            var types = methodInfo.GetParameters().Select(p => p.ParameterType);
+            IEnumerable<Type> types = methodInfo.GetParameters().Select(p => p.ParameterType);
 
             if (isVoid)
             {
@@ -271,7 +281,10 @@ namespace MobX.Utilities
             else
             {
                 getType = Expression.GetFuncType;
-                types = types.Concat(new[] {methodInfo.ReturnType});
+                types = types.Concat(new[]
+                {
+                    methodInfo.ReturnType
+                });
             }
 
             return Delegate.CreateDelegate(getType(types.ToArray()), methodInfo);
@@ -293,8 +306,8 @@ namespace MobX.Utilities
                 return null;
             }
 
-            var gts = propertyInfo.DeclaringType?.GetGenericArguments();
-            var accessor = propertyInfo.GetGetMethod(true);
+            Type[] gts = propertyInfo.DeclaringType?.GetGenericArguments();
+            MethodInfo accessor = propertyInfo.GetGetMethod(true);
             var msilBytes = accessor?.GetMethodBody()?.GetILAsByteArray();
             var rtk = null != msilBytes
                 ? accessor.IsStatic
@@ -314,7 +327,7 @@ namespace MobX.Utilities
                 {
                     if (wtk == rtk)
                     {
-                        var wfi = propertyInfo.Module.ResolveField(wtk, gts, null);
+                        FieldInfo wfi = propertyInfo.Module.ResolveField(wtk, gts, null);
                         if (!strictCheckIsAutoProperty || null == wfi ||
                             StrictCheckIsAutoPropertyBackingField(propertyInfo, wfi))
                         {
@@ -331,7 +344,7 @@ namespace MobX.Utilities
                 return null;
             }
 
-            var rfi = propertyInfo.Module.ResolveField(rtk, gts, null);
+            FieldInfo rfi = propertyInfo.Module.ResolveField(rtk, gts, null);
             return !strictCheckIsAutoProperty || null == rfi || StrictCheckIsAutoPropertyBackingField(propertyInfo, rfi)
                 ? rfi
                 : null;
@@ -377,9 +390,9 @@ namespace MobX.Utilities
         private static int GetAutoPropertyBakingFieldMetadataTokenInSetMethodOfInstance(byte[] msilBytes)
         {
             return 8 == msilBytes.Length && 0x02 == msilBytes[0] && 0x03 == msilBytes[1] && 0x7D == msilBytes[2] &&
-                   0x2A == msilBytes[7]
-                ? BitConverter.ToInt32(msilBytes, 3)
-                : -1;
+                0x2A == msilBytes[7]
+                    ? BitConverter.ToInt32(msilBytes, 3)
+                    : -1;
         }
 #endif
 
@@ -389,7 +402,9 @@ namespace MobX.Utilities
         #region Underlying & Collection Types
 
         public static Type GetUnderlying(this Type nullableType)
-            => Nullable.GetUnderlyingType(nullableType) ?? nullableType;
+        {
+            return Nullable.GetUnderlyingType(nullableType) ?? nullableType;
+        }
 
         public static Type GetEnumerableType(this Type type)
         {
@@ -403,7 +418,7 @@ namespace MobX.Utilities
                 return type.GetGenericArguments()[0];
             }
 
-            var face = (from i in type.GetInterfaces()
+            Type face = (from i in type.GetInterfaces()
                 where i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IEnumerable<>)
                 select i).FirstOrDefault();
 
@@ -420,11 +435,11 @@ namespace MobX.Utilities
             switch (member.MemberType)
             {
                 case MemberTypes.Field:
-                    return ((FieldInfo) member).FieldType;
+                    return ((FieldInfo)member).FieldType;
                 case MemberTypes.Property:
-                    return ((PropertyInfo) member).PropertyType;
+                    return ((PropertyInfo)member).PropertyType;
                 case MemberTypes.Event:
-                    return ((EventInfo) member).EventHandlerType;
+                    return ((EventInfo)member).EventHandlerType;
                 default:
                     throw new ArgumentException("MemberInfo must be if type FieldInfo, PropertyInfo or EventInfo",
                         nameof(member));
@@ -434,7 +449,7 @@ namespace MobX.Utilities
         public static bool IsStatic(this PropertyInfo propertyInfo)
         {
             return propertyInfo?.GetMethod?.IsStatic ??
-                   propertyInfo?.SetMethod?.IsStatic ?? throw new InvalidProgramException();
+                propertyInfo?.SetMethod?.IsStatic ?? throw new InvalidProgramException();
         }
 
         public static bool IsStatic(this EventInfo eventInfo)
@@ -470,19 +485,19 @@ namespace MobX.Utilities
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static string GetSignatureString<TDelegate>(this TDelegate target) where TDelegate : Delegate
         {
-            var method = target?.Method ?? typeof(TDelegate).GetInvokeMethod();
+            MethodInfo method = target?.Method ?? typeof(TDelegate).GetInvokeMethod();
             return method.GetSignatureString();
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static string GetEventSignatureString(this EventInfo eventInfo)
         {
-            var eventType = eventInfo.EventHandlerType;
-            var methodInfo = eventType.GetInvokeMethod();
-            var parameters = methodInfo.GetParameters();
+            Type eventType = eventInfo.EventHandlerType;
+            MethodInfo methodInfo = eventType.GetInvokeMethod();
+            ParameterInfo[] parameters = methodInfo.GetParameters();
             var isGeneric = eventType.IsGenericType;
 
-            var sb = ConcurrentStringBuilderPool.Get();
+            StringBuilder sb = ConcurrentStringBuilderPool.Get();
             sb.Append(eventType.GetNameWithoutGenericArity());
 
             if (eventType.IsGenericType)
@@ -496,7 +511,7 @@ namespace MobX.Utilities
 
             for (var i = 0; i < parameters.Length; i++)
             {
-                var parameterInfo = parameters[i];
+                ParameterInfo parameterInfo = parameters[i];
                 sb.Append(parameterInfo.ParameterType.HumanizedName());
                 if (!isGeneric)
                 {
@@ -522,9 +537,9 @@ namespace MobX.Utilities
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static string GetSignatureString(this MethodInfo methodInfo)
         {
-            var parameters = methodInfo.GetParameters();
+            ParameterInfo[] parameters = methodInfo.GetParameters();
 
-            var stringBuilder = StringBuilderPool.Get();
+            StringBuilder stringBuilder = StringBuilderPool.Get();
 
             stringBuilder.Append(methodInfo.ReturnType.Name);
 
@@ -567,12 +582,12 @@ namespace MobX.Utilities
 
             if (type.IsGenericType)
             {
-                var builder = ConcurrentStringBuilderPool.Get();
-                var argBuilder = ConcurrentStringBuilderPool.Get();
+                StringBuilder builder = ConcurrentStringBuilderPool.Get();
+                StringBuilder argBuilder = ConcurrentStringBuilderPool.Get();
 
-                var arguments = type.GetGenericArguments();
+                Type[] arguments = type.GetGenericArguments();
 
-                foreach (var t in arguments)
+                foreach (Type t in arguments)
                 {
                     // Let's make sure we get the argument list.
                     var arg = ToReadableTypeStringFullName(t);
@@ -626,12 +641,12 @@ namespace MobX.Utilities
 
             if (type.IsGenericType)
             {
-                var builder = ConcurrentStringBuilderPool.Get();
-                var argBuilder = ConcurrentStringBuilderPool.Get();
+                StringBuilder builder = ConcurrentStringBuilderPool.Get();
+                StringBuilder argBuilder = ConcurrentStringBuilderPool.Get();
 
-                var arguments = type.GetGenericArguments();
+                Type[] arguments = type.GetGenericArguments();
 
-                foreach (var typeArg in arguments)
+                foreach (Type typeArg in arguments)
                 {
                     // Let's make sure we get the argument list.
                     var arg = ToAccessibleTypeStringFullName(typeArg);
@@ -685,12 +700,12 @@ namespace MobX.Utilities
 
             if (type.IsGenericType)
             {
-                var builder = ConcurrentStringBuilderPool.Get();
-                var argBuilder = ConcurrentStringBuilderPool.Get();
+                StringBuilder builder = ConcurrentStringBuilderPool.Get();
+                StringBuilder argBuilder = ConcurrentStringBuilderPool.Get();
 
-                var arguments = type.GetGenericArguments();
+                Type[] arguments = type.GetGenericArguments();
 
-                foreach (var t in arguments)
+                foreach (Type t in arguments)
                 {
                     var arg = HumanizedName(t);
 
@@ -814,7 +829,7 @@ namespace MobX.Utilities
 
         public static Type[] GetBaseTypes(this Type type, bool includeThis, bool includeInterfaces = false)
         {
-            var temp = ConcurrentListPool<Type>.Get();
+            List<Type> temp = ConcurrentListPool<Type>.Get();
 
             if (includeThis)
             {
@@ -836,14 +851,14 @@ namespace MobX.Utilities
                 }
             }
 
-            var array = temp.ToArray();
+            Type[] array = temp.ToArray();
             ConcurrentListPool<Type>.Release(temp);
             return array;
         }
 
         public static Type[] GetDeclaringTypes(this Type type, bool includeThis)
         {
-            var temp = ConcurrentListPool<Type>.Get();
+            List<Type> temp = ConcurrentListPool<Type>.Get();
 
             if (includeThis)
             {
@@ -856,14 +871,14 @@ namespace MobX.Utilities
                 type = type.DeclaringType;
             }
 
-            var array = temp.ToArray();
+            Type[] array = temp.ToArray();
             ConcurrentListPool<Type>.Release(temp);
             return array;
         }
 
         public static Type[] GetBaseTypesExcludeUnityTypes(this Type type, bool includeThis)
         {
-            var temp = ConcurrentListPool<Type>.Get();
+            List<Type> temp = ConcurrentListPool<Type>.Get();
 
             if (includeThis)
             {
@@ -881,7 +896,7 @@ namespace MobX.Utilities
                 type = type.BaseType;
             }
 
-            var array = temp.ToArray();
+            Type[] array = temp.ToArray();
             ConcurrentListPool<Type>.Release(temp);
             return array;
         }
@@ -898,8 +913,8 @@ namespace MobX.Utilities
         public static void SetMemberValue<TValue>(string memberName, Type type, object target, BindingFlags flags,
             TValue value)
         {
-            if (memberCache.TryGetValue(type, out var dictionary) &&
-                dictionary.TryGetValue(memberName, out var memberInfo))
+            if (memberCache.TryGetValue(type, out Dictionary<string, MemberInfo> dictionary) &&
+                dictionary.TryGetValue(memberName, out MemberInfo memberInfo))
             {
                 switch (memberInfo)
                 {
@@ -910,12 +925,15 @@ namespace MobX.Utilities
                         pi.SetValue(target, value);
                         break;
                     case MethodInfo mi:
-                        mi.Invoke(target, new object[] {value});
+                        mi.Invoke(target, new object[]
+                        {
+                            value
+                        });
                         break;
                 }
             }
 
-            var fieldInfo = type.GetFieldIncludeBaseTypes(memberName, flags);
+            FieldInfo fieldInfo = type.GetFieldIncludeBaseTypes(memberName, flags);
             if (fieldInfo != null)
             {
                 Cache(fieldInfo);
@@ -923,20 +941,22 @@ namespace MobX.Utilities
                 return;
             }
 
-            var methodInfo = type.GetMethodIncludeBaseTypes(memberName, flags);
+            MethodInfo methodInfo = type.GetMethodIncludeBaseTypes(memberName, flags);
             if (methodInfo != null)
             {
                 Cache(methodInfo);
-                methodInfo.Invoke(target, new object[] {value});
+                methodInfo.Invoke(target, new object[]
+                {
+                    value
+                });
                 return;
             }
 
-            var propertyInfo = type.GetPropertyIncludeBaseTypes(memberName, flags);
+            PropertyInfo propertyInfo = type.GetPropertyIncludeBaseTypes(memberName, flags);
             if (propertyInfo != null)
             {
                 Cache(propertyInfo);
                 propertyInfo.SetValue(target, value);
-                return;
             }
 
             void Cache(MemberInfo member)
@@ -947,7 +967,12 @@ namespace MobX.Utilities
                 }
                 else
                 {
-                    memberCache.Add(type, new Dictionary<string, MemberInfo>() {{memberName, member}});
+                    memberCache.Add(type, new Dictionary<string, MemberInfo>
+                    {
+                        {
+                            memberName, member
+                        }
+                    });
                 }
             }
         }
@@ -959,22 +984,22 @@ namespace MobX.Utilities
 
         public static Func<object> CreateGetDelegateForMember(this object target, string memberName,
             BindingFlags flags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance |
-                                 BindingFlags.Static)
+                BindingFlags.Static)
         {
-            var type = target.GetType();
-            var fieldInfo = type.GetFieldIncludeBaseTypes(memberName, flags);
+            Type type = target.GetType();
+            FieldInfo fieldInfo = type.GetFieldIncludeBaseTypes(memberName, flags);
             if (fieldInfo != null)
             {
                 return () => fieldInfo.GetValue(target);
             }
 
-            var methodInfo = type.GetMethodIncludeBaseTypes(memberName, flags);
+            MethodInfo methodInfo = type.GetMethodIncludeBaseTypes(memberName, flags);
             if (methodInfo != null)
             {
                 return () => methodInfo.Invoke(target, null);
             }
 
-            var propertyInfo = type.GetPropertyIncludeBaseTypes(memberName, flags);
+            PropertyInfo propertyInfo = type.GetPropertyIncludeBaseTypes(memberName, flags);
             if (propertyInfo != null)
             {
                 return () => propertyInfo.GetValue(target);
@@ -985,8 +1010,8 @@ namespace MobX.Utilities
 
         public static object GetMemberValue(string memberName, Type type, object target, BindingFlags flags)
         {
-            if (memberCache.TryGetValue(type, out var dictionary) &&
-                dictionary.TryGetValue(memberName, out var memberInfo))
+            if (memberCache.TryGetValue(type, out Dictionary<string, MemberInfo> dictionary) &&
+                dictionary.TryGetValue(memberName, out MemberInfo memberInfo))
             {
                 switch (memberInfo)
                 {
@@ -996,21 +1021,21 @@ namespace MobX.Utilities
                 }
             }
 
-            var fieldInfo = type.GetFieldIncludeBaseTypes(memberName, flags);
+            FieldInfo fieldInfo = type.GetFieldIncludeBaseTypes(memberName, flags);
             if (fieldInfo != null)
             {
                 Cache(fieldInfo);
                 return fieldInfo.GetValue(target);
             }
 
-            var methodInfo = type.GetMethodIncludeBaseTypes(memberName, flags);
+            MethodInfo methodInfo = type.GetMethodIncludeBaseTypes(memberName, flags);
             if (methodInfo != null)
             {
                 Cache(methodInfo);
                 return methodInfo.Invoke(target, Array.Empty<object>());
             }
 
-            var propertyInfo = type.GetPropertyIncludeBaseTypes(memberName, flags);
+            PropertyInfo propertyInfo = type.GetPropertyIncludeBaseTypes(memberName, flags);
             if (propertyInfo != null)
             {
                 Cache(propertyInfo);
@@ -1025,7 +1050,12 @@ namespace MobX.Utilities
                 }
                 else
                 {
-                    memberCache.Add(type, new Dictionary<string, MemberInfo>() {{memberName, member}});
+                    memberCache.Add(type, new Dictionary<string, MemberInfo>
+                    {
+                        {
+                            memberName, member
+                        }
+                    });
                 }
             }
 
@@ -1040,7 +1070,7 @@ namespace MobX.Utilities
             BindingFlags.FlattenHierarchy)
         {
             FieldInfo fieldInfo = null;
-            var targetType = type;
+            Type targetType = type;
 
             while (fieldInfo == null)
             {
@@ -1064,7 +1094,7 @@ namespace MobX.Utilities
             BindingFlags.FlattenHierarchy)
         {
             PropertyInfo propertyInfo = null;
-            var targetType = type;
+            Type targetType = type;
 
             while (propertyInfo == null)
             {
@@ -1080,10 +1110,15 @@ namespace MobX.Utilities
             return propertyInfo;
         }
 
-        public static MethodInfo GetMethodIncludeBaseTypes(this Type type, string methodName, BindingFlags flags)
+        public static MethodInfo GetMethodIncludeBaseTypes(this Type type, string methodName, BindingFlags flags =
+            BindingFlags.Static |
+            BindingFlags.NonPublic |
+            BindingFlags.Instance |
+            BindingFlags.Public |
+            BindingFlags.FlattenHierarchy)
         {
             MethodInfo methodInfo = null;
-            var targetType = type;
+            Type targetType = type;
 
             var value = 0;
             while (methodInfo == null)
@@ -1103,7 +1138,7 @@ namespace MobX.Utilities
         public static EventInfo GetEventIncludeBaseTypes(this Type type, string eventName, BindingFlags flags)
         {
             EventInfo eventInfo = null;
-            var targetType = type;
+            Type targetType = type;
 
             while (eventInfo == null)
             {
@@ -1125,9 +1160,9 @@ namespace MobX.Utilities
 
         public static FieldInfo[] GetFieldsIncludeBaseTypes(this Type type, BindingFlags flags)
         {
-            var fieldInfos = ConcurrentListPool<FieldInfo>.Get();
-            var typesToCheck = ConcurrentListPool<Type>.Get();
-            var targetType = type;
+            List<FieldInfo> fieldInfos = ConcurrentListPool<FieldInfo>.Get();
+            List<Type> typesToCheck = ConcurrentListPool<Type>.Get();
+            Type targetType = type;
 
             while (targetType.EqualsNone(typeof(MonoBehaviour), typeof(ScriptableObject), typeof(object)))
             {
@@ -1140,7 +1175,7 @@ namespace MobX.Utilities
                 fieldInfos.AddRange(typesToCheck[i].GetFields(flags));
             }
 
-            var array = fieldInfos.ToArray();
+            FieldInfo[] array = fieldInfos.ToArray();
             ConcurrentListPool<Type>.Release(typesToCheck);
             ConcurrentListPool<FieldInfo>.Release(fieldInfos);
             return array;
@@ -1148,9 +1183,9 @@ namespace MobX.Utilities
 
         public static PropertyInfo[] GetPropertiesIncludeBaseTypes(this Type type, BindingFlags flags)
         {
-            var propertyInfos = ConcurrentListPool<PropertyInfo>.Get();
-            var typesToCheck = ConcurrentListPool<Type>.Get();
-            var targetType = type;
+            List<PropertyInfo> propertyInfos = ConcurrentListPool<PropertyInfo>.Get();
+            List<Type> typesToCheck = ConcurrentListPool<Type>.Get();
+            Type targetType = type;
 
             while (targetType.EqualsNone(typeof(MonoBehaviour), typeof(ScriptableObject), typeof(object)))
             {
@@ -1163,7 +1198,7 @@ namespace MobX.Utilities
                 propertyInfos.AddRange(typesToCheck[i].GetProperties(flags));
             }
 
-            var array = propertyInfos.ToArray();
+            PropertyInfo[] array = propertyInfos.ToArray();
             ConcurrentListPool<Type>.Release(typesToCheck);
             ConcurrentListPool<PropertyInfo>.Release(propertyInfos);
             return array;
@@ -1171,9 +1206,9 @@ namespace MobX.Utilities
 
         public static MethodInfo[] GetMethodsIncludeBaseTypes(this Type type, BindingFlags flags)
         {
-            var methodInfos = ConcurrentListPool<MethodInfo>.Get();
-            var typesToCheck = ConcurrentListPool<Type>.Get();
-            var targetType = type;
+            List<MethodInfo> methodInfos = ConcurrentListPool<MethodInfo>.Get();
+            List<Type> typesToCheck = ConcurrentListPool<Type>.Get();
+            Type targetType = type;
 
             while (targetType.EqualsNone(typeof(MonoBehaviour), typeof(ScriptableObject), typeof(object)))
             {
@@ -1186,7 +1221,7 @@ namespace MobX.Utilities
                 methodInfos.AddRange(typesToCheck[i].GetMethods(flags));
             }
 
-            var array = methodInfos.ToArray();
+            MethodInfo[] array = methodInfos.ToArray();
             ConcurrentListPool<Type>.Release(typesToCheck);
             ConcurrentListPool<MethodInfo>.Release(methodInfos);
             return array;
@@ -1194,9 +1229,9 @@ namespace MobX.Utilities
 
         public static MemberInfo[] GetMembersIncludeBaseTypes(this Type type, BindingFlags flags)
         {
-            var memberInfos = ConcurrentListPool<MemberInfo>.Get();
-            var typesToCheck = ConcurrentListPool<Type>.Get();
-            var targetType = type;
+            List<MemberInfo> memberInfos = ConcurrentListPool<MemberInfo>.Get();
+            List<Type> typesToCheck = ConcurrentListPool<Type>.Get();
+            Type targetType = type;
 
             while (targetType.EqualsNone(typeof(MonoBehaviour), typeof(ScriptableObject), typeof(object)))
             {
@@ -1209,7 +1244,7 @@ namespace MobX.Utilities
                 memberInfos.AddRange(typesToCheck[i].GetMembers(flags));
             }
 
-            var array = memberInfos.ToArray();
+            MemberInfo[] array = memberInfos.ToArray();
             ConcurrentListPool<Type>.Release(typesToCheck);
             ConcurrentListPool<MemberInfo>.Release(memberInfos);
             return array;

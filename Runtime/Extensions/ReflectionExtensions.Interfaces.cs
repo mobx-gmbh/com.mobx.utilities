@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityEngine.Pool;
+using Object = UnityEngine.Object;
 
 namespace MobX.Utilities
 {
@@ -10,7 +12,7 @@ namespace MobX.Utilities
     {
         [Pure]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static string[] GetNamesOfGenericInterfaceSubtypesInObject(this UnityEngine.Object target,
+        public static string[] GetNamesOfGenericInterfaceSubtypesInObject(this Object target,
             Type interfaceType)
         {
             if (!interfaceType.IsGenericType)
@@ -23,11 +25,11 @@ namespace MobX.Utilities
                 return Array.Empty<string>();
             }
 
-            var cache = ListPool<string>.Get();
+            List<string> cache = ListPool<string>.Get();
 
             if (target is GameObject gameObject)
             {
-                var components = gameObject.GetComponents<MonoBehaviour>();
+                MonoBehaviour[] components = gameObject.GetComponents<MonoBehaviour>();
                 for (var i = 0; i < components.Length; i++)
                 {
                     cache.AddRange(GetNamesOfGenericInterfaceSubtypesInObject(components[i], interfaceType));
@@ -35,10 +37,9 @@ namespace MobX.Utilities
             }
             else
             {
-                var interfaces = target.GetType().GetInterfaces();
+                Type[] interfaces = target.GetType().GetInterfaces();
                 for (var i = 0; i < interfaces.Length; i++)
                 {
-                    //TODO: make this an option in settings
                     if (interfaces[i].IsGenericType)
                     {
                         continue;

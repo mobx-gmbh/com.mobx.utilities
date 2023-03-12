@@ -1,5 +1,6 @@
 using System;
 using System.Runtime.CompilerServices;
+using Unity.Mathematics;
 using UnityEngine;
 
 namespace MobX.Utilities
@@ -41,13 +42,61 @@ namespace MobX.Utilities
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsBinarySequenceExcludeZero(this int n)
         {
-            return n > 0 && (n & (n - 1)) == 0;
+            return n > 0 && (n & n - 1) == 0;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsBinarySequence(this int n)
         {
-            return (n & (n - 1)) == 0;
+            return (n & n - 1) == 0;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static float CheckNan(this float value, float fallback)
+        {
+            return float.IsNaN(value) ? fallback : value;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static float Clamp(this float value, float min, float max)
+        {
+            return Mathf.Clamp(value, min, max);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static int WithMaxLimit(this int value, int limit)
+        {
+            return Mathf.Min(value, limit);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static float WithMaxLimit(this float value, float limit)
+        {
+            return Mathf.Min(value, limit);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static int WithMinLimit(this int value, int min)
+        {
+            return Mathf.Max(value, min);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static float WithMinLimit(this float value, float min)
+        {
+            return Mathf.Max(value, min);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static int CeilToInt(this float value)
+        {
+            return Mathf.CeilToInt(value);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static int FloorToInt(this float value)
+        {
+            return Mathf.FloorToInt(value);
         }
 
         #endregion
@@ -117,13 +166,23 @@ namespace MobX.Utilities
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int SecondsToMilliseconds(this float seconds)
         {
-            return (int) (seconds * 1000);
+            return (int)(seconds * 1000);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int SecondsToMilliseconds(this int seconds)
         {
             return seconds * 1000;
+        }
+
+        #endregion
+
+
+        #region Conversion
+
+        public static float3 ToFloat3(this Vector3 vector3)
+        {
+            return new float3(vector3.x, vector3.y, vector3.z);
         }
 
         #endregion

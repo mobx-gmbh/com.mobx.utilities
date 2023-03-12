@@ -1,6 +1,8 @@
+using System;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace MobX.Utilities
 {
@@ -133,6 +135,13 @@ namespace MobX.Utilities
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool TryGetComponents(this GameObject gameObject, Type componentType, out Component[] components)
+        {
+            components = gameObject.GetComponents(componentType);
+            return components.IsNotNullOrEmpty();
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool TryGetComponentInChildren<T>(this Component target, out T component, bool includeInactive = false) where T : Component
         {
             component = target.GetComponentInChildren<T>(includeInactive);
@@ -143,6 +152,12 @@ namespace MobX.Utilities
         public static T GetOrCreateComponent<T>(this Component target) where T : Component
         {
             return target.gameObject.GetOrCreateComponent<T>();
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Transform GetParent<TComponent>(this TComponent component) where TComponent : Component
+        {
+            return component.transform.parent;
         }
 
         #endregion
@@ -170,7 +185,7 @@ namespace MobX.Utilities
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static T GetOrCreateComponent<T>(this GameObject target) where T : Component
         {
-            if (!target.TryGetComponent<T>(out var component))
+            if (!target.TryGetComponent(out T component))
             {
                 component = target.AddComponent<T>();
             }

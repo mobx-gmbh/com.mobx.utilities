@@ -130,7 +130,7 @@ namespace MobX.Utilities.Editor.Inspector
 
         public override void OnInspectorGUI()
         {
-            if (_useDefaultInspector)
+            if (_useDefaultInspector || targets.Length >= 2)
             {
                 base.OnInspectorGUI();
                 return;

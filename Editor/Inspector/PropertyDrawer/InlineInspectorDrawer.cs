@@ -1,22 +1,21 @@
 ﻿using MobX.Utilities.Inspector;
 using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
 
 namespace MobX.Utilities.Editor.Inspector
 {
-    [CustomPropertyDrawer(typeof(InlineInspectorAttribute))]
-    internal class InlineInspectorDrawer : UnityEditor.PropertyDrawer
+    [UnityEditor.CustomPropertyDrawer(typeof(InlineInspectorAttribute))]
+    class InlineInspectorDrawer : UnityEditor.PropertyDrawer
     {
         private UnityEditor.Editor _inspector;
         private InlineInspectorAttribute _inspectorAttribute;
         private string _key;
 
-        private static readonly Dictionary<Object, FoldoutHandler> foldoutHandlers = new();
+        private static readonly Dictionary<Object, FoldoutHandler> foldoutHandlers = new Dictionary<Object, FoldoutHandler>();
 
         private FoldoutHandler Foldout(Object target)
         {
-            if (foldoutHandlers.TryGetValue(target, out var handler))
+            if (foldoutHandlers.TryGetValue(target, out FoldoutHandler handler))
             {
                 return handler;
             }
@@ -26,11 +25,11 @@ namespace MobX.Utilities.Editor.Inspector
             return handler;
         }
 
-        public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
+        public override void OnGUI(Rect position, UnityEditor.SerializedProperty property, GUIContent label)
         {
-            EditorGUI.PropertyField(position, property, label);
+            UnityEditor.EditorGUI.PropertyField(position, property, label);
 
-            if (property.propertyType != SerializedPropertyType.ObjectReference)
+            if (property.propertyType != UnityEditor.SerializedPropertyType.ObjectReference)
             {
                 return;
             }
@@ -46,15 +45,14 @@ namespace MobX.Utilities.Editor.Inspector
                 return;
             }
 
-            _inspectorAttribute ??= (InlineInspectorAttribute) attribute;
-            FoldoutHandler.BeginStyleOverride(FoldoutStyle.DarkGradient);
+            _inspectorAttribute ??= (InlineInspectorAttribute)attribute;
             GetOrCreateInspector(property).OnInspectorGUI();
             FoldoutHandler.EndStyleOverride();
         }
 
-        private UnityEditor.Editor GetOrCreateInspector(SerializedProperty property)
+        private UnityEditor.Editor GetOrCreateInspector(UnityEditor.SerializedProperty property)
         {
-            _inspectorAttribute ??= (InlineInspectorAttribute) attribute;
+            _inspectorAttribute ??= (InlineInspectorAttribute)attribute;
 
             if (_inspector && _inspector.target != property.objectReferenceValue)
             {

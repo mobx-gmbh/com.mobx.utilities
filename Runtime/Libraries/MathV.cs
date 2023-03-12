@@ -3,7 +3,7 @@
 namespace MobX.Utilities
 {
     /// <summary>
-    /// Class containing the vector equivalent operations of <see cref="Mathf"/>
+    ///     Class containing the vector equivalent operations of <see cref="Mathf" />
     /// </summary>
     public struct MathV
     {
@@ -82,7 +82,7 @@ namespace MobX.Utilities
         }
 
         /// <summary>
-        /// Quaternion equivalent for Vector3.SmoothDamp
+        ///     Quaternion equivalent for Vector3.SmoothDamp
         /// </summary>
         public static Quaternion QuaternionSmoothDamp(Quaternion current, Quaternion target, ref float currentAngularSpeed, float smoothTime)
         {
@@ -98,7 +98,7 @@ namespace MobX.Utilities
         }
 
         /// <summary>
-        /// Decomposes a vector into a normalized direction and its magnitude
+        ///     Decomposes a vector into a normalized direction and its magnitude
         /// </summary>
         /// <param name="vector">The vector to decompose</param>
         /// <returns>(vector.normalized, vector.magnitude) equivalent</returns>
@@ -106,6 +106,48 @@ namespace MobX.Utilities
         {
             var mag = vector.magnitude;
             return mag > Vector3.kEpsilon ? (vector / mag, mag) : (Vector3.zero, 0f);
+        }
+
+        /// <summary>
+        ///     Clamps a quaternion to specific min max euler angles in ranges of [-180, 180]
+        /// </summary>
+        /// <param name="val">The rotation to clamp</param>
+        /// <param name="minAngles">Values in Range [-180, 180]</param>
+        /// <param name="maxAngles">Values in Range [-180, 180]</param>
+        /// <returns>The clamped rotation</returns>
+        public static Quaternion ClampAngles(Quaternion val, Vector3 minAngles, Vector3 maxAngles)
+        {
+            Vector3 eulers = val.eulerAngles;
+            for (var i = 0; i < 3; i++)
+            {
+                if (eulers[i] > 180f)
+                {
+                    eulers[i] -= 360f;
+                }
+            }
+            return Quaternion.Euler(Clamp(eulers, minAngles, maxAngles));
+        }
+
+        public static Vector3 GetClosestPointOnLineSegment(Vector3 point, Vector3 lineStart, Vector3 lineEnd)
+        {
+            // calculate coordinates of the point on the line segment
+            Vector3 dir = lineEnd - lineStart;
+            var t = Vector3.Dot(point - lineStart, dir) / dir.sqrMagnitude;
+            // clamp to segment
+            t = Mathf.Clamp01(t);
+            // return point on segment
+            return lineStart + t * dir;
+        }
+
+        public static float GetClosestSqrDistanceToLineSegment(Vector3 point, Vector3 lineStart, Vector3 lineEnd, out Vector3 projectedPoint)
+        {
+            projectedPoint = GetClosestPointOnLineSegment(point, lineStart, lineEnd);
+            var result = projectedPoint.SqrDist(point);
+            if (float.IsNaN(result))
+            {
+                Debug.Log($"result of Distance to Line was NaN with p:{point} start:{lineStart} end:{lineEnd}");
+            }
+            return result;
         }
     }
 }

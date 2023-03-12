@@ -9,7 +9,7 @@ namespace MobX.Utilities.Input
     {
         Performed = 0,
         Started = 1,
-        Cancelled = 2,
+        Cancelled = 2
     }
 
     public static class InputSystemExtensions
@@ -59,6 +59,24 @@ namespace MobX.Utilities.Input
                     return true;
                 default:
                     return false;
+            }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void SetEnabled(this InputActionMap inputActionMap, bool enabled)
+        {
+            if (inputActionMap == null)
+            {
+                return;
+            }
+
+            if (enabled)
+            {
+                inputActionMap.Enable();
+            }
+            else
+            {
+                inputActionMap.Disable();
             }
         }
     }

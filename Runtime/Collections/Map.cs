@@ -1,19 +1,18 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.Assertions;
 
 namespace MobX.Utilities.Collections
 {
     /// <summary>
-    /// Serializable Dictionary
+    ///     Serializable Dictionary
     /// </summary>
     [Serializable]
     public class Map<TKey, TValue> : Dictionary<TKey, TValue>, ISerializationCallbackReceiver
     {
-        [SerializeField] private List<TKey> keys = new(16);
-        [SerializeField] private List<TValue> values = new(16);
+        [SerializeField] private List<TKey> keys = new List<TKey>(16);
+        [SerializeField] private List<TValue> values = new List<TValue>(16);
 
         public bool TryGetElementAtIndex(int index, out KeyValuePair<TKey, TValue> result)
         {
@@ -23,16 +22,16 @@ namespace MobX.Utilities.Collections
                 return true;
             }
 
-            result = default;
+            result = default(KeyValuePair<TKey, TValue>);
             return false;
         }
 
         public int IndexOf(TKey key)
         {
             var index = 0;
-            var comparer = EqualityComparer<TKey>.Default;
+            EqualityComparer<TKey> comparer = EqualityComparer<TKey>.Default;
 
-            foreach (var keyEntry in Keys)
+            foreach (TKey keyEntry in Keys)
             {
                 if (comparer.Equals(key, keyEntry))
                 {
@@ -62,7 +61,7 @@ namespace MobX.Utilities.Collections
         {
             keys.Clear();
             values.Clear();
-            foreach (var (key, value) in this)
+            foreach ((TKey key, TValue value) in this)
             {
                 keys.Add(key);
                 values.Add(value);
