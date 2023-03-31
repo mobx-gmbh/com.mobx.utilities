@@ -1,7 +1,9 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using UnityEngine;
+using UnityEngine.Pool;
 using Object = UnityEngine.Object;
 
 namespace MobX.Utilities
@@ -9,6 +11,19 @@ namespace MobX.Utilities
     public static class UnityExtensions
     {
         #region Transform
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Transform[] GetChildren(this Transform transform)
+        {
+            List<Transform> buffer = ListPool<Transform>.Get();
+            foreach (Transform child in transform)
+            {
+                buffer.Add(child);
+            }
+            Transform[] result = buffer.ToArray();
+            ListPool<Transform>.Release(buffer);
+            return result;
+        }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static float AnchorX(this RectTransform rectTransform)
@@ -65,10 +80,40 @@ namespace MobX.Utilities
             transform.SetPositionAndRotation(position, rotation);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void SetScale(this Transform transform, float scale)
+        {
+            transform.localScale = Vector3.one * scale;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void SetScale(this Transform transform, Vector3 scale)
+        {
+            transform.localScale = scale;
+        }
+
         #endregion
 
 
         #region Component
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void SetPosition<TComponent>(this TComponent component, Vector3 position) where TComponent : Component
+        {
+            component.transform.position = position;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void SetScale<TComponent>(this TComponent component, float scale) where TComponent : Component
+        {
+            component.transform.localScale = Vector3.one * scale;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void SetScale<TComponent>(this TComponent component, Vector3 scale) where TComponent : Component
+        {
+            component.transform.localScale = scale;
+        }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void SetActive<TComponent>(this TComponent component, bool active) where TComponent : Component
@@ -149,6 +194,13 @@ namespace MobX.Utilities
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool TryGetComponentInParent<T>(this Component target, out T component, bool includeInactive = false) where T : Component
+        {
+            component = target.GetComponentInChildren<T>(includeInactive);
+            return component != null;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static T GetOrCreateComponent<T>(this Component target) where T : Component
         {
             return target.gameObject.GetOrCreateComponent<T>();
@@ -214,6 +266,27 @@ namespace MobX.Utilities
 #if UNITY_EDITOR
             UnityEditor.EditorUtility.SetDirty(target);
 #endif
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool TrySetPosition(this Object obj, Vector3 position)
+        {
+            switch (obj)
+            {
+                case Component component:
+                    component.transform.position = position;
+                    return true;
+                case GameObject gameObject:
+                    gameObject.transform.position = position;
+                    return true;
+            }
+            return false;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void SetPosition(this GameObject gameObject, Vector3 position)
+        {
+            gameObject.transform.position = position;
         }
 
         #endregion

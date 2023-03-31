@@ -11,7 +11,7 @@ namespace MobX.Utilities.Editor.Inspector
         private InlineInspectorAttribute _inspectorAttribute;
         private string _key;
 
-        private static readonly Dictionary<Object, FoldoutHandler> foldoutHandlers = new Dictionary<Object, FoldoutHandler>();
+        private static readonly Dictionary<Object, FoldoutHandler> foldoutHandlers = new();
 
         private FoldoutHandler Foldout(Object target)
         {
@@ -47,7 +47,6 @@ namespace MobX.Utilities.Editor.Inspector
 
             _inspectorAttribute ??= (InlineInspectorAttribute)attribute;
             GetOrCreateInspector(property).OnInspectorGUI();
-            FoldoutHandler.EndStyleOverride();
         }
 
         private UnityEditor.Editor GetOrCreateInspector(UnityEditor.SerializedProperty property)

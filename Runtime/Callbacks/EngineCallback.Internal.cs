@@ -29,7 +29,7 @@ namespace MobX.Utilities.Callbacks
         private static void OnBeforeSceneLoad()
         {
 #if DEBUG
-            foreach (var listener in beginPlayCallbacks)
+            foreach (IOnBeginPlay listener in beginPlayCallbacks)
             {
                 try
                 {
@@ -37,11 +37,11 @@ namespace MobX.Utilities.Callbacks
                 }
                 catch (Exception exception)
                 {
-                    UnityEngine.Debug.LogException(exception);
+                    Debug.LogException(exception);
                 }
             }
 
-            foreach (var listener in beginPlayDelegates)
+            foreach (Action listener in beginPlayDelegates)
             {
                 try
                 {
@@ -49,7 +49,7 @@ namespace MobX.Utilities.Callbacks
                 }
                 catch (Exception exception)
                 {
-                    UnityEngine.Debug.LogException(exception);
+                    Debug.LogException(exception);
                 }
             }
 #else
@@ -70,7 +70,7 @@ namespace MobX.Utilities.Callbacks
         {
             initialized = false;
 #if DEBUG
-            foreach (var listener in endPlayCallbacks)
+            foreach (IOnEndPlay listener in endPlayCallbacks)
             {
                 try
                 {
@@ -78,11 +78,11 @@ namespace MobX.Utilities.Callbacks
                 }
                 catch (Exception exception)
                 {
-                    UnityEngine.Debug.LogException(exception);
+                    Debug.LogException(exception);
                 }
             }
 
-            foreach (var listener in endPlayDelegates)
+            foreach (Action listener in endPlayDelegates)
             {
                 try
                 {
@@ -90,7 +90,7 @@ namespace MobX.Utilities.Callbacks
                 }
                 catch (Exception exception)
                 {
-                    UnityEngine.Debug.LogException(exception);
+                    Debug.LogException(exception);
                 }
             }
 #else
@@ -110,7 +110,7 @@ namespace MobX.Utilities.Callbacks
         {
 #if DEBUG
             var deltaTime = Time.deltaTime;
-            foreach (var listener in updateCallbacks)
+            foreach (IOnUpdate listener in updateCallbacks)
             {
                 try
                 {
@@ -118,11 +118,11 @@ namespace MobX.Utilities.Callbacks
                 }
                 catch (Exception exception)
                 {
-                    UnityEngine.Debug.LogException(exception);
+                    Debug.LogException(exception);
                 }
             }
 
-            foreach (var listener in updateDelegates)
+            foreach (UpdateDelegate listener in updateDelegates)
             {
                 try
                 {
@@ -130,7 +130,7 @@ namespace MobX.Utilities.Callbacks
                 }
                 catch (Exception exception)
                 {
-                    UnityEngine.Debug.LogException(exception);
+                    Debug.LogException(exception);
                 }
             }
 #else
@@ -151,7 +151,7 @@ namespace MobX.Utilities.Callbacks
         {
 #if DEBUG
             var deltaTime = Time.deltaTime;
-            foreach (var listener in lateUpdateCallbacks)
+            foreach (IOnLateUpdate listener in lateUpdateCallbacks)
             {
                 try
                 {
@@ -159,11 +159,11 @@ namespace MobX.Utilities.Callbacks
                 }
                 catch (Exception exception)
                 {
-                    UnityEngine.Debug.LogException(exception);
+                    Debug.LogException(exception);
                 }
             }
 
-            foreach (var listener in lateUpdateDelegates)
+            foreach (LateUpdateDelegate listener in lateUpdateDelegates)
             {
                 try
                 {
@@ -171,7 +171,7 @@ namespace MobX.Utilities.Callbacks
                 }
                 catch (Exception exception)
                 {
-                    UnityEngine.Debug.LogException(exception);
+                    Debug.LogException(exception);
                 }
             }
 #else
@@ -192,7 +192,7 @@ namespace MobX.Utilities.Callbacks
         {
 #if DEBUG
             var deltaTime = Time.fixedDeltaTime;
-            foreach (var listener in fixedUpdateCallbacks)
+            foreach (IOnFixedUpdate listener in fixedUpdateCallbacks)
             {
                 try
                 {
@@ -200,11 +200,11 @@ namespace MobX.Utilities.Callbacks
                 }
                 catch (Exception exception)
                 {
-                    UnityEngine.Debug.LogException(exception);
+                    Debug.LogException(exception);
                 }
             }
 
-            foreach (var listener in fixedUpdateDelegates)
+            foreach (FixedUpdateDelegate listener in fixedUpdateDelegates)
             {
                 try
                 {
@@ -212,7 +212,7 @@ namespace MobX.Utilities.Callbacks
                 }
                 catch (Exception exception)
                 {
-                    UnityEngine.Debug.LogException(exception);
+                    Debug.LogException(exception);
                 }
             }
 #else

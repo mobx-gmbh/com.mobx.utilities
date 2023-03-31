@@ -99,6 +99,17 @@ namespace MobX.Utilities
             return Mathf.FloorToInt(value);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool IsInfinity(this float value)
+        {
+            return float.IsInfinity(value);
+        }
+
+        public static bool IsInRange(this float value, float min, float max)
+        {
+            return value >= min && value <= max;
+        }
+
         #endregion
 
 
@@ -139,6 +150,11 @@ namespace MobX.Utilities
         public static Vector2 Max(this Vector2 target, Vector2 other)
         {
             return Vector2.Max(target, other);
+        }
+
+        public static bool HasNan(this Vector3 vector3)
+        {
+            return float.IsNaN(vector3.x) || float.IsNaN(vector3.y) || float.IsNaN(vector3.z);
         }
 
         #endregion

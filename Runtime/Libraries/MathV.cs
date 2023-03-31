@@ -145,7 +145,7 @@ namespace MobX.Utilities
             var result = projectedPoint.SqrDist(point);
             if (float.IsNaN(result))
             {
-                Debug.Log($"result of Distance to Line was NaN with p:{point} start:{lineStart} end:{lineEnd}");
+                Debug.LogError($"result of Distance to Line was NaN with p:{point} start:{lineStart} end:{lineEnd}");
             }
             return result;
         }

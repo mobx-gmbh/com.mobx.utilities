@@ -361,9 +361,7 @@ namespace MobX.Utilities.Editor.Windows
                         UnityEditor.EditorGUIUtility.wideMode = false;
                         UnityEditor.EditorGUI.indentLevel++;
                         UnityEditor.EditorGUIUtility.labelWidth = UnityEditor.EditorGUIUtility.currentViewWidth * 0.4f;
-                        UnityEditor.EditorGUILayout.HelpBox(
-                            $"{editorTitle} is null! Did you forget to assign the variable in the Configurations Prefab in the Resources folder?",
-                            UnityEditor.MessageType.Error);
+                        UnityEditor.EditorGUILayout.HelpBox($"{editorTitle} is null! Did you forget to assign the variable in the Configurations Prefab in the Resources folder?", UnityEditor.MessageType.Error);
                         UnityEditor.EditorGUI.indentLevel--;
                         GUIHelper.Space();
                     }

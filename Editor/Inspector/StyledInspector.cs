@@ -1,10 +1,10 @@
 using System;
 using System.Reflection;
-using UnityEditor;
+using Object = UnityEngine.Object;
 
 namespace MobX.Utilities.Editor.Inspector
 {
-    public class StyledInspector<T> : UnityEditor.Editor where T : UnityEngine.Object
+    public class StyledInspector<T> : UnityEditor.Editor where T : Object
     {
         #region Properties & Fields
 
@@ -29,6 +29,7 @@ namespace MobX.Utilities.Editor.Inspector
 
         #endregion
 
+
         //--------------------------------------------------------------------------------------------------------------
 
         protected void SetDefaultFoldoutState(FoldoutData data, bool stateValue)
@@ -43,23 +44,22 @@ namespace MobX.Utilities.Editor.Inspector
                 BindingFlags.Public |
                 BindingFlags.NonPublic;
 
-            var fields = inspector.GetType().GetFields(Flags);
+            FieldInfo[] fields = inspector.GetType().GetFields(Flags);
 
-            foreach (var fieldInfo in fields)
+            foreach (FieldInfo fieldInfo in fields)
             {
-                if (fieldInfo.FieldType == typeof(SerializedProperty))
+                if (fieldInfo.FieldType == typeof(UnityEditor.SerializedProperty))
                 {
                     fieldInfo.SetValue(inspector, inspector.FindProperty(fieldInfo.Name));
                 }
             }
         }
 
-        protected SerializedProperty FindProperty(string member)
+        protected UnityEditor.SerializedProperty FindProperty(string member)
         {
-            var parsedMemberName = member.StartsWith('_') ? member.Remove(0,1) : member;
+            var parsedMemberName = member.StartsWith('_') ? member.Remove(0, 1) : member;
             return serializedObject.FindProperty(parsedMemberName);
         }
-
 
         protected virtual void OnEnable()
         {
@@ -82,11 +82,10 @@ namespace MobX.Utilities.Editor.Inspector
 
         protected virtual void LoadStateData(string editorPrefsKey)
         {
+            Foldout = new FoldoutHandler(editorPrefsKey);
             if (Environment.StackTrace.Contains("RedrawFromNative"))
             {
-                return;
             }
-            Foldout = new FoldoutHandler(editorPrefsKey);
         }
 
         protected virtual void SaveStateData(string editorPrefsKey)
