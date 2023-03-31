@@ -1,5 +1,5 @@
-﻿using Fusion;
-using System;
+﻿using System;
+using UnityEngine;
 
 namespace MobX.Utilities.Inspector
 {

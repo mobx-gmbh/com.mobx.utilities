@@ -1,6 +1,5 @@
 ﻿using System;
 using UnityEngine;
-using PropertyAttribute = Fusion.PropertyAttribute;
 
 namespace MobX.Utilities.Inspector
 {
