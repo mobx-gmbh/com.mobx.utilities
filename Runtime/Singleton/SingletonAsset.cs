@@ -16,5 +16,10 @@ namespace MobX.Utilities.Singleton
             EngineCallbacks.AddCallbacks(this);
             Singleton = (T) this;
         }
+
+        private void OnDisable()
+        {
+            EngineCallbacks.RemoveCallbacks(this);
+        }
     }
 }

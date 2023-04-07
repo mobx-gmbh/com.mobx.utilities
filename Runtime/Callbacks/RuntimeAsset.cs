@@ -7,20 +7,20 @@ namespace MobX.Utilities.Callbacks
         private void OnEnable()
         {
             EngineCallbacks.AddCallbacks(this);
-            OnEnabled();
+            OnAssetEnabled();
         }
 
         private void OnDisable()
         {
             EngineCallbacks.RemoveCallbacks(this);
-            OnDisabled();
+            OnAssetDisabled();
         }
 
-        protected virtual void OnEnabled()
+        protected virtual void OnAssetEnabled()
         {
         }
 
-        protected virtual void OnDisabled()
+        protected virtual void OnAssetDisabled()
         {
         }
     }
