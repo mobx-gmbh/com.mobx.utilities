@@ -1,5 +1,4 @@
-﻿using MobX.Utilities.Inspector;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -79,7 +78,7 @@ namespace MobX.Utilities.Editor
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static float GetIndentLength(Rect sourceRect)
         {
-            Rect indentRect = UnityEditor.EditorGUI.IndentedRect(sourceRect);
+            var indentRect = UnityEditor.EditorGUI.IndentedRect(sourceRect);
             var indentLength = indentRect.x - sourceRect.x;
 
             return indentLength;
@@ -93,7 +92,7 @@ namespace MobX.Utilities.Editor
         {
             type ??= target.GetType();
             var name = type.GetCustomAttribute<AddComponentMenu>()?.componentMenu?.Split('/').Last() ??
-                type.Name.Humanize();
+                       type.Name.Humanize();
             return new GUIContent(" " + name, UnityEditor.AssetPreview.GetMiniThumbnail(target));
         }
 
@@ -104,21 +103,6 @@ namespace MobX.Utilities.Editor
         public static void BeginBox()
         {
             UnityEditor.EditorGUILayout.BeginVertical(HelpBoxStyle);
-        }
-
-        public static void BeginBox(BoxStyle style)
-        {
-            switch (style)
-            {
-                case Utilities.Inspector.BoxStyle.GrayBox:
-                    UnityEditor.EditorGUILayout.BeginVertical(BoxStyle);
-                    break;
-                case Utilities.Inspector.BoxStyle.HelpBox:
-                    UnityEditor.EditorGUILayout.BeginVertical(HelpBoxStyle);
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(style), style, null);
-            }
         }
 
         public static void EndBox()
@@ -136,7 +120,7 @@ namespace MobX.Utilities.Editor
 
             GUILayout.Box(new GUIContent(title), options);
 
-            EventType eventType = Event.current.type;
+            var eventType = Event.current.type;
             var isAccepted = false;
 
             if (eventType is EventType.DragUpdated or EventType.DragPerform)
@@ -160,7 +144,7 @@ namespace MobX.Utilities.Editor
          * Async
          */
 
-        public async static Task CompleteGUI()
+        public static async Task CompleteGUI()
         {
             await Task.Delay(25);
         }
@@ -169,7 +153,7 @@ namespace MobX.Utilities.Editor
          * Indent
          */
 
-        private static readonly Stack<int> indentOverrides = new Stack<int>(4);
+        private static readonly Stack<int> indentOverrides = new(4);
 
         public static void BeginIndentOverride(int indent)
         {
@@ -201,7 +185,7 @@ namespace MobX.Utilities.Editor
             UnityEditor.EditorGUI.indentLevel--;
         }
 
-        private static readonly Stack<bool> enabledOverrides = new Stack<bool>(4);
+        private static readonly Stack<bool> enabledOverrides = new(4);
 
         public static void BeginEnabledOverride(bool enabledState)
         {

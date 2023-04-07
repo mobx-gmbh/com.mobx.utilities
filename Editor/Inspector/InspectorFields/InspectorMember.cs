@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using UnityEditor;
 using UnityEngine;
 
 namespace MobX.Utilities.Editor.Inspector
@@ -16,8 +15,8 @@ namespace MobX.Utilities.Editor.Inspector
          */
 
         public GUIContent Label { get; protected set; }
-        public MemberInfo Member { get;}
-        public bool HasHeaderAttribute { get;}
+        public MemberInfo Member { get; }
+        public bool HasHeaderAttribute { get; }
         protected object Target { get; }
 
         private readonly bool _hasConditional;
@@ -84,7 +83,8 @@ namespace MobX.Utilities.Editor.Inspector
                         break;
 
                     case AnnotationAttribute annotationAttribute:
-                        _preDraw += () => EditorGUILayout.HelpBox(annotationAttribute.Annotation, (MessageType) annotationAttribute.MessageType);
+                        _preDraw += () => UnityEditor.EditorGUILayout.HelpBox(annotationAttribute.Annotation,
+                            (UnityEditor.MessageType) annotationAttribute.MessageType);
                         break;
 
                     case ConditionalShowAttribute conditionalAttribute:
@@ -107,22 +107,6 @@ namespace MobX.Utilities.Editor.Inspector
                             return result ? DisplayMode.Show :
                                 conditionalAttribute.ReadOnly ? DisplayMode.Readonly : DisplayMode.Hide;
                         };
-                        break;
-
-                    case BeginBoxAttribute beginBoxAttribute:
-                        _preDraw += () => GUIHelper.BeginBox(beginBoxAttribute.Style);
-                        break;
-
-                    case EndBoxAttribute:
-                        _postDraw += GUIHelper.EndBox;
-                        break;
-
-                    case BeginHorizontalAttribute:
-                        _preDraw += () => EditorGUILayout.BeginHorizontal();
-                        break;
-
-                    case EndHorizontalAttribute:
-                        _postDraw += EditorGUILayout.EndHorizontal;
                         break;
                 }
             }

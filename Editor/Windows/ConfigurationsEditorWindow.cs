@@ -13,16 +13,16 @@ namespace MobX.Utilities.Editor.Windows
         // Window State
         private FoldoutHandler Foldout { get; set; }
         private Vector2 _scrollPosition;
-        private readonly List<Action> _headerInstructions = new List<Action>(8);
-        private readonly List<Action> _footerInstructions = new List<Action>(8);
-        private readonly List<Action> _instructions = new List<Action>(32);
-        private readonly List<UnityEditor.Editor> _editorCache = new List<UnityEditor.Editor>(32);
+        private readonly List<Action> _headerInstructions = new(8);
+        private readonly List<Action> _footerInstructions = new(8);
+        private readonly List<Action> _instructions = new(32);
+        private readonly List<UnityEditor.Editor> _editorCache = new(32);
         private bool _initialized;
         private bool? _drawOptions;
         private bool? _drawTitles;
         private bool? _saveSearchQuery;
         private string _searchQuery;
-        private readonly List<(GUIContent name, string key)> _options = new List<(GUIContent name, string key)>();
+        private readonly List<(GUIContent name, string key)> _options = new();
 
         #endregion
 
@@ -93,7 +93,7 @@ namespace MobX.Utilities.Editor.Windows
 
         private void InitializeEditor()
         {
-            foreach (UnityEditor.Editor editor in _editorCache)
+            foreach (var editor in _editorCache)
             {
                 DestroyImmediate(editor);
             }
@@ -124,13 +124,10 @@ namespace MobX.Utilities.Editor.Windows
                 return;
             }
 
-            FoldoutStyle foldoutStyle = FoldoutHandler.Style;
+            var foldoutStyle = FoldoutHandler.Style;
             DrawHeader();
-            InspectorSearch.ResetContextQuery();
             DrawBody();
-            InspectorSearch.ResetContextQuery();
             DrawFooter(foldoutStyle);
-            InspectorSearch.ResetContextQuery();
         }
 
         private void DrawHeader()
@@ -141,13 +138,12 @@ namespace MobX.Utilities.Editor.Windows
 
             GUILayout.BeginVertical();
             GUILayout.Space(8);
-            SearchQuery = InspectorSearch.BeginSearchContext(SearchQuery);
+            SearchQuery = GUIHelper.SearchBar(SearchQuery);
             GUILayout.EndVertical();
 
             if (GUIHelper.ClearButton())
             {
                 SearchQuery = string.Empty;
-                InspectorSearch.EndSearchContext(true);
                 GUI.FocusControl(null);
             }
 
@@ -168,7 +164,7 @@ namespace MobX.Utilities.Editor.Windows
                 DrawTitles = UnityEditor.EditorGUILayout.ToggleLeft("Show Titles", DrawTitles);
                 SaveSearchQuery = UnityEditor.EditorGUILayout.ToggleLeft("Save Search Filter", SaveSearchQuery);
 
-                foreach ((GUIContent name, string key) option in _options)
+                foreach (var option in _options)
                 {
                     var current = UnityEditor.EditorPrefs.GetBool(option.key);
                     var result = UnityEditor.EditorGUILayout.ToggleLeft(option.name, current);
@@ -176,7 +172,7 @@ namespace MobX.Utilities.Editor.Windows
                 }
             }
 
-            foreach (Action instruction in _headerInstructions)
+            foreach (var instruction in _headerInstructions)
             {
                 try
                 {
@@ -195,7 +191,7 @@ namespace MobX.Utilities.Editor.Windows
         {
             _scrollPosition = UnityEditor.EditorGUILayout.BeginScrollView(_scrollPosition);
 
-            foreach (Action instruction in _instructions)
+            foreach (var instruction in _instructions)
             {
                 instruction();
             }
@@ -206,12 +202,11 @@ namespace MobX.Utilities.Editor.Windows
 
         private void DrawFooter(FoldoutStyle foldoutStyle)
         {
-            foreach (Action instruction in _footerInstructions)
+            foreach (var instruction in _footerInstructions)
             {
                 instruction();
             }
 
-            InspectorSearch.EndSearchContext();
             FoldoutHandler.Style = foldoutStyle;
         }
 
@@ -247,13 +242,17 @@ namespace MobX.Utilities.Editor.Windows
 
             _instructions.Add(() =>
             {
-                FoldoutStyle foldoutStyle = FoldoutHandler.Style;
+                if (SearchQuery.IsNotNullOrWhitespace() && !editorTitle.ContainsIgnoreCase(SearchQuery))
+                {
+                    return;
+                }
+                var foldoutStyle = FoldoutHandler.Style;
                 FoldoutHandler.Style = FoldoutStyle.Dark;
                 if (Foldout[editorTitle])
                 {
                     UnityEditor.EditorGUIUtility.wideMode = false;
                     UnityEditor.EditorGUIUtility.labelWidth = UnityEditor.EditorGUIUtility.currentViewWidth * 0.4f;
-                    foreach ((UnityEditor.Editor editor, var displayName) in editors)
+                    foreach (var (editor, displayName) in editors)
                     {
                         FoldoutHandler.Style = FoldoutStyle.Default;
                         if (foldout[displayName])
@@ -273,8 +272,6 @@ namespace MobX.Utilities.Editor.Windows
                             UnityEditor.EditorGUI.indentLevel -= 2;
                         }
                     }
-
-                    GUIHelper.Space(!InspectorSearch.IsActive);
                 }
 
                 foldout.SaveState();
@@ -285,13 +282,11 @@ namespace MobX.Utilities.Editor.Windows
         {
             _instructions.Add(() =>
             {
-                InspectorSearch.SetContextQuery(titleName);
-                if (!InspectorSearch.IsValid(titleName))
+                if (!DrawTitles)
                 {
                     return;
                 }
-
-                if (!DrawTitles)
+                if (SearchQuery.IsNotNullOrWhitespace() && !titleName.ContainsIgnoreCase(SearchQuery))
                 {
                     return;
                 }
@@ -300,8 +295,9 @@ namespace MobX.Utilities.Editor.Windows
                 {
                     if (Event.current.type != EventType.Repaint)
                     {
-                        Rect lastRect = GUILayoutUtility.GetLastRect();
-                        UnityEditor.EditorGUI.DrawRect(new Rect(0, lastRect.y, UnityEditor.EditorGUIUtility.currentViewWidth, 1),
+                        var lastRect = GUILayoutUtility.GetLastRect();
+                        UnityEditor.EditorGUI.DrawRect(
+                            new Rect(0, lastRect.y, UnityEditor.EditorGUIUtility.currentViewWidth, 1),
                             new Color(0f, 0f, 0f, 0.3f));
                     }
                 }
@@ -329,7 +325,11 @@ namespace MobX.Utilities.Editor.Windows
             {
                 _instructions.Add(() =>
                 {
-                    FoldoutStyle foldoutStyle = FoldoutHandler.Style;
+                    if (SearchQuery.IsNotNullOrWhitespace() && !editorTitle.ContainsIgnoreCase(SearchQuery))
+                    {
+                        return;
+                    }
+                    var foldoutStyle = FoldoutHandler.Style;
                     FoldoutHandler.Style = FoldoutStyle.Dark;
                     if (Foldout[editorTitle])
                     {
@@ -347,7 +347,6 @@ namespace MobX.Utilities.Editor.Windows
                         editor.OnInspectorGUI();
                         editor.serializedObject.ApplyModifiedProperties();
                         UnityEditor.EditorGUI.indentLevel--;
-                        GUIHelper.Space(!InspectorSearch.IsActive);
                         FoldoutHandler.Style = foldoutStyle;
                     }
                 });
@@ -356,12 +355,18 @@ namespace MobX.Utilities.Editor.Windows
             {
                 _instructions.Add(() =>
                 {
+                    if (SearchQuery.IsNotNullOrWhitespace() && !editorTitle.ContainsIgnoreCase(SearchQuery))
+                    {
+                        return;
+                    }
                     if (Foldout[editorTitle])
                     {
                         UnityEditor.EditorGUIUtility.wideMode = false;
                         UnityEditor.EditorGUI.indentLevel++;
                         UnityEditor.EditorGUIUtility.labelWidth = UnityEditor.EditorGUIUtility.currentViewWidth * 0.4f;
-                        UnityEditor.EditorGUILayout.HelpBox($"{editorTitle} is null! Did you forget to assign the variable in the Configurations Prefab in the Resources folder?", UnityEditor.MessageType.Error);
+                        UnityEditor.EditorGUILayout.HelpBox(
+                            $"{editorTitle} is null! Did you forget to assign the variable in the Configurations Prefab in the Resources folder?",
+                            UnityEditor.MessageType.Error);
                         UnityEditor.EditorGUI.indentLevel--;
                         GUIHelper.Space();
                     }
@@ -390,8 +395,12 @@ namespace MobX.Utilities.Editor.Windows
                     {
                         return;
                     }
+                    if (SearchQuery.IsNotNullOrWhitespace() && !editorTitle.ContainsIgnoreCase(SearchQuery))
+                    {
+                        return;
+                    }
 
-                    FoldoutStyle foldoutStyle = FoldoutHandler.Style;
+                    var foldoutStyle = FoldoutHandler.Style;
                     FoldoutHandler.Style = FoldoutStyle.Dark;
                     if (Foldout[editorTitle])
                     {
@@ -409,7 +418,6 @@ namespace MobX.Utilities.Editor.Windows
                         editor.OnInspectorGUI();
                         editor.serializedObject.ApplyModifiedProperties();
                         UnityEditor.EditorGUI.indentLevel--;
-                        GUIHelper.Space(!InspectorSearch.IsActive);
                         FoldoutHandler.Style = foldoutStyle;
                     }
                 });
@@ -419,6 +427,10 @@ namespace MobX.Utilities.Editor.Windows
                 _instructions.Add(() =>
                 {
                     if (!UnityEditor.EditorPrefs.GetBool(optionKey, showByDefault))
+                    {
+                        return;
+                    }
+                    if (SearchQuery.IsNotNullOrWhitespace() && !editorTitle.ContainsIgnoreCase(SearchQuery))
                     {
                         return;
                     }
@@ -455,21 +467,21 @@ namespace MobX.Utilities.Editor.Windows
                     return;
                 }
 
-                InspectorSearch.SetContextQuery(titleName);
-                if (!InspectorSearch.IsValid(titleName))
+                if (!DrawTitles)
                 {
                     return;
                 }
 
-                if (!DrawTitles)
+                if (SearchQuery.IsNotNullOrWhitespace() && !titleName.ContainsIgnoreCase(SearchQuery))
                 {
                     return;
                 }
 
                 if (drawLine)
                 {
-                    Rect lastRect = GUILayoutUtility.GetLastRect();
-                    UnityEditor.EditorGUI.DrawRect(new Rect(0, lastRect.y, UnityEditor.EditorGUIUtility.currentViewWidth, 1),
+                    var lastRect = GUILayoutUtility.GetLastRect();
+                    UnityEditor.EditorGUI.DrawRect(
+                        new Rect(0, lastRect.y, UnityEditor.EditorGUIUtility.currentViewWidth, 1),
                         new Color(0f, 0f, 0f, 0.3f));
                 }
 
@@ -491,6 +503,10 @@ namespace MobX.Utilities.Editor.Windows
         {
             _instructions.Add(() =>
             {
+                if (SearchQuery.IsNotNullOrWhitespace() && !editorTitle.ContainsIgnoreCase(SearchQuery))
+                {
+                    return;
+                }
                 if (Foldout[editorTitle])
                 {
                     UnityEditor.EditorGUILayout.Space();
