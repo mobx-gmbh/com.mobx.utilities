@@ -269,5 +269,17 @@ namespace MobX.Utilities
             }
             return -1;
         }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool TryRemove<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key, out TValue value)
+        {
+            if (dictionary.TryGetValue(key, out value))
+            {
+                dictionary.Remove(key);
+                return true;
+            }
+
+            return false;
+        }
     }
 }
