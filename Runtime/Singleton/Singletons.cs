@@ -1,8 +1,9 @@
 using MobX.Utilities.Inspector;
+using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.Assertions;
 using Object = UnityEngine.Object;
 
 namespace MobX.Utilities.Singleton
@@ -24,15 +25,24 @@ namespace MobX.Utilities.Singleton
         [Button]
         [SpaceBefore]
         [Tooltip("Remove null objects from the registry")]
-        private void ClearInvalid() => registry.RemoveNull();
+        private void ClearInvalid()
+        {
+            registry.RemoveNull();
+        }
 
         [Button]
         [ConditionalShow(nameof(_enableEditing), false)]
-        private void EnableEdit() => _enableEditing = true;
+        private void EnableEdit()
+        {
+            _enableEditing = true;
+        }
 
         [Button]
         [ConditionalShow(nameof(_enableEditing))]
-        private void DisableEdit() => _enableEditing = false;
+        private void DisableEdit()
+        {
+            _enableEditing = false;
+        }
 
         #endregion
 
@@ -41,6 +51,34 @@ namespace MobX.Utilities.Singleton
 
         public static void Register<T>(T instance) where T : Object
         {
+#if UNITY_EDITOR
+            static async Task WaitWhile(Func<bool> condition)
+            {
+                while (condition())
+                {
+                    await Task.Delay(25);
+                }
+            }
+
+            static bool IsImport()
+            {
+                return UnityEditor.EditorApplication.isCompiling || UnityEditor.EditorApplication.isUpdating;
+            }
+
+            if (IsImport())
+            {
+                var scheduler = TaskScheduler.FromCurrentSynchronizationContext();
+                WaitWhile(IsImport).ContinueWith(task =>
+                {
+                    if (task.IsFaulted)
+                    {
+                        return;
+                    }
+                    Register(instance);
+                }, scheduler);
+                return;
+            }
+#endif
             for (var i = 0; i < Singleton.registry.Count; i++)
             {
                 if (Singleton.registry[i].GetType() == typeof(T))
@@ -107,16 +145,8 @@ namespace MobX.Utilities.Singleton
                             break;
                         }
                     }
-
-                    Assert.IsNotNull(singleton);
                 }
 #endif
-
-                if (singleton == null)
-                {
-                    Debug.LogError("Singleton", "No singleton registry found!");
-                }
-
                 return singleton;
             }
         }
