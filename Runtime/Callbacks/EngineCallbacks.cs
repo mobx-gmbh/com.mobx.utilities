@@ -1,9 +1,27 @@
 ﻿using System.Diagnostics;
+using UnityEngine;
 
 namespace MobX.Utilities.Callbacks
 {
+#if UNITY_EDITOR
+    [UnityEditor.InitializeOnLoadAttribute]
+#endif
     public partial class EngineCallbacks
     {
+        #region Initialization
+
+        static EngineCallbacks()
+        {
+            Application.quitting += () => IsQuitting = true;
+#if UNITY_EDITOR
+            UnityEditor.EditorApplication.playModeStateChanged -= EditorApplicationOnplayModeStateChanged;
+            UnityEditor.EditorApplication.playModeStateChanged += EditorApplicationOnplayModeStateChanged;
+#endif
+        }
+
+        #endregion
+
+
         #region Callbacks
 
         public static void AddCallbacks<T>(T listener) where T : class

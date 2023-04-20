@@ -1,34 +1,21 @@
 #if UNITY_EDITOR
 using System;
 using System.Collections.Generic;
-using UnityEditor;
 using Object = UnityEngine.Object;
 
 namespace MobX.Utilities.Callbacks
 {
-    [InitializeOnLoad]
-    public sealed partial class EngineCallbacks : AssetModificationProcessor
+    public sealed partial class EngineCallbacks : UnityEditor.AssetModificationProcessor
     {
-        #region Initialization
-
-        static EngineCallbacks()
-        {
-            EditorApplication.playModeStateChanged -= EditorApplicationOnplayModeStateChanged;
-            EditorApplication.playModeStateChanged += EditorApplicationOnplayModeStateChanged;
-        }
-
-        #endregion
-
-
         #region Asset Handling
 
-        private static AssetDeleteResult OnWillDeleteAsset(string assetPath, RemoveAssetOptions options)
+        private static UnityEditor.AssetDeleteResult OnWillDeleteAsset(string assetPath, UnityEditor.RemoveAssetOptions options)
         {
-            var asset = AssetDatabase.LoadAssetAtPath<Object>(assetPath);
+            Object asset = UnityEditor.AssetDatabase.LoadAssetAtPath<Object>(assetPath);
 
             if (asset is not ICallbackInterface)
             {
-                return AssetDeleteResult.DidNotDelete;
+                return UnityEditor.AssetDeleteResult.DidNotDelete;
             }
 
             // ReSharper disable once SuspiciousTypeConversion.Global
@@ -55,7 +42,7 @@ namespace MobX.Utilities.Callbacks
                 enterEditModeListener.Remove(enterEditModeCallback);
             }
 
-            return AssetDeleteResult.DidNotDelete;
+            return UnityEditor.AssetDeleteResult.DidNotDelete;
         }
 
         #endregion
@@ -123,22 +110,22 @@ namespace MobX.Utilities.Callbacks
 
         #region Play Mode State Changed
 
-        private static void EditorApplicationOnplayModeStateChanged(PlayModeStateChange state)
+        private static void EditorApplicationOnplayModeStateChanged(UnityEditor.PlayModeStateChange state)
         {
             switch (state)
             {
-                case PlayModeStateChange.EnteredEditMode:
+                case UnityEditor.PlayModeStateChange.EnteredEditMode:
                     OnEnterEditMode();
                     break;
-                case PlayModeStateChange.ExitingEditMode:
+                case UnityEditor.PlayModeStateChange.ExitingEditMode:
                     OnExitEditMode();
 
                     break;
-                case PlayModeStateChange.EnteredPlayMode:
+                case UnityEditor.PlayModeStateChange.EnteredPlayMode:
                     OnEnterPlayMode();
 
                     break;
-                case PlayModeStateChange.ExitingPlayMode:
+                case UnityEditor.PlayModeStateChange.ExitingPlayMode:
                     OnExitPlayMode();
 
                     break;

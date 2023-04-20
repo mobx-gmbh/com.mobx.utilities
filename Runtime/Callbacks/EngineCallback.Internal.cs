@@ -8,6 +8,8 @@ namespace MobX.Utilities.Callbacks
     {
         #region Update Callbacks
 
+        public static bool IsQuitting { get; private set; }
+
         private const int DefaultCapacity = 16;
 
         private static readonly List<IOnUpdate> updateCallbacks = new(DefaultCapacity);
@@ -68,6 +70,7 @@ namespace MobX.Utilities.Callbacks
 
         private static void OnQuit()
         {
+            IsQuitting = true;
             initialized = false;
 #if DEBUG
             foreach (IOnEndPlay listener in endPlayCallbacks)
@@ -232,6 +235,7 @@ namespace MobX.Utilities.Callbacks
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
         private static void SetupUpdateCallbacks()
         {
+            IsQuitting = false;
             RuntimeHook.Create(OnUpdate, OnLateUpdate, OnFixedUpdate, OnQuit);
         }
 
