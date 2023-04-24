@@ -185,7 +185,7 @@ namespace MobX.Utilities
 
             target = target.Replace('_', ' ');
 
-            List<char> chars = ListPool<char>.Get();
+            var chars = ListPool<char>.Get();
 
             for (var i = 0; i < target.Length; i++)
             {
@@ -197,8 +197,8 @@ namespace MobX.Utilities
                 {
                     if (i < target.Length - 1)
                     {
-                        if (char.IsUpper(target[i]) && !char.IsUpper(target[i + 1])
-                            || char.IsUpper(target[i]) && !char.IsUpper(target[i - 1]))
+                        if ((char.IsUpper(target[i]) && !char.IsUpper(target[i + 1]))
+                            || (char.IsUpper(target[i]) && !char.IsUpper(target[i - 1])))
                         {
                             if (i > 1)
                             {
@@ -235,7 +235,7 @@ namespace MobX.Utilities
 
         public static string ReduceWhitespace(this string value)
         {
-            StringBuilder sb = ConcurrentStringBuilderPool.Get();
+            var sb = ConcurrentStringBuilderPool.Get();
             var previousIsWhitespaceFlag = false;
             for (var i = 0; i < value.Length; i++)
             {
@@ -275,7 +275,7 @@ namespace MobX.Utilities
 
         public static string CombineToString(this IEnumerable<string> enumerable, string separator = " ")
         {
-            StringBuilder stringBuilder = ConcurrentStringBuilderPool.Get();
+            var stringBuilder = ConcurrentStringBuilderPool.Get();
             foreach (var argument in enumerable)
             {
                 stringBuilder.Append(argument);
@@ -287,7 +287,7 @@ namespace MobX.Utilities
 
         public static string[] RemoveNullOrWhiteSpace(this IEnumerable<string> enumerable, char separator = ' ')
         {
-            List<string> list = ConcurrentListPool<string>.Get();
+            var list = ConcurrentListPool<string>.Get();
 
             foreach (var value in enumerable)
             {

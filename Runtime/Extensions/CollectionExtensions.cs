@@ -1,9 +1,9 @@
+using JetBrains.Annotations;
 using MobX.Utilities.Pooling;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
 using UnityEngine.Pool;
 
 namespace MobX.Utilities
@@ -13,7 +13,7 @@ namespace MobX.Utilities
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void ForEach<T>(this IEnumerable<T> enumerable, Action<T> action)
         {
-            foreach (T item in enumerable)
+            foreach (var item in enumerable)
             {
                 action(item);
             }
@@ -31,25 +31,25 @@ namespace MobX.Utilities
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsNullOrEmpty<T>(this T[] array)
         {
-            return array is not { Length: > 0 };
+            return array is not {Length: > 0};
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsNotNullOrEmpty<T>(this T[] array)
         {
-            return array is { Length: > 0 };
+            return array is {Length: > 0};
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsNullOrEmpty<T>(this IList<T> list)
         {
-            return list is not { Count: > 0 };
+            return list is not {Count: > 0};
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsNotNullOrEmpty<T>(this IList<T> list)
         {
-            return list is { Count: > 0 };
+            return list is {Count: > 0};
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -79,7 +79,7 @@ namespace MobX.Utilities
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void RemoveDuplicates<T>(this IList<T> list)
         {
-            HashSet<T> set = HashSetPool<T>.Get();
+            var set = HashSetPool<T>.Get();
 
             for (var i = list.Count - 1; i >= 0; i--)
             {
@@ -117,8 +117,12 @@ namespace MobX.Utilities
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool AddUnique<T>(this IList<T> list, T value, bool nullCheck = false)
+        public static bool AddUnique<T>([NotNull] this IList<T> list, T value, bool nullCheck = false)
         {
+            if (list == null)
+            {
+                throw new ArgumentNullException(nameof(list));
+            }
             if (nullCheck && value == null)
             {
                 return false;
@@ -134,8 +138,34 @@ namespace MobX.Utilities
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool AddUnique<TKey, TValue>(this IDictionary<TKey, TValue> target, TKey key, TValue value)
+        public static void UpdateEntry<T>([NotNull] this IList<T> list, T value, bool nullCheck = false)
         {
+            if (list == null)
+            {
+                throw new ArgumentNullException(nameof(list));
+            }
+            if (nullCheck && value == null)
+            {
+                return;
+            }
+
+            var index = list.IndexOf(value);
+            if (index > -1)
+            {
+                list.RemoveAt(index);
+            }
+
+            list.Add(value);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool AddUnique<TKey, TValue>([NotNull] this IDictionary<TKey, TValue> target, TKey key,
+            TValue value)
+        {
+            if (target == null)
+            {
+                throw new ArgumentNullException(nameof(target));
+            }
             if (target.ContainsKey(key))
             {
                 return false;
@@ -146,7 +176,7 @@ namespace MobX.Utilities
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void AddOrUpdate<TKey, TValue>(this IDictionary<TKey, TValue> target, TKey key, TValue value)
+        public static void UpdateEntry<TKey, TValue>(this IDictionary<TKey, TValue> target, TKey key, TValue value)
         {
             if (target == null)
             {
@@ -163,7 +193,8 @@ namespace MobX.Utilities
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void AddOrUpdate<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key, Func<TValue, TValue> updateFunc)
+        public static void UpdateEntry<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key,
+            Func<TValue, TValue> updateFunc)
         {
             if (dictionary.ContainsKey(key))
             {
@@ -178,7 +209,7 @@ namespace MobX.Utilities
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void AddTyped<TValue>(this IDictionary<Type, TValue> target, TValue value)
         {
-            Type key = value.GetType();
+            var key = value.GetType();
             if (target.ContainsKey(key))
             {
                 target[key] = value;
@@ -193,8 +224,8 @@ namespace MobX.Utilities
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void RemoveNullItems<TKey, TValue>(this IDictionary<TKey, TValue> target) where TValue : class
         {
-            List<TKey> invalidKeys = ListPool<TKey>.Get();
-            foreach ((TKey key, TValue value) in target)
+            var invalidKeys = ListPool<TKey>.Get();
+            foreach (var (key, value) in target)
             {
                 if (value.IsNull())
                 {
@@ -202,7 +233,7 @@ namespace MobX.Utilities
                 }
             }
 
-            foreach (TKey invalidKey in invalidKeys)
+            foreach (var invalidKey in invalidKeys)
             {
                 target.Remove(invalidKey);
             }
@@ -235,8 +266,8 @@ namespace MobX.Utilities
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static string ToCollectionString<T>(this IEnumerable<T> enumerable)
         {
-            StringBuilder stringBuilder = StringBuilderPool.Get();
-            foreach (T item in enumerable)
+            var stringBuilder = StringBuilderPool.Get();
+            foreach (var item in enumerable)
             {
                 var text = item.ToString();
                 stringBuilder.Append(text);
@@ -247,9 +278,10 @@ namespace MobX.Utilities
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static TValue ValueOrDefault<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key, TValue defaultValue = default)
+        public static TValue ValueOrDefault<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key,
+            TValue defaultValue = default)
         {
-            return dictionary.TryGetValue(key, out TValue value) ? value : defaultValue;
+            return dictionary.TryGetValue(key, out var value) ? value : defaultValue;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -259,7 +291,7 @@ namespace MobX.Utilities
             {
                 return -1;
             }
-            EqualityComparer<T> comparer = EqualityComparer<T>.Default;
+            var comparer = EqualityComparer<T>.Default;
             for (var i = 0; i < array.Length; i++)
             {
                 if (comparer.Equals(array[i], element))
@@ -271,7 +303,8 @@ namespace MobX.Utilities
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool TryRemove<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key, out TValue value)
+        public static bool TryRemove<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key,
+            out TValue value)
         {
             if (dictionary.TryGetValue(key, out value))
             {

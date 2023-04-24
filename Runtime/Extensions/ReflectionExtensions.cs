@@ -6,6 +6,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
+using System.Runtime.Serialization;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.Pool;
@@ -1340,6 +1341,53 @@ namespace MobX.Utilities
             ConcurrentListPool<Type>.Release(typesToCheck);
             ConcurrentListPool<MemberInfo>.Release(memberInfos);
             return array;
+        }
+
+        #endregion
+
+
+        #region Unity
+
+        public static bool IsUnitySerializable(this Type type)
+        {
+            // Check if the type is marked with the Serializable attribute
+            if (type.IsDefined(typeof(SerializableAttribute), true))
+            {
+                return true;
+            }
+
+            // Check if the type implements ISerializable interface
+            if (typeof(ISerializable).IsAssignableFrom(type))
+            {
+                return true;
+            }
+
+            // Check if it is a built-in Unity serializable type
+            Type[] unitySerializableTypes =
+            {
+                typeof(Vector2),
+                typeof(Vector3),
+                typeof(Vector4),
+                typeof(Quaternion),
+                typeof(Color),
+                typeof(Rect),
+                typeof(AnimationCurve),
+                typeof(Bounds),
+                typeof(Gradient),
+                typeof(Matrix4x4),
+                typeof(Vector2Int),
+                typeof(Vector3Int),
+                typeof(RectInt),
+                typeof(BoundsInt),
+                typeof(LayerMask)
+            };
+
+            if (Array.IndexOf(unitySerializableTypes, type) != -1)
+            {
+                return true;
+            }
+
+            return false;
         }
 
         #endregion
