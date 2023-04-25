@@ -1,7 +1,6 @@
 ﻿using MobX.Utilities.Inspector;
 using System;
 using System.Reflection;
-using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
 
@@ -9,8 +8,8 @@ namespace MobX.Utilities.Editor.Inspector
 {
     public class SerializedPropertyInspectorMember : InspectorMember
     {
-        private readonly SerializedObject _serializedObject;
-        private readonly SerializedProperty _serializedProperty;
+        private readonly UnityEditor.SerializedObject _serializedObject;
+        private readonly UnityEditor.SerializedProperty _serializedProperty;
         private readonly bool _hideLabel;
         private readonly bool _textArea;
         private readonly bool _listInspector;
@@ -18,7 +17,8 @@ namespace MobX.Utilities.Editor.Inspector
         private readonly bool _readonly;
         private readonly ReorderableList _reorderableList;
 
-        public SerializedPropertyInspectorMember(SerializedProperty serializedProperty, MemberInfo memberInfo, object target) : base(memberInfo, target)
+        public SerializedPropertyInspectorMember(UnityEditor.SerializedProperty serializedProperty,
+            MemberInfo memberInfo, object target) : base(memberInfo, target)
         {
             _serializedProperty = serializedProperty ?? throw new ArgumentNullException(nameof(serializedProperty));
             _serializedObject = serializedProperty.serializedObject;
@@ -36,12 +36,15 @@ namespace MobX.Utilities.Editor.Inspector
             if (memberInfo.TryGetCustomAttribute<ListOptions>(out var listAttribute))
             {
                 _listInspector = true;
-                _reorderableList = new ReorderableList(serializedProperty.serializedObject, serializedProperty, listAttribute.Draggable, listAttribute.DisplayHeader, listAttribute.AddButton,listAttribute.RemoveButton);
-                _reorderableList.drawHeaderCallback += rect => { EditorGUI.LabelField(rect, Label); };
+                _reorderableList = new ReorderableList(serializedProperty.serializedObject, serializedProperty,
+                    listAttribute.Draggable, listAttribute.DisplayHeader, listAttribute.AddButton,
+                    listAttribute.RemoveButton);
+                _reorderableList.drawHeaderCallback += rect => { UnityEditor.EditorGUI.LabelField(rect, Label); };
                 _reorderableList.elementHeight -= 4;
                 _reorderableList.drawElementCallback += (rect, index, _, _) =>
                 {
-                    EditorGUI.PropertyField(rect, serializedProperty.GetArrayElementAtIndex(index), GUIContent.none);
+                    UnityEditor.EditorGUI.PropertyField(rect, serializedProperty.GetArrayElementAtIndex(index),
+                        GUIContent.none);
                 };
             }
         }
@@ -57,12 +60,12 @@ namespace MobX.Utilities.Editor.Inspector
 
             if (_textArea)
             {
-                EditorGUILayout.BeginHorizontal();
-                EditorGUILayout.LabelField(Label, GUILayout.Width(GUIHelper.GetLabelWidth()));
+                UnityEditor.EditorGUILayout.BeginHorizontal();
+                UnityEditor.EditorGUILayout.LabelField(Label, GUILayout.Width(GUIHelper.GetLabelWidth()));
                 GUIHelper.BeginIndentOverride(0);
-                _serializedProperty.stringValue = EditorGUILayout.TextArea(_serializedProperty.stringValue);
+                _serializedProperty.stringValue = UnityEditor.EditorGUILayout.TextArea(_serializedProperty.stringValue);
                 GUIHelper.EndIndentOverride();
-                EditorGUILayout.EndHorizontal();
+                UnityEditor.EditorGUILayout.EndHorizontal();
                 GUI.enabled = enabled;
                 _serializedObject.ApplyModifiedProperties();
                 return;
@@ -80,10 +83,9 @@ namespace MobX.Utilities.Editor.Inspector
                 return;
             }
 
-
             if (_hideLabel)
             {
-                EditorGUILayout.PropertyField(_serializedProperty, GUIContent.none);
+                UnityEditor.EditorGUILayout.PropertyField(_serializedProperty, GUIContent.none);
                 GUI.enabled = enabled;
                 _serializedObject.ApplyModifiedProperties();
                 return;
@@ -91,11 +93,12 @@ namespace MobX.Utilities.Editor.Inspector
 
             try
             {
-                EditorGUILayout.PropertyField(_serializedProperty, Label);
+                UnityEditor.EditorGUILayout.PropertyField(_serializedProperty, Label);
                 _serializedObject.ApplyModifiedProperties();
             }
-            catch (InvalidOperationException)
+            catch (Exception)
             {
+                // ignored
             }
 
             GUI.enabled = enabled;

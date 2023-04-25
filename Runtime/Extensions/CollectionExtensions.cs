@@ -264,14 +264,14 @@ namespace MobX.Utilities
         ///     Returns a string, appending string representation of every element in the collection.
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static string ToCollectionString<T>(this IEnumerable<T> enumerable)
+        public static string ToCollectionString<T>(this IEnumerable<T> enumerable, string separator = "\n")
         {
             var stringBuilder = StringBuilderPool.Get();
             foreach (var item in enumerable)
             {
                 var text = item.ToString();
                 stringBuilder.Append(text);
-                stringBuilder.Append('\n');
+                stringBuilder.Append(separator);
             }
 
             return StringBuilderPool.Release(stringBuilder);
@@ -313,6 +313,18 @@ namespace MobX.Utilities
             }
 
             return false;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static TValue GetOrCreate<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key)
+            where TValue : new()
+        {
+            if (!dictionary.TryGetValue(key, out var value))
+            {
+                value = new TValue();
+                dictionary.Add(key, value);
+            }
+            return value;
         }
     }
 }

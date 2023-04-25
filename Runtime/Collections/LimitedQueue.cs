@@ -1,111 +1,52 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Text;
 using UnityEngine;
 
 namespace MobX.Utilities.Collections
 {
     /// <summary>
-    /// Class acts as a limited and fast generic first in last out collection.
+    ///     Class acts as a limited and fast generic first in last out collection.
     /// </summary>
     public sealed class LimitedQueue<T> : IEnumerable<T>, IQueue<T>
     {
-        private readonly List<T> _data;
-        private int _index;
-        private readonly int _maxCapacity;
+        private readonly Queue<T> _queue;
 
-        public int Capacity => _maxCapacity;
-        public int Count => _data.Count - _index;
-        public int Range { get; private set; }
+        public int Capacity { get; }
+        public int Count => _queue.Count;
 
         public LimitedQueue(int max)
         {
-            _maxCapacity = Mathf.Max(1, max);
-            _data = new List<T>(_maxCapacity);
-        }
-
-        public T this[int i]
-        {
-            get
-            {
-                var index = _index + i;
-                if (index >= _data.Count)
-                {
-                    throw new ArgumentException($"queue index {index} > last index {_data.Count - 1}");
-                }
-
-                if (index < 0)
-                {
-                    throw new ArgumentException($"queue index {index} < 0");
-                }
-
-                if (index > Range)
-                {
-                    Range = index;
-                }
-
-                return _data[index];
-            }
+            Capacity = Mathf.Max(1, max);
+            _queue = new Queue<T>(Capacity);
         }
 
         public T Dequeue()
         {
-            if (Count == 0)
-            {
-                throw new InvalidOperationException();
-            }
-
-            var obj = this[0];
-            ++_index;
-            if (_index != _data.Count)
-            {
-                return obj;
-            }
-
-            Clear();
-            return obj;
+            return _queue.Dequeue();
         }
 
         public void Enqueue(T item)
         {
-            _data.Add(item);
-            if (_data.Count > _maxCapacity)
+            _queue.Enqueue(item);
+            if (_queue.Count > Capacity)
             {
-                Dequeue();
+                _queue.Dequeue();
             }
         }
 
         public T Peek()
         {
-            return this[0];
+            return _queue.Peek();
         }
 
         public void Clear()
         {
-            _index = 0;
-            _data.Clear();
-        }
-
-        public override string ToString()
-        {
-            var stringBuilder = new StringBuilder();
-            var count = Count;
-            for (var i = 0; i < count; ++i)
-            {
-                stringBuilder.Append(this[i]);
-                if (i + 1 < count)
-                {
-                    stringBuilder.Append(" ");
-                }
-            }
-
-            return stringBuilder.ToString();
+            _queue.Clear();
         }
 
         public IEnumerator<T> GetEnumerator()
         {
-            return _data.GetEnumerator();
+            return _queue.GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
