@@ -138,6 +138,70 @@ namespace MobX.Utilities
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool EnqueueUnique<T>([NotNull] this Queue<T> queue, T value)
+        {
+            if (queue == null)
+            {
+                throw new ArgumentNullException(nameof(queue));
+            }
+
+            if (queue.Contains(value))
+            {
+                return false;
+            }
+
+            queue.Enqueue(value);
+            return true;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool Remove<T>(this Queue<T> queue, T element)
+        {
+            if (queue == null)
+            {
+                throw new ArgumentNullException(nameof(queue));
+            }
+
+            var removed = false;
+            var initialCount = queue.Count;
+            var tempQueue = QueuePool<T>.Get();
+
+            for (var i = 0; i < initialCount; i++)
+            {
+                var item = queue.Dequeue();
+                if (!removed && EqualityComparer<T>.Default.Equals(item, element))
+                {
+                    removed = true;
+                }
+                else
+                {
+                    tempQueue.Enqueue(item);
+                }
+            }
+
+            while (tempQueue.Count > 0)
+            {
+                queue.Enqueue(tempQueue.Dequeue());
+            }
+
+            QueuePool<T>.Release(tempQueue);
+            return removed;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void EnqueueRange<T>(this Queue<T> queue, IEnumerable<T> range)
+        {
+            if (queue == null)
+            {
+                throw new ArgumentNullException(nameof(queue));
+            }
+            foreach (var item in range)
+            {
+                queue.Enqueue(item);
+            }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void UpdateEntry<T>([NotNull] this IList<T> list, T value, bool nullCheck = false)
         {
             if (list == null)
@@ -176,7 +240,7 @@ namespace MobX.Utilities
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void UpdateEntry<TKey, TValue>(this IDictionary<TKey, TValue> target, TKey key, TValue value)
+        public static void Update<TKey, TValue>(this IDictionary<TKey, TValue> target, TKey key, TValue value)
         {
             if (target == null)
             {
@@ -193,7 +257,7 @@ namespace MobX.Utilities
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void UpdateEntry<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key,
+        public static void Update<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key,
             Func<TValue, TValue> updateFunc)
         {
             if (dictionary.ContainsKey(key))
@@ -313,6 +377,15 @@ namespace MobX.Utilities
             }
 
             return false;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static TValue Pop<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key)
+        {
+            var value = dictionary[key];
+            dictionary.Remove(key);
+
+            return value;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

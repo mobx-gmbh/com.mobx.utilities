@@ -1,108 +1,137 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace MobX.Utilities.Collections
 {
-    public class DictionaryQueue<TKey, TValue>
+    public class DictionaryQueue<TKey, TValue> : IEnumerable<KeyValuePair<TKey, TValue>>
     {
-        private readonly Queue<TKey> _queue;
-        private readonly Dictionary<TKey, TValue> _dictionary;
+        public Queue<TKey> Queue { get; }
 
-        public DictionaryQueue()
+        public Dictionary<TKey, TValue> Dictionary { get; }
+
+        public DictionaryQueue(int capacity = 4)
         {
-            _queue = new Queue<TKey>();
-            _dictionary = new Dictionary<TKey, TValue>();
+            Queue = new Queue<TKey>(capacity);
+            Dictionary = new Dictionary<TKey, TValue>(capacity);
         }
 
         public void Clear()
         {
-            _queue.Clear();
-            _dictionary.Clear();
+            Queue.Clear();
+            Dictionary.Clear();
         }
 
         public void Enqueue(TKey key, TValue value)
         {
-            if (_dictionary.ContainsKey(key))
+            if (Dictionary.ContainsKey(key))
             {
                 throw new ArgumentException("An element with the same key already exists in the DictionaryQueue.");
             }
 
-            _queue.Enqueue(key);
-            _dictionary.Add(key, value);
+            Queue.Enqueue(key);
+            Dictionary.Add(key, value);
         }
 
         public bool TryPeek(out TValue value)
         {
-            if (_queue.Count == 0)
+            if (Queue.Count == 0)
             {
                 value = default(TValue);
                 return false;
             }
 
-            var key = _queue.Peek();
-            value = _dictionary[key];
+            var key = Queue.Peek();
+            value = Dictionary[key];
             return true;
+        }
+
+        public bool TryPeekKey(out TKey key)
+        {
+            if (Queue.Count == 0)
+            {
+                key = default(TKey);
+                return false;
+            }
+
+            key = Queue.Peek();
+            return true;
+        }
+
+        public TKey PeekKey()
+        {
+            return Queue.Peek();
         }
 
         public bool TryDequeue(out TValue value)
         {
-            if (_queue.Count == 0)
+            if (Queue.Count == 0)
             {
                 value = default(TValue);
                 return false;
             }
 
-            var key = _queue.Dequeue();
-            value = _dictionary[key];
-            _dictionary.Remove(key);
+            var key = Queue.Dequeue();
+            value = Dictionary[key];
+            Dictionary.Remove(key);
             return true;
         }
 
         public TValue Dequeue()
         {
-            if (_queue.Count == 0)
+            if (Queue.Count == 0)
             {
                 throw new InvalidOperationException("The DictionaryQueue is empty.");
             }
 
-            var key = _queue.Dequeue();
-            var value = _dictionary[key];
-            _dictionary.Remove(key);
+            var key = Queue.Dequeue();
+            var value = Dictionary[key];
+            Dictionary.Remove(key);
             return value;
         }
 
         public void UpdateElement(TKey key, TValue item)
         {
-            if (!_dictionary.ContainsKey(key))
+            if (!Dictionary.ContainsKey(key))
             {
                 throw new KeyNotFoundException("The specified key does not exist in the DictionaryQueue.");
             }
 
-            _dictionary[key] = item;
+            Dictionary[key] = item;
         }
 
-        public int Count => _queue.Count;
+        public int Count => Queue.Count;
 
         public bool ContainsKey(TKey key)
         {
-            return _dictionary.ContainsKey(key);
+            return Dictionary.ContainsKey(key);
         }
 
         public bool TryGetValue(TKey key, out TValue value)
         {
-            return _dictionary.TryGetValue(key, out value);
+            return Dictionary.TryGetValue(key, out value);
         }
 
         public void Update(TKey key, TValue value)
         {
-            if (_dictionary.ContainsKey(key))
+            if (Dictionary.ContainsKey(key))
             {
-                _dictionary[key] = value;
+                Dictionary[key] = value;
                 return;
             }
 
-            _queue.Enqueue(key);
-            _dictionary.Add(key, value);
+            Queue.Enqueue(key);
+            Dictionary.Add(key, value);
+        }
+
+        public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()
+        {
+            return Dictionary.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
         }
     }
 }

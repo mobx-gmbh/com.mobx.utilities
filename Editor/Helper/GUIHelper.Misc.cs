@@ -202,9 +202,25 @@ namespace MobX.Utilities.Editor
             }
             else
             {
+                // ReSharper disable once Unity.PerformanceCriticalCodeInvocation
                 UnityEngine.Debug.LogError(
                     $"Mismatched calls of {nameof(BeginEnabledOverride)} & {nameof(EndEnabledOverride)}!");
             }
+        }
+
+        public static float GetPropertyHeight(this UnityEditor.SerializedProperty property)
+        {
+            if (!property.isExpanded)
+            {
+                return UnityEditor.EditorGUIUtility.singleLineHeight; // single line if not expanded
+            }
+            return (2 + property.arraySize.Min(1)) * LineHeight();
+        }
+
+        public static float LineHeight()
+        {
+            return UnityEditor.EditorGUIUtility.singleLineHeight +
+                   UnityEditor.EditorGUIUtility.standardVerticalSpacing;
         }
     }
 }

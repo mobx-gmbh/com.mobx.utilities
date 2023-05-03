@@ -1,39 +1,76 @@
 ﻿using MobX.Utilities.Types;
-using UnityEditor;
 using UnityEngine;
 
 namespace MobX.Utilities.Editor.Inspector
 {
-    [CustomPropertyDrawer(typeof(Optional<>))]
+    [UnityEditor.CustomPropertyDrawer(typeof(Optional<>))]
     public class OptionalValuePropertyDrawer : UnityEditor.PropertyDrawer
     {
-        private readonly GUIContent _whiteSpace = new GUIContent("   ");
+        private bool _isArray;
+        private UnityEditor.SerializedProperty _arrayProperty;
+        private UnityEditor.SerializedProperty _enabledProperty;
+
+        public override float GetPropertyHeight(UnityEditor.SerializedProperty property, GUIContent label)
+        {
+            if (_isArray && _enabledProperty.boolValue)
+            {
+                return _arrayProperty.GetPropertyHeight() + GUIHelper.LineHeight();
+            }
+            return base.GetPropertyHeight(property, label);
+        }
 
         /// <summary>
-        ///   <para>Override this method to make your own IMGUI based GUI for the property.</para>
+        ///     <para>Override this method to make your own IMGUI based GUI for the property.</para>
         /// </summary>
         /// <param name="position">Rectangle on the screen to use for the property GUI.</param>
         /// <param name="property">The SerializedProperty to make the custom GUI for.</param>
         /// <param name="label">The label of this property.</param>
-        public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
+        public override void OnGUI(Rect position, UnityEditor.SerializedProperty property, GUIContent label)
         {
+            property.serializedObject.Update();
+
             var enabledProperty = property.FindPropertyRelative("enabled");
             var valueProperty = property.FindPropertyRelative("value");
-            var guiEnabled = GUI.enabled;
-            const int Width = 60;
-            GUI.enabled = enabledProperty.boolValue;
-            var valueRect = position;
-            valueRect.x += Width;
-            valueRect.width -= Width;
-            var labelWidth = EditorGUIUtility.labelWidth;
-            EditorGUIUtility.labelWidth -= Width;
-            _whiteSpace.tooltip = label.tooltip;
-            EditorGUI.PropertyField(valueRect, valueProperty, _whiteSpace);
-            EditorGUIUtility.labelWidth = labelWidth;
-            GUI.enabled = guiEnabled;
-            var boolRect = position;
-            boolRect.width = EditorGUIUtility.labelWidth - Width;
-            enabledProperty.boolValue = EditorGUI.ToggleLeft(boolRect, label, enabledProperty.boolValue);
+
+            _isArray = valueProperty.isArray && valueProperty.type != "string";
+            _arrayProperty = valueProperty;
+            _enabledProperty = enabledProperty;
+
+            if (_isArray)
+            {
+                DrawMultiLine(position, enabledProperty, valueProperty, label);
+            }
+            else
+            {
+                DrawSingleLine(position, enabledProperty, valueProperty, label);
+            }
+
+            property.serializedObject.ApplyModifiedProperties();
+        }
+
+        private static void DrawMultiLine(Rect position, UnityEditor.SerializedProperty enabledProperty,
+            UnityEditor.SerializedProperty valueProperty, GUIContent label)
+        {
+            enabledProperty.boolValue = UnityEditor.EditorGUI.Toggle(position, label, enabledProperty.boolValue);
+
+            if (enabledProperty.boolValue)
+            {
+                var offset = GUIHelper.LineHeight();
+                var rect = position.WithOffset(y: offset, height: -offset);
+                UnityEditor.EditorGUI.PropertyField(rect, valueProperty, new GUIContent("Content"));
+            }
+        }
+
+        private static void DrawSingleLine(Rect position, UnityEditor.SerializedProperty enabledProperty,
+            UnityEditor.SerializedProperty valueProperty, GUIContent label)
+        {
+            var boolRect = position.WithWidth(UnityEditor.EditorGUIUtility.labelWidth - 12);
+            var valueRect = position.WithOffset(UnityEditor.EditorGUIUtility.labelWidth - 12);
+            enabledProperty.boolValue = UnityEditor.EditorGUI.ToggleLeft(boolRect, label, enabledProperty.boolValue);
+            enabledProperty.serializedObject.ApplyModifiedProperties();
+            GUIHelper.BeginEnabledOverride(enabledProperty.boolValue);
+            UnityEditor.EditorGUI.PropertyField(valueRect, valueProperty, GUIContent.none);
+            GUIHelper.EndEnabledOverride();
         }
     }
 }
