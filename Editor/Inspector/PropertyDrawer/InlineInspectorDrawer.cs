@@ -1,37 +1,39 @@
 ﻿using MobX.Utilities.Inspector;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace MobX.Utilities.Editor.Inspector
 {
     [UnityEditor.CustomPropertyDrawer(typeof(InlineInspectorAttribute))]
-    class InlineInspectorDrawer : UnityEditor.PropertyDrawer
+    internal class InlineInspectorDrawer : UnityEditor.PropertyDrawer
     {
         private UnityEditor.Editor _inspector;
         private InlineInspectorAttribute _inspectorAttribute;
         private string _key;
+        private bool _required;
 
-        private static readonly Dictionary<Object, FoldoutHandler> foldoutHandlers = new();
-
-        private FoldoutHandler Foldout(Object target)
+        public override float GetPropertyHeight(UnityEditor.SerializedProperty property, GUIContent label)
         {
-            if (foldoutHandlers.TryGetValue(target, out FoldoutHandler handler))
-            {
-                return handler;
-            }
-
-            handler = new FoldoutHandler(target.name);
-            foldoutHandlers.Add(target, handler);
-            return handler;
+            return 0;
         }
 
         public override void OnGUI(Rect position, UnityEditor.SerializedProperty property, GUIContent label)
         {
-            UnityEditor.EditorGUI.PropertyField(position, property, label);
+            if (_required && property.objectReferenceValue == null)
+            {
+                var message = $"{property.displayName} is Required!";
+                UnityEditor.EditorGUILayout.HelpBox(message, UnityEditor.MessageType.Error);
+            }
+
+            UnityEditor.EditorGUILayout.PropertyField(property, label);
 
             if (property.propertyType != UnityEditor.SerializedPropertyType.ObjectReference)
             {
                 return;
+            }
+
+            if (attribute is InlineInspectorAttribute inlineInspectorAttribute)
+            {
+                _required = inlineInspectorAttribute.Required;
             }
 
             if (property.objectReferenceValue == null)
@@ -45,13 +47,13 @@ namespace MobX.Utilities.Editor.Inspector
                 return;
             }
 
-            _inspectorAttribute ??= (InlineInspectorAttribute)attribute;
+            _inspectorAttribute ??= (InlineInspectorAttribute) attribute;
             GetOrCreateInspector(property).OnInspectorGUI();
         }
 
         private UnityEditor.Editor GetOrCreateInspector(UnityEditor.SerializedProperty property)
         {
-            _inspectorAttribute ??= (InlineInspectorAttribute)attribute;
+            _inspectorAttribute ??= (InlineInspectorAttribute) attribute;
 
             if (_inspector && _inspector.target != property.objectReferenceValue)
             {
