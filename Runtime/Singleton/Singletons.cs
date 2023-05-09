@@ -1,7 +1,6 @@
 using MobX.Utilities.Inspector;
 using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -52,7 +51,7 @@ namespace MobX.Utilities.Singleton
         public static void Register<T>(T instance) where T : Object
         {
 #if UNITY_EDITOR
-            static async Task WaitWhile(Func<bool> condition)
+            async static Task WaitWhile(Func<bool> condition)
             {
                 while (condition())
                 {
@@ -60,10 +59,7 @@ namespace MobX.Utilities.Singleton
                 }
             }
 
-            static bool IsImport()
-            {
-                return UnityEditor.EditorApplication.isCompiling || UnityEditor.EditorApplication.isUpdating;
-            }
+            static bool IsImport() => UnityEditor.EditorApplication.isCompiling || UnityEditor.EditorApplication.isUpdating;
 
             if (IsImport())
             {
@@ -97,7 +93,7 @@ namespace MobX.Utilities.Singleton
             {
                 if (Singleton.registry[i].GetType() == typeof(T))
                 {
-                    return (T) Singleton.registry[i];
+                    return (T)Singleton.registry[i];
                 }
             }
 
@@ -128,22 +124,23 @@ namespace MobX.Utilities.Singleton
 
         public static Singletons Singleton
         {
-            [MethodImpl(MethodImplOptions.Synchronized)]
             get
             {
                 // In the editor we load the singleton from the asset database.
 #if UNITY_EDITOR
-                if (singleton == null)
+                if (singleton != null)
                 {
-                    var guids = UnityEditor.AssetDatabase.FindAssets($"t:{typeof(Singletons)}");
-                    for (var i = 0; i < guids.Length; i++)
+                    return singleton;
+                }
+
+                var guids = UnityEditor.AssetDatabase.FindAssets($"t:{typeof(Singletons)}");
+                for (var i = 0; i < guids.Length; i++)
+                {
+                    var path = UnityEditor.AssetDatabase.GUIDToAssetPath(guids[i]);
+                    singleton = UnityEditor.AssetDatabase.LoadAssetAtPath<Singletons>(path);
+                    if (singleton != null)
                     {
-                        var path = UnityEditor.AssetDatabase.GUIDToAssetPath(guids[i]);
-                        singleton = UnityEditor.AssetDatabase.LoadAssetAtPath<Singletons>(path);
-                        if (singleton != null)
-                        {
-                            break;
-                        }
+                        break;
                     }
                 }
 #endif
