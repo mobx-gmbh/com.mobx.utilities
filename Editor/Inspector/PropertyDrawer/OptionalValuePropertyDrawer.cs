@@ -64,8 +64,9 @@ namespace MobX.Utilities.Editor.Inspector
         private static void DrawSingleLine(Rect position, UnityEditor.SerializedProperty enabledProperty,
             UnityEditor.SerializedProperty valueProperty, GUIContent label)
         {
-            var boolRect = position.WithWidth(UnityEditor.EditorGUIUtility.labelWidth - 12);
-            var valueRect = position.WithOffset(UnityEditor.EditorGUIUtility.labelWidth - 12);
+            var labelWidth = UnityEditor.EditorGUIUtility.labelWidth - 12;
+            var boolRect = position.WithWidth(labelWidth);
+            var valueRect = new Rect(position.x + labelWidth, position.y, position.width - labelWidth, position.height);
             enabledProperty.boolValue = UnityEditor.EditorGUI.ToggleLeft(boolRect, label, enabledProperty.boolValue);
             enabledProperty.serializedObject.ApplyModifiedProperties();
             GUIHelper.BeginEnabledOverride(enabledProperty.boolValue);
