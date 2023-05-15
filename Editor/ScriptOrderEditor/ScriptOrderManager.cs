@@ -1,14 +1,14 @@
 using MobX.Utilities.Reflection;
 using System;
 using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
 
-namespace MobX.Utilities.Editor
+namespace MobX.Utilities.Editor.ScriptOrderEditor
 {
     /// <summary>
-    /// Dynamically manages script execution order for Mono scripts based on these attributes:<br/>
-    /// <see cref="ExecuteAfterAttribute"/>, <see cref="ExecuteAfterAttribute"/> or <see cref="ExecutionOrderAttribute"/>
+    ///     Dynamically manages script execution order for Mono scripts based on these attributes:<br />
+    ///     <see cref="ExecuteAfterAttribute" />, <see cref="ExecuteAfterAttribute" /> or
+    ///     <see cref="ExecutionOrderAttribute" />
     /// </summary>
     public static class ExecutionOrderAttributeEditor
     {
@@ -18,28 +18,32 @@ namespace MobX.Utilities.Editor
         {
             public struct Edge
             {
-                public MonoScript Node;
+                public UnityEditor.MonoScript Node;
                 public int Weight;
             }
 
-            public static Dictionary<MonoScript, List<Edge>> Create(List<OrderDefinition> definitions,
+            public static Dictionary<UnityEditor.MonoScript, List<Edge>> Create(List<OrderDefinition> definitions,
                 List<OrderDependency> dependencies)
             {
-                var graph = new Dictionary<MonoScript, List<Edge>>();
+                var graph = new Dictionary<UnityEditor.MonoScript, List<Edge>>();
 
                 for (var i = 0; i < dependencies.Count; i++)
                 {
-                    var dependency = dependencies[i];
-                    var source = dependency.FirstScript;
-                    var dest = dependency.SecondScript;
+                    OrderDependency dependency = dependencies[i];
+                    UnityEditor.MonoScript source = dependency.FirstScript;
+                    UnityEditor.MonoScript dest = dependency.SecondScript;
 
-                    if (!graph.TryGetValue(source, out var edges))
+                    if (!graph.TryGetValue(source, out List<Edge> edges))
                     {
                         edges = new List<Edge>();
                         graph.Add(source, edges);
                     }
 
-                    edges.Add(new Edge() {Node = dest, Weight = dependency.OrderDelta});
+                    edges.Add(new Edge
+                    {
+                        Node = dest,
+                        Weight = dependency.OrderDelta
+                    });
                     if (!graph.ContainsKey(dest))
                     {
                         graph.Add(dest, new List<Edge>());
@@ -48,8 +52,8 @@ namespace MobX.Utilities.Editor
 
                 for (var i = 0; i < definitions.Count; i++)
                 {
-                    var definition = definitions[i];
-                    var node = definition.Script;
+                    OrderDefinition definition = definitions[i];
+                    UnityEditor.MonoScript node = definition.Script;
                     if (!graph.ContainsKey(node))
                     {
                         graph.Add(node, new List<Edge>());
@@ -60,10 +64,10 @@ namespace MobX.Utilities.Editor
             }
 
             private static bool IsCyclicRecursion(
-                Dictionary<MonoScript, List<Edge>> graph,
-                MonoScript node,
-                Dictionary<MonoScript, bool> visited,
-                Dictionary<MonoScript, bool> inPath)
+                Dictionary<UnityEditor.MonoScript, List<Edge>> graph,
+                UnityEditor.MonoScript node,
+                Dictionary<UnityEditor.MonoScript, bool> visited,
+                Dictionary<UnityEditor.MonoScript, bool> inPath)
             {
                 if (visited[node])
                 {
@@ -75,8 +79,8 @@ namespace MobX.Utilities.Editor
 
                 for (var i = 0; i < graph[node].Count; i++)
                 {
-                    var edge = graph[node][i];
-                    var succeeding = edge.Node;
+                    Edge edge = graph[node][i];
+                    UnityEditor.MonoScript succeeding = edge.Node;
                     if (!IsCyclicRecursion(graph, succeeding, visited, inPath))
                     {
                         continue;
@@ -90,20 +94,20 @@ namespace MobX.Utilities.Editor
                 return false;
             }
 
-            public static bool IsCyclic(Dictionary<MonoScript, List<Edge>> graph)
+            public static bool IsCyclic(Dictionary<UnityEditor.MonoScript, List<Edge>> graph)
             {
-                var visited = new Dictionary<MonoScript, bool>();
-                var inPath = new Dictionary<MonoScript, bool>();
+                var visited = new Dictionary<UnityEditor.MonoScript, bool>();
+                var inPath = new Dictionary<UnityEditor.MonoScript, bool>();
 
-                var keys = graph.Keys;
+                Dictionary<UnityEditor.MonoScript, List<Edge>>.KeyCollection keys = graph.Keys;
 
-                foreach (var node in keys)
+                foreach (UnityEditor.MonoScript node in keys)
                 {
                     visited.Add(node, false);
                     inPath.Add(node, false);
                 }
 
-                foreach (var node in keys)
+                foreach (UnityEditor.MonoScript node in keys)
                 {
                     if (IsCyclicRecursion(graph, node, visited, inPath))
                     {
@@ -114,26 +118,26 @@ namespace MobX.Utilities.Editor
                 return false;
             }
 
-            public static List<MonoScript> GetRoots(Dictionary<MonoScript, List<Edge>> graph)
+            public static List<UnityEditor.MonoScript> GetRoots(Dictionary<UnityEditor.MonoScript, List<Edge>> graph)
             {
-                var degrees = new Dictionary<MonoScript, int>();
+                var degrees = new Dictionary<UnityEditor.MonoScript, int>();
 
-                foreach (var node in graph.Keys)
+                foreach (UnityEditor.MonoScript node in graph.Keys)
                 {
                     degrees.Add(node, 0);
                 }
 
-                foreach (var (_, edges) in graph)
+                foreach ((var _, List<Edge> edges) in graph)
                 {
-                    foreach (var edge in edges)
+                    foreach (Edge edge in edges)
                     {
-                        var succeeding = edge.Node;
+                        UnityEditor.MonoScript succeeding = edge.Node;
                         degrees[succeeding]++;
                     }
                 }
 
-                var roots = new List<MonoScript>();
-                foreach (var (node, degree) in degrees)
+                var roots = new List<UnityEditor.MonoScript>();
+                foreach ((UnityEditor.MonoScript node, var degree) in degrees)
                 {
                     if (degree == 0)
                     {
@@ -144,28 +148,28 @@ namespace MobX.Utilities.Editor
                 return roots;
             }
 
-            public static void PropagateValues(Dictionary<MonoScript, List<Edge>> graph,
-                Dictionary<MonoScript, int> values)
+            public static void PropagateValues(Dictionary<UnityEditor.MonoScript, List<Edge>> graph,
+                Dictionary<UnityEditor.MonoScript, int> values)
             {
-                var queue = new Queue<MonoScript>();
+                var queue = new Queue<UnityEditor.MonoScript>();
 
-                foreach (var node in values.Keys)
+                foreach (UnityEditor.MonoScript node in values.Keys)
                 {
                     queue.Enqueue(node);
                 }
 
                 while (queue.Count > 0)
                 {
-                    var node = queue.Dequeue();
+                    UnityEditor.MonoScript node = queue.Dequeue();
                     var currentValue = values[node];
 
-                    foreach (var edge in graph[node])
+                    foreach (Edge edge in graph[node])
                     {
-                        var succeeding = edge.Node;
+                        UnityEditor.MonoScript succeeding = edge.Node;
                         var newValue = currentValue + edge.Weight;
                         var hasPrevValue = values.TryGetValue(succeeding, out var previousValue);
                         var newValueBeyond =
-                            (edge.Weight > 0) ? (newValue > previousValue) : (newValue < previousValue);
+                            edge.Weight > 0 ? newValue > previousValue : newValue < previousValue;
                         if (hasPrevValue && !newValueBeyond)
                         {
                             continue;
@@ -180,14 +184,14 @@ namespace MobX.Utilities.Editor
 
         private struct OrderDefinition
         {
-            public MonoScript Script { get; set; }
+            public UnityEditor.MonoScript Script { get; set; }
             public int Order { get; set; }
         }
 
         private struct OrderDependency
         {
-            public MonoScript FirstScript { get; set; }
-            public MonoScript SecondScript { get; set; }
+            public UnityEditor.MonoScript FirstScript { get; set; }
+            public UnityEditor.MonoScript SecondScript { get; set; }
             public int OrderDelta { get; set; }
         }
 
@@ -199,10 +203,10 @@ namespace MobX.Utilities.Editor
         [UnityEditor.Callbacks.DidReloadScripts]
         private static void OnDidReloadScripts()
         {
-            var types = GetTypeDictionary();
-            var definitions = GetExecutionOrderDefinitions(types);
-            var dependencies = GetExecutionOrderDependencies(types);
-            var graph = Graph.Create(definitions, dependencies);
+            Dictionary<Type, UnityEditor.MonoScript> types = GetTypeDictionary();
+            List<OrderDefinition> definitions = GetExecutionOrderDefinitions(types);
+            List<OrderDependency> dependencies = GetExecutionOrderDependencies(types);
+            Dictionary<UnityEditor.MonoScript, List<Graph.Edge>> graph = Graph.Create(definitions, dependencies);
 
             if (Graph.IsCyclic(graph))
             {
@@ -210,8 +214,8 @@ namespace MobX.Utilities.Editor
                 return;
             }
 
-            var roots = Graph.GetRoots(graph);
-            var orders = GetInitialExecutionOrder(definitions, roots);
+            List<UnityEditor.MonoScript> roots = Graph.GetRoots(graph);
+            Dictionary<UnityEditor.MonoScript, int> orders = GetInitialExecutionOrder(definitions, roots);
             Graph.PropagateValues(graph, orders);
 
             UpdateExecutionOrder(orders);
@@ -222,11 +226,11 @@ namespace MobX.Utilities.Editor
 
         #region Logic
 
-        private static List<OrderDependency> GetExecutionOrderDependencies(Dictionary<Type, MonoScript> types)
+        private static List<OrderDependency> GetExecutionOrderDependencies(Dictionary<Type, UnityEditor.MonoScript> types)
         {
             var list = new List<OrderDependency>();
 
-            foreach (var (type, script) in types)
+            foreach ((Type type, UnityEditor.MonoScript script) in types)
             {
                 var hasExecutionOrderAttribute = Attribute.IsDefined(type, typeof(ExecutionOrderAttribute), true);
                 var hasExecuteAfterAttribute = Attribute.IsDefined(type, typeof(ExecuteAfterAttribute), true);
@@ -248,8 +252,8 @@ namespace MobX.Utilities.Editor
             return list;
         }
 
-        private static void GetExecuteBeforeDependencies(Dictionary<Type, MonoScript> types,
-            bool hasExecutionOrderAttribute, MonoScript script,
+        private static void GetExecuteBeforeDependencies(Dictionary<Type, UnityEditor.MonoScript> types,
+            bool hasExecutionOrderAttribute, UnityEditor.MonoScript script,
             bool hasExecuteAfterAttribute, Type type, List<OrderDependency> list)
         {
             if (hasExecutionOrderAttribute)
@@ -272,7 +276,7 @@ namespace MobX.Utilities.Editor
                 (ExecuteBeforeAttribute[]) Attribute.GetCustomAttributes(type, typeof(ExecuteBeforeAttribute), true);
             for (var i = 0; i < attributes.Length; i++)
             {
-                var attribute = attributes[i];
+                ExecuteBeforeAttribute attribute = attributes[i];
                 if (attribute.OrderDecrease < 0)
                 {
                     UnityEngine.Debug.LogError(
@@ -290,17 +294,19 @@ namespace MobX.Utilities.Editor
                     continue;
                 }
 
-                var targetScript = types[attribute.TargetType];
-                var dependency = new OrderDependency()
+                UnityEditor.MonoScript targetScript = types[attribute.TargetType];
+                var dependency = new OrderDependency
                 {
-                    FirstScript = targetScript, SecondScript = script, OrderDelta = -attribute.OrderDecrease
+                    FirstScript = targetScript,
+                    SecondScript = script,
+                    OrderDelta = -attribute.OrderDecrease
                 };
                 list.Add(dependency);
             }
         }
 
-        private static bool GetExecuteAfterDependencies(Dictionary<Type, MonoScript> types,
-            bool hasExecutionOrderAttribute, MonoScript script, Type type, List<OrderDependency> list)
+        private static bool GetExecuteAfterDependencies(Dictionary<Type, UnityEditor.MonoScript> types,
+            bool hasExecutionOrderAttribute, UnityEditor.MonoScript script, Type type, List<OrderDependency> list)
         {
             if (hasExecutionOrderAttribute)
             {
@@ -312,7 +318,7 @@ namespace MobX.Utilities.Editor
 
             var attributes =
                 (ExecuteAfterAttribute[]) Attribute.GetCustomAttributes(type, typeof(ExecuteAfterAttribute), true);
-            foreach (var attribute in attributes)
+            foreach (ExecuteAfterAttribute attribute in attributes)
             {
                 if (!attribute.TargetType.IsSubclassOf(typeof(MonoBehaviour)) &&
                     !attribute.TargetType.IsSubclassOf(typeof(ScriptableObject)))
@@ -323,20 +329,24 @@ namespace MobX.Utilities.Editor
                     continue;
                 }
 
-                var targetScript = types[attribute.TargetType];
-                var dependency = new OrderDependency()
-                    {FirstScript = targetScript, SecondScript = script, OrderDelta = (int) attribute.OrderIncrease};
+                UnityEditor.MonoScript targetScript = types[attribute.TargetType];
+                var dependency = new OrderDependency
+                {
+                    FirstScript = targetScript,
+                    SecondScript = script,
+                    OrderDelta = (int) attribute.OrderIncrease
+                };
                 list.Add(dependency);
             }
 
             return false;
         }
 
-        private static List<OrderDefinition> GetExecutionOrderDefinitions(Dictionary<Type, MonoScript> types)
+        private static List<OrderDefinition> GetExecutionOrderDefinitions(Dictionary<Type, UnityEditor.MonoScript> types)
         {
             var list = new List<OrderDefinition>();
 
-            foreach (var (type, script) in types)
+            foreach ((Type type, UnityEditor.MonoScript script) in types)
             {
                 if (!Attribute.IsDefined(type, typeof(ExecutionOrderAttribute), true))
                 {
@@ -345,64 +355,67 @@ namespace MobX.Utilities.Editor
 
                 var attribute =
                     (ExecutionOrderAttribute) Attribute.GetCustomAttribute(type, typeof(ExecutionOrderAttribute), true);
-                var definition = new OrderDefinition()
-                    {Script = script, Order = attribute.Order};
+                var definition = new OrderDefinition
+                {
+                    Script = script,
+                    Order = attribute.Order
+                };
                 list.Add(definition);
             }
 
             return list;
         }
 
-        private static Dictionary<MonoScript, int> GetInitialExecutionOrder(List<OrderDefinition> definitions,
-            List<MonoScript> graphRoots)
+        private static Dictionary<UnityEditor.MonoScript, int> GetInitialExecutionOrder(List<OrderDefinition> definitions,
+            List<UnityEditor.MonoScript> graphRoots)
         {
-            var orders = new Dictionary<MonoScript, int>();
+            var orders = new Dictionary<UnityEditor.MonoScript, int>();
             for (var i = 0; i < definitions.Count; i++)
             {
-                var definition = definitions[i];
-                var script = definition.Script;
+                OrderDefinition definition = definitions[i];
+                UnityEditor.MonoScript script = definition.Script;
                 var order = definition.Order;
                 orders.Add(script, order);
             }
 
             for (var i = 0; i < graphRoots.Count; i++)
             {
-                var script = graphRoots[i];
+                UnityEditor.MonoScript script = graphRoots[i];
                 if (orders.ContainsKey(script))
                 {
                     continue;
                 }
 
-                var order = MonoImporter.GetExecutionOrder(script);
+                var order = UnityEditor.MonoImporter.GetExecutionOrder(script);
                 orders.Add(script, order);
             }
 
             return orders;
         }
 
-        private static void UpdateExecutionOrder(Dictionary<MonoScript, int> orders)
+        private static void UpdateExecutionOrder(Dictionary<UnityEditor.MonoScript, int> orders)
         {
             var startedEdit = false;
 
-            foreach (var (script, order) in orders)
+            foreach ((UnityEditor.MonoScript script, var order) in orders)
             {
-                if (MonoImporter.GetExecutionOrder(script) == order)
+                if (UnityEditor.MonoImporter.GetExecutionOrder(script) == order)
                 {
                     continue;
                 }
 
                 if (!startedEdit)
                 {
-                    AssetDatabase.StartAssetEditing();
+                    UnityEditor.AssetDatabase.StartAssetEditing();
                     startedEdit = true;
                 }
 
-                MonoImporter.SetExecutionOrder(script, order);
+                UnityEditor.MonoImporter.SetExecutionOrder(script, order);
             }
 
             if (startedEdit)
             {
-                AssetDatabase.StopAssetEditing();
+                UnityEditor.AssetDatabase.StopAssetEditing();
             }
         }
 
@@ -411,14 +424,14 @@ namespace MobX.Utilities.Editor
 
         #region Helper
 
-        private static Dictionary<Type, MonoScript> GetTypeDictionary()
+        private static Dictionary<Type, UnityEditor.MonoScript> GetTypeDictionary()
         {
-            var types = new Dictionary<Type, MonoScript>();
+            var types = new Dictionary<Type, UnityEditor.MonoScript>();
 
-            var scripts = MonoImporter.GetAllRuntimeMonoScripts();
-            foreach (var script in scripts)
+            UnityEditor.MonoScript[] scripts = UnityEditor.MonoImporter.GetAllRuntimeMonoScripts();
+            foreach (UnityEditor.MonoScript script in scripts)
             {
-                var type = script.GetClass();
+                Type type = script.GetClass();
 
                 if (!IsTypeValid(type))
                 {

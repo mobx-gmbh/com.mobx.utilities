@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
-using UnityEditor;
 
-namespace MobX.Utilities.Editor
+namespace MobX.Utilities.Editor.Helper
 {
     public sealed class GUIToggle : IDisposable
     {
@@ -17,12 +16,12 @@ namespace MobX.Utilities.Editor
             _draw = toggleLeft
                 ? () =>
                 {
-                    var value = EditorGUILayout.ToggleLeft(label, Value);
+                    var value = UnityEditor.EditorGUILayout.ToggleLeft(label, Value);
                     UpdateValue(value);
                 }
                 : () =>
                 {
-                    var value = EditorGUILayout.Toggle(label, Value);
+                    var value = UnityEditor.EditorGUILayout.Toggle(label, Value);
                     UpdateValue(value);
                 };
         }
@@ -56,12 +55,12 @@ namespace MobX.Utilities.Editor
 
         public void SaveValue(string key)
         {
-            EditorPrefs.SetBool(key, Value);
+            UnityEditor.EditorPrefs.SetBool(key, Value);
         }
 
         public void LoadValue(string key)
         {
-            UpdateValue(EditorPrefs.GetBool(key, Value));
+            UpdateValue(UnityEditor.EditorPrefs.GetBool(key, Value));
         }
     }
 }

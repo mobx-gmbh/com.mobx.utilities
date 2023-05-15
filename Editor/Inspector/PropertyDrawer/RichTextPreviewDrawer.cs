@@ -1,10 +1,11 @@
-﻿using MobX.Utilities.Inspector;
+﻿using MobX.Utilities.Editor.Helper;
+using MobX.Utilities.Inspector;
 using UnityEngine;
 
-namespace MobX.Utilities.Editor.Inspector
+namespace MobX.Utilities.Editor.Inspector.PropertyDrawer
 {
     [UnityEditor.CustomPropertyDrawer(typeof(RichTextPreviewAttribute))]
-    class RichTextPreviewDrawer : UnityEditor.PropertyDrawer
+    internal class RichTextPreviewDrawer : UnityEditor.PropertyDrawer
     {
         private GUIContent _richTextLabel;
         private static bool Enabled

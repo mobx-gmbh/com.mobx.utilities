@@ -1,7 +1,8 @@
-﻿using MobX.Utilities.Types;
+﻿using MobX.Utilities.Editor.Helper;
+using MobX.Utilities.Types;
 using UnityEngine;
 
-namespace MobX.Utilities.Editor.Inspector
+namespace MobX.Utilities.Editor.Inspector.PropertyDrawer
 {
     [UnityEditor.CustomPropertyDrawer(typeof(Optional<>))]
     public class OptionalValuePropertyDrawer : UnityEditor.PropertyDrawer
@@ -29,8 +30,8 @@ namespace MobX.Utilities.Editor.Inspector
         {
             property.serializedObject.Update();
 
-            var enabledProperty = property.FindPropertyRelative("enabled");
-            var valueProperty = property.FindPropertyRelative("value");
+            UnityEditor.SerializedProperty enabledProperty = property.FindPropertyRelative("enabled");
+            UnityEditor.SerializedProperty valueProperty = property.FindPropertyRelative("value");
 
             _isArray = valueProperty.isArray && valueProperty.type != "string";
             _arrayProperty = valueProperty;
@@ -56,7 +57,7 @@ namespace MobX.Utilities.Editor.Inspector
             if (enabledProperty.boolValue)
             {
                 var offset = GUIHelper.LineHeight();
-                var rect = position.WithOffset(y: offset, height: -offset);
+                Rect rect = position.WithOffset(y: offset, height: -offset);
                 UnityEditor.EditorGUI.PropertyField(rect, valueProperty, new GUIContent("Content"));
             }
         }
@@ -65,7 +66,7 @@ namespace MobX.Utilities.Editor.Inspector
             UnityEditor.SerializedProperty valueProperty, GUIContent label)
         {
             var labelWidth = UnityEditor.EditorGUIUtility.labelWidth - 12;
-            var boolRect = position.WithWidth(labelWidth);
+            Rect boolRect = position.WithWidth(labelWidth);
             var valueRect = new Rect(position.x + labelWidth, position.y, position.width - labelWidth, position.height);
             enabledProperty.boolValue = UnityEditor.EditorGUI.ToggleLeft(boolRect, label, enabledProperty.boolValue);
             enabledProperty.serializedObject.ApplyModifiedProperties();

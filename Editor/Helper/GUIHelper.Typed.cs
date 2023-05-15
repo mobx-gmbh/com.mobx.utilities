@@ -4,7 +4,7 @@ using System.Collections;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace MobX.Utilities.Editor
+namespace MobX.Utilities.Editor.Helper
 {
     public static partial class GUIHelper
     {
@@ -144,8 +144,8 @@ namespace MobX.Utilities.Editor
 
             if (type.IsGenericIEnumerable())
             {
-                var elementType = type.GetElementTypeDefinition();
-                var elementDrawer = CreateDrawer(GUIContent.none, elementType);
+                Type elementType = type.GetElementTypeDefinition();
+                Action<object> elementDrawer = CreateDrawer(GUIContent.none, elementType);
                 return value => DrawBoxedIEnumerable(label, type, value, elementDrawer);
             }
 
@@ -319,7 +319,7 @@ namespace MobX.Utilities.Editor
                 return value => UnityEditor.EditorGUILayout.ObjectField(label, (Object) value, type, true, options);
             }
 
-            var drawer = CreateDrawer(label, type, options);
+            Action<object> drawer = CreateDrawer(label, type, options);
 
             return value =>
             {

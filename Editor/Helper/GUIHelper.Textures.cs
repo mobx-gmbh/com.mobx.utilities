@@ -1,8 +1,7 @@
 ﻿using System.Runtime.CompilerServices;
-using UnityEditor;
 using UnityEngine;
 
-namespace MobX.Utilities.Editor
+namespace MobX.Utilities.Editor.Helper
 {
     public static partial class GUIHelper
     {
@@ -16,7 +15,7 @@ namespace MobX.Utilities.Editor
                 fixedWidth = scale
             };
             GUILayout.Label(name, style);
-            var result = (Texture2D) EditorGUILayout.ObjectField(texture, typeof(Texture2D), false,
+            var result = (Texture2D) UnityEditor.EditorGUILayout.ObjectField(texture, typeof(Texture2D), false,
                 GUILayout.Width(scale), GUILayout.Height(scale));
             GUILayout.EndVertical();
             return result;
@@ -25,7 +24,7 @@ namespace MobX.Utilities.Editor
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Texture2D TextureField(Texture2D texture, int scale = 70)
         {
-            var result = (Texture2D) EditorGUILayout.ObjectField(texture, typeof(Texture2D), false,
+            var result = (Texture2D) UnityEditor.EditorGUILayout.ObjectField(texture, typeof(Texture2D), false,
                 GUILayout.Width(scale), GUILayout.Height(scale));
             return result;
         }

@@ -1,3 +1,4 @@
+using MobX.Utilities.Editor.Helper;
 using MobX.Utilities.Editor.Inspector;
 using System;
 using System.Collections.Generic;
@@ -263,7 +264,18 @@ namespace MobX.Utilities.Editor.Windows
                                 return;
                             }
 
+                            GUIHelper.Space();
                             UnityEditor.EditorGUI.indentLevel += 2;
+
+                            GUILayout.BeginHorizontal();
+                            GUILayout.FlexibleSpace();
+                            if (GUIHelper.SelectButton())
+                            {
+                                UnityEditor.Selection.activeObject = editor.serializedObject.targetObject;
+                                UnityEditor.EditorGUIUtility.PingObject(editor.serializedObject.targetObject);
+                            }
+                            GUILayout.EndHorizontal();
+
                             FoldoutHandler.Style = FoldoutStyle.Default;
                             editor.serializedObject.Update();
                             editor.OnInspectorGUI();
@@ -272,6 +284,8 @@ namespace MobX.Utilities.Editor.Windows
                             UnityEditor.EditorGUI.indentLevel -= 2;
                         }
                     }
+
+                    GUIHelper.Space();
                 }
 
                 foldout.SaveState();
@@ -338,7 +352,7 @@ namespace MobX.Utilities.Editor.Windows
                             UnityEditor.EditorGUILayout.HelpBox("Target is null!", UnityEditor.MessageType.Error);
                             return;
                         }
-
+                        GUIHelper.Space();
                         FoldoutHandler.Style = FoldoutStyle.Default;
                         UnityEditor.EditorGUIUtility.wideMode = false;
                         UnityEditor.EditorGUI.indentLevel++;
@@ -402,6 +416,7 @@ namespace MobX.Utilities.Editor.Windows
                             return;
                         }
 
+                        GUIHelper.Space();
                         FoldoutHandler.Style = FoldoutStyle.Default;
                         UnityEditor.EditorGUIUtility.wideMode = false;
                         UnityEditor.EditorGUI.indentLevel++;
@@ -473,6 +488,12 @@ namespace MobX.Utilities.Editor.Windows
                             return;
                         }
 
+                        GUIHelper.Space();
+                        if (GUILayout.Button("Select"))
+                        {
+                            UnityEditor.Selection.activeObject = editor.serializedObject.targetObject;
+                            UnityEditor.EditorGUIUtility.PingObject(editor.serializedObject.targetObject);
+                        }
                         FoldoutHandler.Style = FoldoutStyle.Default;
                         UnityEditor.EditorGUIUtility.wideMode = false;
                         UnityEditor.EditorGUI.indentLevel++;

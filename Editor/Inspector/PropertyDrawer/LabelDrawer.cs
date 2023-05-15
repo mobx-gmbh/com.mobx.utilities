@@ -1,19 +1,18 @@
 using MobX.Utilities.Inspector;
-using UnityEditor;
 using UnityEngine;
 
-namespace MobX.Utilities.Editor.Inspector
+namespace MobX.Utilities.Editor.Inspector.PropertyDrawer
 {
-    [CustomPropertyDrawer(typeof(LabelAttribute), true)]
+    [UnityEditor.CustomPropertyDrawer(typeof(LabelAttribute), true)]
     public class LabelDrawer : UnityEditor.PropertyDrawer
     {
         private string _label;
 
-        public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
+        public override void OnGUI(Rect position, UnityEditor.SerializedProperty property, GUIContent label)
         {
             _label ??= ((LabelAttribute) attribute).Label;
             label.text = _label;
-            EditorGUI.PropertyField(position, property, label);
+            UnityEditor.EditorGUI.PropertyField(position, property, label);
         }
     }
 }

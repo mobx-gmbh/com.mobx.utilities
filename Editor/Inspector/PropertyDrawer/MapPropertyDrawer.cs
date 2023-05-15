@@ -1,12 +1,13 @@
 using MobX.Utilities.Collections;
+using System;
 using System.Collections.Generic;
 using System.Reflection;
-using UnityEditor;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
-namespace MobX.Utilities.Editor.Inspector
+namespace MobX.Utilities.Editor.Inspector.PropertyDrawer
 {
-    [CustomPropertyDrawer(typeof(Map<,>))]
+    [UnityEditor.CustomPropertyDrawer(typeof(Map<,>))]
     public class MapPropertyDrawer : UnityEditor.PropertyDrawer
     {
         private const string KEYS_FIELD_NAME = "keys";
@@ -28,24 +29,24 @@ namespace MobX.Utilities.Editor.Inspector
 
         private class ConflictState
         {
-            public object ConflictKey = null;
-            public object ConflictValue = null;
+            public object ConflictKey;
+            public object ConflictValue;
             public int ConflictIndex = -1;
             public int ConflictOtherIndex = -1;
-            public bool ConflictKeyPropertyExpanded = false;
-            public bool ConflictValuePropertyExpanded = false;
-            public float ConflictLineHeight = 0f;
+            public bool ConflictKeyPropertyExpanded;
+            public bool ConflictValuePropertyExpanded;
+            public float ConflictLineHeight;
         }
 
         private struct PropertyIdentity
         {
-            public PropertyIdentity(SerializedProperty property)
+            public PropertyIdentity(UnityEditor.SerializedProperty property)
             {
                 _instance = property.serializedObject.targetObject;
                 _propertyPath = property.propertyPath;
             }
 
-            private UnityEngine.Object _instance;
+            private Object _instance;
             private string _propertyPath;
         }
 
@@ -58,29 +59,29 @@ namespace MobX.Utilities.Editor.Inspector
             Remove
         }
 
-        public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
+        public override void OnGUI(Rect position, UnityEditor.SerializedProperty property, GUIContent label)
         {
-            label = EditorGUI.BeginProperty(position, label, property);
+            label = UnityEditor.EditorGUI.BeginProperty(position, label, property);
 
-            var buttonAction = Action.None;
+            Action buttonAction = Action.None;
             var buttonActionIndex = 0;
 
-            var keyArrayProperty = property.FindPropertyRelative(KEYS_FIELD_NAME);
-            var valueArrayProperty = property.FindPropertyRelative(VALUES_FIELD_NAME);
+            UnityEditor.SerializedProperty keyArrayProperty = property.FindPropertyRelative(KEYS_FIELD_NAME);
+            UnityEditor.SerializedProperty valueArrayProperty = property.FindPropertyRelative(VALUES_FIELD_NAME);
 
-            var conflictState = GetConflictState(property);
+            ConflictState conflictState = GetConflictState(property);
 
             if (conflictState.ConflictIndex != -1)
             {
                 keyArrayProperty.InsertArrayElementAtIndex(conflictState.ConflictIndex);
-                var keyProperty = keyArrayProperty.GetArrayElementAtIndex(conflictState.ConflictIndex);
+                UnityEditor.SerializedProperty keyProperty = keyArrayProperty.GetArrayElementAtIndex(conflictState.ConflictIndex);
                 SetPropertyValue(keyProperty, conflictState.ConflictKey);
                 keyProperty.isExpanded = conflictState.ConflictKeyPropertyExpanded;
 
                 if (valueArrayProperty != null)
                 {
                     valueArrayProperty.InsertArrayElementAtIndex(conflictState.ConflictIndex);
-                    var valueProperty = valueArrayProperty.GetArrayElementAtIndex(conflictState.ConflictIndex);
+                    UnityEditor.SerializedProperty valueProperty = valueArrayProperty.GetArrayElementAtIndex(conflictState.ConflictIndex);
                     SetPropertyValue(valueProperty, conflictState.ConflictValue);
                     valueProperty.isExpanded = conflictState.ConflictValuePropertyExpanded;
                 }
@@ -88,41 +89,41 @@ namespace MobX.Utilities.Editor.Inspector
 
             var buttonWidth = buttonStyle.CalcSize(iconPlus).x;
 
-            var labelPosition = position;
-            labelPosition.height = EditorGUIUtility.singleLineHeight;
+            Rect labelPosition = position;
+            labelPosition.height = UnityEditor.EditorGUIUtility.singleLineHeight;
             labelPosition.xMax -= buttonStyle.CalcSize(iconPlus).x;
 
-            EditorGUI.PropertyField(labelPosition, property, label, false);
+            UnityEditor.EditorGUI.PropertyField(labelPosition, property, label, false);
             if (property.isExpanded)
             {
-                var buttonPosition = position;
+                Rect buttonPosition = position;
                 buttonPosition.xMin = buttonPosition.xMax - buttonWidth;
-                buttonPosition.height = EditorGUIUtility.singleLineHeight;
-                EditorGUI.BeginDisabledGroup(conflictState.ConflictIndex != -1);
+                buttonPosition.height = UnityEditor.EditorGUIUtility.singleLineHeight;
+                UnityEditor.EditorGUI.BeginDisabledGroup(conflictState.ConflictIndex != -1);
                 if (GUI.Button(buttonPosition, iconPlus, buttonStyle))
                 {
                     buttonAction = Action.Add;
                     buttonActionIndex = keyArrayProperty.arraySize;
                 }
 
-                EditorGUI.EndDisabledGroup();
+                UnityEditor.EditorGUI.EndDisabledGroup();
 
-                EditorGUI.indentLevel++;
-                var linePosition = position;
-                linePosition.y += EditorGUIUtility.singleLineHeight;
+                UnityEditor.EditorGUI.indentLevel++;
+                Rect linePosition = position;
+                linePosition.y += UnityEditor.EditorGUIUtility.singleLineHeight;
                 linePosition.xMax -= buttonWidth;
 
-                foreach (var entry in EnumerateEntries(keyArrayProperty, valueArrayProperty))
+                foreach (EnumerationEntry entry in EnumerateEntries(keyArrayProperty, valueArrayProperty))
                 {
-                    var keyProperty = entry.KeyProperty;
-                    var valueProperty = entry.ValueProperty;
+                    UnityEditor.SerializedProperty keyProperty = entry.KeyProperty;
+                    UnityEditor.SerializedProperty valueProperty = entry.ValueProperty;
                     var i = entry.Index;
 
                     var lineHeight = DrawKeyValueLine(keyProperty, valueProperty, linePosition);
 
                     buttonPosition = linePosition;
                     buttonPosition.x = linePosition.xMax;
-                    buttonPosition.height = EditorGUIUtility.singleLineHeight;
+                    buttonPosition.height = UnityEditor.EditorGUIUtility.singleLineHeight;
                     if (GUI.Button(buttonPosition, iconMinus, buttonStyle))
                     {
                         buttonAction = Action.Remove;
@@ -131,34 +132,33 @@ namespace MobX.Utilities.Editor.Inspector
 
                     if (i == conflictState.ConflictIndex && conflictState.ConflictOtherIndex == -1)
                     {
-                        var iconPosition = linePosition;
+                        Rect iconPosition = linePosition;
                         iconPosition.size = buttonStyle.CalcSize(warningIconNull);
                         GUI.Label(iconPosition, warningIconNull);
                     }
                     else if (i == conflictState.ConflictIndex)
                     {
-                        var iconPosition = linePosition;
+                        Rect iconPosition = linePosition;
                         iconPosition.size = buttonStyle.CalcSize(warningIconConflict);
                         GUI.Label(iconPosition, warningIconConflict);
                     }
                     else if (i == conflictState.ConflictOtherIndex)
                     {
-                        var iconPosition = linePosition;
+                        Rect iconPosition = linePosition;
                         iconPosition.size = buttonStyle.CalcSize(warningIconOther);
                         GUI.Label(iconPosition, warningIconOther);
                     }
 
-
                     linePosition.y += lineHeight;
                 }
 
-                EditorGUI.indentLevel--;
+                UnityEditor.EditorGUI.indentLevel--;
             }
             else if (keyArrayProperty.arraySize == 0)
             {
-                var buttonPosition = position;
+                Rect buttonPosition = position;
                 buttonPosition.xMin = buttonPosition.xMax - buttonWidth;
-                buttonPosition.height = EditorGUIUtility.singleLineHeight;
+                buttonPosition.height = UnityEditor.EditorGUIUtility.singleLineHeight;
                 if (GUI.Button(buttonPosition, iconPlus, buttonStyle))
                 {
                     buttonAction = Action.Add;
@@ -178,7 +178,7 @@ namespace MobX.Utilities.Editor.Inspector
                     }
 
                     // auto increment key
-                    var newEntry = keyArrayProperty.GetArrayElementAtIndex(buttonActionIndex);
+                    UnityEditor.SerializedProperty newEntry = keyArrayProperty.GetArrayElementAtIndex(buttonActionIndex);
                     if (IsIntValue(newEntry.propertyType))
                     {
                         newEntry.intValue++;
@@ -212,15 +212,15 @@ namespace MobX.Utilities.Editor.Inspector
             conflictState.ConflictKeyPropertyExpanded = false;
             conflictState.ConflictValuePropertyExpanded = false;
 
-            foreach (var entry1 in EnumerateEntries(keyArrayProperty, valueArrayProperty))
+            foreach (EnumerationEntry entry1 in EnumerateEntries(keyArrayProperty, valueArrayProperty))
             {
-                var keyProperty1 = entry1.KeyProperty;
+                UnityEditor.SerializedProperty keyProperty1 = entry1.KeyProperty;
                 var i = entry1.Index;
                 var keyProperty1Value = GetPropertyValue(keyProperty1);
 
                 if (keyProperty1Value == null)
                 {
-                    var valueProperty1 = entry1.ValueProperty;
+                    UnityEditor.SerializedProperty valueProperty1 = entry1.ValueProperty;
                     SaveProperty(keyProperty1, valueProperty1, i, -1, conflictState);
                     DeleteArrayElementAtIndex(keyArrayProperty, i);
                     if (valueArrayProperty != null)
@@ -231,16 +231,15 @@ namespace MobX.Utilities.Editor.Inspector
                     break;
                 }
 
-
-                foreach (var entry2 in EnumerateEntries(keyArrayProperty, valueArrayProperty, i + 1))
+                foreach (EnumerationEntry entry2 in EnumerateEntries(keyArrayProperty, valueArrayProperty, i + 1))
                 {
-                    var keyProperty2 = entry2.KeyProperty;
+                    UnityEditor.SerializedProperty keyProperty2 = entry2.KeyProperty;
                     var j = entry2.Index;
                     var keyProperty2Value = GetPropertyValue(keyProperty2);
 
                     if (ComparePropertyValues(keyProperty1Value, keyProperty2Value))
                     {
-                        var valueProperty2 = entry2.ValueProperty;
+                        UnityEditor.SerializedProperty valueProperty2 = entry2.ValueProperty;
                         SaveProperty(keyProperty2, valueProperty2, j, i, conflictState);
                         DeleteArrayElementAtIndex(keyArrayProperty, j);
                         if (valueArrayProperty != null)
@@ -253,45 +252,45 @@ namespace MobX.Utilities.Editor.Inspector
                 }
             }
 
-            breakLoops:
+        breakLoops:
 
-            EditorGUI.EndProperty();
+            UnityEditor.EditorGUI.EndProperty();
         }
 
-        private static float DrawKeyValueLine(SerializedProperty keyProperty, SerializedProperty valueProperty,
+        private static float DrawKeyValueLine(UnityEditor.SerializedProperty keyProperty, UnityEditor.SerializedProperty valueProperty,
             Rect linePosition)
         {
-            var labelWidth = EditorGUIUtility.labelWidth;
+            var labelWidth = UnityEditor.EditorGUIUtility.labelWidth;
             var labelWidthRelative = labelWidth / linePosition.width;
 
-            var keyPropertyHeight = EditorGUI.GetPropertyHeight(keyProperty);
-            var keyPosition = linePosition;
+            var keyPropertyHeight = UnityEditor.EditorGUI.GetPropertyHeight(keyProperty);
+            Rect keyPosition = linePosition;
             keyPosition.height = keyPropertyHeight;
             keyPosition.width = labelWidth - INDENT_WIDTH;
-            EditorGUIUtility.labelWidth = keyPosition.width * labelWidthRelative;
-            EditorGUI.PropertyField(keyPosition, keyProperty, GUIContent.none, true);
+            UnityEditor.EditorGUIUtility.labelWidth = keyPosition.width * labelWidthRelative;
+            UnityEditor.EditorGUI.PropertyField(keyPosition, keyProperty, GUIContent.none, true);
 
-            var valuePropertyHeight = EditorGUI.GetPropertyHeight(valueProperty);
-            var valuePosition = linePosition;
+            var valuePropertyHeight = UnityEditor.EditorGUI.GetPropertyHeight(valueProperty);
+            Rect valuePosition = linePosition;
             valuePosition.height = valuePropertyHeight;
             valuePosition.xMin += labelWidth;
-            EditorGUIUtility.labelWidth = valuePosition.width * labelWidthRelative;
-            EditorGUI.indentLevel--;
-            EditorGUI.PropertyField(valuePosition, valueProperty, GUIContent.none, true);
-            EditorGUI.indentLevel++;
+            UnityEditor.EditorGUIUtility.labelWidth = valuePosition.width * labelWidthRelative;
+            UnityEditor.EditorGUI.indentLevel--;
+            UnityEditor.EditorGUI.PropertyField(valuePosition, valueProperty, GUIContent.none, true);
+            UnityEditor.EditorGUI.indentLevel++;
 
-            EditorGUIUtility.labelWidth = labelWidth;
+            UnityEditor.EditorGUIUtility.labelWidth = labelWidth;
 
             return Mathf.Max(keyPropertyHeight, valuePropertyHeight);
         }
 
-        private static void SaveProperty(SerializedProperty keyProperty, SerializedProperty valueProperty, int index,
+        private static void SaveProperty(UnityEditor.SerializedProperty keyProperty, UnityEditor.SerializedProperty valueProperty, int index,
             int otherIndex, ConflictState conflictState)
         {
             conflictState.ConflictKey = GetPropertyValue(keyProperty);
             conflictState.ConflictValue = valueProperty != null ? GetPropertyValue(valueProperty) : null;
-            var keyPropertyHeight = EditorGUI.GetPropertyHeight(keyProperty);
-            var valuePropertyHeight = valueProperty != null ? EditorGUI.GetPropertyHeight(valueProperty) : 0f;
+            var keyPropertyHeight = UnityEditor.EditorGUI.GetPropertyHeight(keyProperty);
+            var valuePropertyHeight = valueProperty != null ? UnityEditor.EditorGUI.GetPropertyHeight(valueProperty) : 0f;
             var lineHeight = Mathf.Max(keyPropertyHeight, valuePropertyHeight);
             conflictState.ConflictLineHeight = lineHeight;
             conflictState.ConflictIndex = index;
@@ -300,26 +299,26 @@ namespace MobX.Utilities.Editor.Inspector
             conflictState.ConflictValuePropertyExpanded = valueProperty != null && valueProperty.isExpanded;
         }
 
-        public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
+        public override float GetPropertyHeight(UnityEditor.SerializedProperty property, GUIContent label)
         {
-            var propertyHeight = EditorGUIUtility.singleLineHeight;
+            var propertyHeight = UnityEditor.EditorGUIUtility.singleLineHeight;
 
             if (property.isExpanded)
             {
-                var keysProperty = property.FindPropertyRelative("keys");
-                var valuesProperty = property.FindPropertyRelative("values");
+                UnityEditor.SerializedProperty keysProperty = property.FindPropertyRelative("keys");
+                UnityEditor.SerializedProperty valuesProperty = property.FindPropertyRelative("values");
 
-                foreach (var entry in EnumerateEntries(keysProperty, valuesProperty))
+                foreach (EnumerationEntry entry in EnumerateEntries(keysProperty, valuesProperty))
                 {
-                    var keyProperty = entry.KeyProperty;
-                    var valueProperty = entry.ValueProperty;
-                    var keyPropertyHeight = EditorGUI.GetPropertyHeight(keyProperty);
-                    var valuePropertyHeight = valueProperty != null ? EditorGUI.GetPropertyHeight(valueProperty) : 0f;
+                    UnityEditor.SerializedProperty keyProperty = entry.KeyProperty;
+                    UnityEditor.SerializedProperty valueProperty = entry.ValueProperty;
+                    var keyPropertyHeight = UnityEditor.EditorGUI.GetPropertyHeight(keyProperty);
+                    var valuePropertyHeight = valueProperty != null ? UnityEditor.EditorGUI.GetPropertyHeight(valueProperty) : 0f;
                     var lineHeight = Mathf.Max(keyPropertyHeight, valuePropertyHeight);
                     propertyHeight += lineHeight;
                 }
 
-                var conflictState = GetConflictState(property);
+                ConflictState conflictState = GetConflictState(property);
 
                 if (conflictState.ConflictIndex != -1)
                 {
@@ -330,10 +329,10 @@ namespace MobX.Utilities.Editor.Inspector
             return propertyHeight;
         }
 
-        private static ConflictState GetConflictState(SerializedProperty property)
+        private static ConflictState GetConflictState(UnityEditor.SerializedProperty property)
         {
             PropertyIdentity propId = new(property);
-            if (!sConflictStateDict.TryGetValue(propId, out var conflictState))
+            if (!sConflictStateDict.TryGetValue(propId, out ConflictState conflictState))
             {
                 conflictState = new ConflictState();
                 sConflictStateDict.Add(propId, conflictState);
@@ -342,59 +341,96 @@ namespace MobX.Utilities.Editor.Inspector
             return conflictState;
         }
 
-        private static readonly Dictionary<SerializedPropertyType, PropertyInfo> sSerializedPropertyValueAccessorsDict;
+        private static readonly Dictionary<UnityEditor.SerializedPropertyType, PropertyInfo> sSerializedPropertyValueAccessorsDict;
 
         static MapPropertyDrawer()
         {
-            Dictionary<SerializedPropertyType, string> serializedPropertyValueAccessorsNameDict = new()
+            Dictionary<UnityEditor.SerializedPropertyType, string> serializedPropertyValueAccessorsNameDict = new()
             {
-                {SerializedPropertyType.Integer, "intValue"},
-                {SerializedPropertyType.Boolean, "boolValue"},
-                {SerializedPropertyType.Float, "floatValue"},
-                {SerializedPropertyType.String, "stringValue"},
-                {SerializedPropertyType.Color, "colorValue"},
-                {SerializedPropertyType.ObjectReference, "objectReferenceValue"},
-                {SerializedPropertyType.LayerMask, "intValue"},
-                {SerializedPropertyType.Enum, "intValue"},
-                {SerializedPropertyType.Vector2, "vector2Value"},
-                {SerializedPropertyType.Vector3, "vector3Value"},
-                {SerializedPropertyType.Vector4, "vector4Value"},
-                {SerializedPropertyType.Rect, "rectValue"},
-                {SerializedPropertyType.ArraySize, "intValue"},
-                {SerializedPropertyType.Character, "intValue"},
-                {SerializedPropertyType.AnimationCurve, "animationCurveValue"},
-                {SerializedPropertyType.Bounds, "boundsValue"},
-                {SerializedPropertyType.Quaternion, "quaternionValue"},
+                {
+                    UnityEditor.SerializedPropertyType.Integer, "intValue"
+                },
+                {
+                    UnityEditor.SerializedPropertyType.Boolean, "boolValue"
+                },
+                {
+                    UnityEditor.SerializedPropertyType.Float, "floatValue"
+                },
+                {
+                    UnityEditor.SerializedPropertyType.String, "stringValue"
+                },
+                {
+                    UnityEditor.SerializedPropertyType.Color, "colorValue"
+                },
+                {
+                    UnityEditor.SerializedPropertyType.ObjectReference, "objectReferenceValue"
+                },
+                {
+                    UnityEditor.SerializedPropertyType.LayerMask, "intValue"
+                },
+                {
+                    UnityEditor.SerializedPropertyType.Enum, "intValue"
+                },
+                {
+                    UnityEditor.SerializedPropertyType.Vector2, "vector2Value"
+                },
+                {
+                    UnityEditor.SerializedPropertyType.Vector3, "vector3Value"
+                },
+                {
+                    UnityEditor.SerializedPropertyType.Vector4, "vector4Value"
+                },
+                {
+                    UnityEditor.SerializedPropertyType.Rect, "rectValue"
+                },
+                {
+                    UnityEditor.SerializedPropertyType.ArraySize, "intValue"
+                },
+                {
+                    UnityEditor.SerializedPropertyType.Character, "intValue"
+                },
+                {
+                    UnityEditor.SerializedPropertyType.AnimationCurve, "animationCurveValue"
+                },
+                {
+                    UnityEditor.SerializedPropertyType.Bounds, "boundsValue"
+                },
+                {
+                    UnityEditor.SerializedPropertyType.Quaternion, "quaternionValue"
+                }
             };
-            var serializedPropertyType = typeof(SerializedProperty);
+            Type serializedPropertyType = typeof(UnityEditor.SerializedProperty);
 
-            sSerializedPropertyValueAccessorsDict = new Dictionary<SerializedPropertyType, PropertyInfo>();
+            sSerializedPropertyValueAccessorsDict = new Dictionary<UnityEditor.SerializedPropertyType, PropertyInfo>();
             const BindingFlags Flags = BindingFlags.Instance | BindingFlags.Public;
 
-            foreach (var kvp in serializedPropertyValueAccessorsNameDict)
+            foreach (KeyValuePair<UnityEditor.SerializedPropertyType, string> kvp in serializedPropertyValueAccessorsNameDict)
             {
-                var propertyInfo = serializedPropertyType.GetProperty(kvp.Value, Flags);
+                PropertyInfo propertyInfo = serializedPropertyType.GetProperty(kvp.Value, Flags);
                 sSerializedPropertyValueAccessorsDict.Add(kvp.Key, propertyInfo);
             }
         }
 
-        private static bool IsIntValue(SerializedPropertyType type) => type switch
+        private static bool IsIntValue(UnityEditor.SerializedPropertyType type)
         {
-            SerializedPropertyType.Enum => true,
-            SerializedPropertyType.Integer => true,
-            _ => false,
-        };
+            return type switch
+            {
+                UnityEditor.SerializedPropertyType.Enum => true,
+                UnityEditor.SerializedPropertyType.Integer => true,
+                _ => false
+            };
+        }
 
         private static GUIContent IconContent(string name, string tooltip)
         {
-            var builtinIcon = EditorGUIUtility.IconContent(name);
+            GUIContent builtinIcon = UnityEditor.EditorGUIUtility.IconContent(name);
             return new GUIContent(builtinIcon.image, tooltip);
         }
 
-        private static void DeleteArrayElementAtIndex(SerializedProperty arrayProperty, int index)
+        private static void DeleteArrayElementAtIndex(UnityEditor.SerializedProperty arrayProperty, int index)
         {
-            var property = arrayProperty.GetArrayElementAtIndex(index);
-            if (property.propertyType == SerializedPropertyType.ObjectReference)
+            UnityEditor.SerializedProperty property = arrayProperty.GetArrayElementAtIndex(index);
+            if (property.propertyType == UnityEditor.SerializedPropertyType.ObjectReference)
             {
                 property.objectReferenceValue = null;
             }
@@ -402,28 +438,22 @@ namespace MobX.Utilities.Editor.Inspector
             arrayProperty.DeleteArrayElementAtIndex(index);
         }
 
-        public static object GetPropertyValue(SerializedProperty p)
+        public static object GetPropertyValue(UnityEditor.SerializedProperty p)
         {
-            if (sSerializedPropertyValueAccessorsDict.TryGetValue(p.propertyType, out var propertyInfo))
+            if (sSerializedPropertyValueAccessorsDict.TryGetValue(p.propertyType, out PropertyInfo propertyInfo))
             {
                 return propertyInfo.GetValue(p, null);
             }
-            else
+            if (p.isArray)
             {
-                if (p.isArray)
-                {
-                    return GetPropertyValueArray(p);
-                }
-                else
-                {
-                    return GetPropertyValueGeneric(p);
-                }
+                return GetPropertyValueArray(p);
             }
+            return GetPropertyValueGeneric(p);
         }
 
-        private static void SetPropertyValue(SerializedProperty p, object v)
+        private static void SetPropertyValue(UnityEditor.SerializedProperty p, object v)
         {
-            if (sSerializedPropertyValueAccessorsDict.TryGetValue(p.propertyType, out var propertyInfo))
+            if (sSerializedPropertyValueAccessorsDict.TryGetValue(p.propertyType, out PropertyInfo propertyInfo))
             {
                 propertyInfo.SetValue(p, v, null);
             }
@@ -440,59 +470,61 @@ namespace MobX.Utilities.Editor.Inspector
             }
         }
 
-        private static object GetPropertyValueArray(SerializedProperty property)
+        private static object GetPropertyValueArray(UnityEditor.SerializedProperty property)
         {
             var array = new object[property.arraySize];
             for (var i = 0; i < property.arraySize; i++)
             {
-                var item = property.GetArrayElementAtIndex(i);
+                UnityEditor.SerializedProperty item = property.GetArrayElementAtIndex(i);
                 array[i] = GetPropertyValue(item);
             }
 
             return array;
         }
 
-        private static object GetPropertyValueGeneric(SerializedProperty property)
+        private static object GetPropertyValueGeneric(UnityEditor.SerializedProperty property)
         {
             Dictionary<string, object> dict = new();
-            var iterator = property.Copy();
+            UnityEditor.SerializedProperty iterator = property.Copy();
             if (iterator.Next(true))
             {
-                var end = property.GetEndProperty();
+                UnityEditor.SerializedProperty end = property.GetEndProperty();
                 do
                 {
                     var name = iterator.name;
                     var value = GetPropertyValue(iterator);
                     dict.Add(name, value);
-                } while (iterator.Next(false) && iterator.propertyPath != end.propertyPath);
+                }
+                while (iterator.Next(false) && iterator.propertyPath != end.propertyPath);
             }
 
             return dict;
         }
 
-        private static void SetPropertyValueArray(SerializedProperty property, object v)
+        private static void SetPropertyValueArray(UnityEditor.SerializedProperty property, object v)
         {
             var array = (object[]) v;
             property.arraySize = array.Length;
             for (var i = 0; i < property.arraySize; i++)
             {
-                var item = property.GetArrayElementAtIndex(i);
+                UnityEditor.SerializedProperty item = property.GetArrayElementAtIndex(i);
                 SetPropertyValue(item, array[i]);
             }
         }
 
-        private static void SetPropertyValueGeneric(SerializedProperty property, object v)
+        private static void SetPropertyValueGeneric(UnityEditor.SerializedProperty property, object v)
         {
             var dict = (Dictionary<string, object>) v;
-            var iterator = property.Copy();
+            UnityEditor.SerializedProperty iterator = property.Copy();
             if (iterator.Next(true))
             {
-                var end = property.GetEndProperty();
+                UnityEditor.SerializedProperty end = property.GetEndProperty();
                 do
                 {
                     var name = iterator.name;
                     SetPropertyValue(iterator, dict[name]);
-                } while (iterator.Next(false) && iterator.propertyPath != end.propertyPath);
+                }
+                while (iterator.Next(false) && iterator.propertyPath != end.propertyPath);
             }
         }
 
@@ -502,10 +534,7 @@ namespace MobX.Utilities.Editor.Inspector
             {
                 return CompareDictionaries(dictionary1, dictionary2);
             }
-            else
-            {
-                return Equals(value1, value2);
-            }
+            return Equals(value1, value2);
         }
 
         private static bool CompareDictionaries(Dictionary<string, object> dict1, Dictionary<string, object> dict2)
@@ -515,7 +544,7 @@ namespace MobX.Utilities.Editor.Inspector
                 return false;
             }
 
-            foreach (var kvp1 in dict1)
+            foreach (KeyValuePair<string, object> kvp1 in dict1)
             {
                 var key1 = kvp1.Key;
                 var value1 = kvp1.Value;
@@ -536,11 +565,11 @@ namespace MobX.Utilities.Editor.Inspector
 
         private struct EnumerationEntry
         {
-            public readonly SerializedProperty KeyProperty;
-            public readonly SerializedProperty ValueProperty;
+            public readonly UnityEditor.SerializedProperty KeyProperty;
+            public readonly UnityEditor.SerializedProperty ValueProperty;
             public readonly int Index;
 
-            public EnumerationEntry(SerializedProperty keyProperty, SerializedProperty valueProperty, int index)
+            public EnumerationEntry(UnityEditor.SerializedProperty keyProperty, UnityEditor.SerializedProperty valueProperty, int index)
             {
                 KeyProperty = keyProperty;
                 ValueProperty = valueProperty;
@@ -548,23 +577,24 @@ namespace MobX.Utilities.Editor.Inspector
             }
         }
 
-        private static IEnumerable<EnumerationEntry> EnumerateEntries(SerializedProperty keyArrayProperty,
-            SerializedProperty valueArrayProperty, int startIndex = 0)
+        private static IEnumerable<EnumerationEntry> EnumerateEntries(UnityEditor.SerializedProperty keyArrayProperty,
+            UnityEditor.SerializedProperty valueArrayProperty, int startIndex = 0)
         {
             if (keyArrayProperty.arraySize > startIndex)
             {
                 var index = startIndex;
-                var keyProperty = keyArrayProperty.GetArrayElementAtIndex(startIndex);
-                var valueProperty = valueArrayProperty?.GetArrayElementAtIndex(startIndex);
-                var endProperty = keyArrayProperty.GetEndProperty();
+                UnityEditor.SerializedProperty keyProperty = keyArrayProperty.GetArrayElementAtIndex(startIndex);
+                UnityEditor.SerializedProperty valueProperty = valueArrayProperty?.GetArrayElementAtIndex(startIndex);
+                UnityEditor.SerializedProperty endProperty = keyArrayProperty.GetEndProperty();
 
                 do
                 {
                     yield return new EnumerationEntry(keyProperty, valueProperty, index);
                     index++;
-                } while (keyProperty.Next(false)
-                         && (valueProperty == null || valueProperty.Next(false))
-                         && !SerializedProperty.EqualContents(keyProperty, endProperty));
+                }
+                while (keyProperty.Next(false)
+                    && (valueProperty == null || valueProperty.Next(false))
+                    && !UnityEditor.SerializedProperty.EqualContents(keyProperty, endProperty));
             }
         }
     }

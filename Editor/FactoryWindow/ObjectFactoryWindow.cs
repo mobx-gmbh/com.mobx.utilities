@@ -1,17 +1,18 @@
-﻿using MobX.Utilities.Reflection;
+﻿using MobX.Utilities.Editor.Helper;
+using MobX.Utilities.Reflection;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
-using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
 namespace MobX.Utilities.Editor.FactoryWindow
 {
-    public class ObjectFactoryWindow : EditorWindow
+    public class ObjectFactoryWindow : UnityEditor.EditorWindow
     {
         #region Fields & Properties
 
@@ -26,10 +27,10 @@ namespace MobX.Utilities.Editor.FactoryWindow
         private const int MAX_AMOUNT = 100;
         private const int MIN_AMOUNT = 1;
         private bool _setInitialFocus = true;
-        private bool _isReady = false;
+        private bool _isReady;
         private bool _enableInputCheck = true;
-        private bool _isMultiSelect = false;
-        private bool _resetFocusBuffer = false;
+        private bool _isMultiSelect;
+        private bool _resetFocusBuffer;
 
         internal static event Action WindowClosed;
 
@@ -43,16 +44,16 @@ namespace MobX.Utilities.Editor.FactoryWindow
 
         #region Setup
 
-        [MenuItem("Assets/Create/ScriptableObject %&s", priority = -100)]
+        [UnityEditor.MenuItem("Assets/Create/ScriptableObject %&s", priority = -100)]
         public static void OpenWindow()
         {
-            var window = GetWindow<ObjectFactoryWindow>("Object Factory");
+            ObjectFactoryWindow window = GetWindow<ObjectFactoryWindow>("Object Factory");
             window.Show(false);
         }
 
         public static void OpenWindow(string activeFilter)
         {
-            var window = GetWindow<ObjectFactoryWindow>("Object Factory");
+            ObjectFactoryWindow window = GetWindow<ObjectFactoryWindow>("Object Factory");
             window.Show(false);
             window._searchFilter = activeFilter;
         }
@@ -60,14 +61,14 @@ namespace MobX.Utilities.Editor.FactoryWindow
         private void OnEnable()
         {
             _searchFilter =
-                EditorPrefs.GetString($"{nameof(ObjectFactoryWindow)}{nameof(_searchFilter)}", _searchFilter);
+                UnityEditor.EditorPrefs.GetString($"{nameof(ObjectFactoryWindow)}{nameof(_searchFilter)}", _searchFilter);
             ObjectFactorySettings.SettingsChanged += OnSettingsChanged;
             Initialize();
         }
 
         private void OnDisable()
         {
-            EditorPrefs.SetString($"{nameof(ObjectFactoryWindow)}{nameof(_searchFilter)}", _searchFilter);
+            UnityEditor.EditorPrefs.SetString($"{nameof(ObjectFactoryWindow)}{nameof(_searchFilter)}", _searchFilter);
             ObjectFactorySettings.SettingsChanged -= OnSettingsChanged;
             WindowClosed?.Invoke();
         }
@@ -134,19 +135,19 @@ namespace MobX.Utilities.Editor.FactoryWindow
             }
         }
 
-        private static async ValueTask<List<CreatableObject>> ProfileAssemblies()
+        private async static ValueTask<List<CreatableObject>> ProfileAssemblies()
         {
-            var assemblies =
+            Assembly[] assemblies =
                 AssemblyProfiler.GetFilteredAssemblies(null, ObjectFactorySettings.GetIgnoredAssemblyPrefixes());
             var ignoreNames = ObjectFactorySettings.GetIgnoredNames();
 
-            var result = await Task.Run(() =>
+            List<CreatableObject> result = await Task.Run(() =>
             {
                 var creatable = new List<CreatableObject>(100);
                 for (var i = 0; i < assemblies.Length; i++)
                 {
-                    var assembly = assemblies[i];
-                    var assemblyTypes = assembly.GetTypes();
+                    Assembly assembly = assemblies[i];
+                    Type[] assemblyTypes = assembly.GetTypes();
 
                     creatable.AddRange(from type in assemblyTypes
                         where IsTypeValidForCreation(type, ignoreNames)
@@ -176,7 +177,7 @@ namespace MobX.Utilities.Editor.FactoryWindow
                 return false;
             }
 
-            if (type.IsSubclassOrAssignable(typeof(EditorWindow)))
+            if (type.IsSubclassOrAssignable(typeof(UnityEditor.EditorWindow)))
             {
                 return false;
             }
@@ -211,69 +212,69 @@ namespace MobX.Utilities.Editor.FactoryWindow
         {
             var creatable = (CreatableObject) _displayedList.list[index];
             var lineRect = new Rect(0, rect.y, GUIHelper.GetViewWidth(), 1);
-            EditorGUI.DrawRect(lineRect, new Color(0f, 0f, 0f, 0.2f));
+            UnityEditor.EditorGUI.DrawRect(lineRect, new Color(0f, 0f, 0f, 0.2f));
 
             if (index.IsEven())
             {
                 var backgroundRect = new Rect(0, rect.y, GUIHelper.GetViewWidth(), rect.height);
-                EditorGUI.DrawRect(backgroundRect, new Color(0f, 0f, 0f, 0.03f));
+                UnityEditor.EditorGUI.DrawRect(backgroundRect, new Color(0f, 0f, 0f, 0.03f));
             }
 
             if (_displayedList.IsSelected(index))
             {
                 var selectionRect = new Rect(0, rect.y, 3, rect.height);
-                EditorGUI.DrawRect(selectionRect, new Color(0.7f, 1f, 0.75f, 0.9f));
+                UnityEditor.EditorGUI.DrawRect(selectionRect, new Color(0.7f, 1f, 0.75f, 0.9f));
             }
 
-            EditorGUI.LabelField(rect, creatable.ToString());
+            UnityEditor.EditorGUI.LabelField(rect, creatable.ToString());
 
             var rectOffset = COLUMN_WIDTH;
 
             if (ObjectFactorySettings.SearchOptions.HasFlagUnsafe(SearchOptions.AssemblyName))
             {
                 var assemblyRect = new Rect(rect.x + rectOffset, rect.y, rect.width - rectOffset, rect.height);
-                EditorGUI.LabelField(assemblyRect, creatable.AssemblyName);
+                UnityEditor.EditorGUI.LabelField(assemblyRect, creatable.AssemblyName);
                 rectOffset += COLUMN_WIDTH;
             }
 
             if (ObjectFactorySettings.SearchOptions.HasFlagUnsafe(SearchOptions.CreateAttributePath))
             {
                 var attributeRect = new Rect(rect.x + rectOffset, rect.y, rect.width - rectOffset, rect.height);
-                EditorGUI.LabelField(attributeRect, creatable.CreateAssetPath);
+                UnityEditor.EditorGUI.LabelField(attributeRect, creatable.CreateAssetPath);
                 rectOffset += COLUMN_WIDTH;
             }
 
             if (ObjectFactorySettings.SearchOptions.HasFlagUnsafe(SearchOptions.BaseTypes))
             {
                 var tagRect = new Rect(rect.x + rectOffset, rect.y, rect.width - rectOffset, rect.height);
-                EditorGUI.LabelField(tagRect, creatable.BaseTypes);
+                UnityEditor.EditorGUI.LabelField(tagRect, creatable.BaseTypes);
             }
         }
 
         private void DrawColumnDescriptions()
         {
             var rectOffset = COLUMN_WIDTH;
-            var rect = GUIHelper.GetControlRect();
-            EditorGUI.LabelField(rect, "Name");
+            Rect rect = GUIHelper.GetControlRect();
+            UnityEditor.EditorGUI.LabelField(rect, "Name");
 
             if (ObjectFactorySettings.SearchOptions.HasFlagUnsafe(SearchOptions.AssemblyName))
             {
                 var assemblyRect = new Rect(rect.x + rectOffset, rect.y, rect.width - rectOffset, rect.height);
-                EditorGUI.LabelField(assemblyRect, "Assembly Name");
+                UnityEditor.EditorGUI.LabelField(assemblyRect, "Assembly Name");
                 rectOffset += COLUMN_WIDTH;
             }
 
             if (ObjectFactorySettings.SearchOptions.HasFlagUnsafe(SearchOptions.CreateAttributePath))
             {
                 var attributeRect = new Rect(rect.x + rectOffset, rect.y, rect.width - rectOffset, rect.height);
-                EditorGUI.LabelField(attributeRect, "Create Asset Path");
+                UnityEditor.EditorGUI.LabelField(attributeRect, "Create Asset Path");
                 rectOffset += COLUMN_WIDTH;
             }
 
             if (ObjectFactorySettings.SearchOptions.HasFlagUnsafe(SearchOptions.BaseTypes))
             {
                 var tagRect = new Rect(rect.x + rectOffset, rect.y, rect.width - rectOffset, rect.height);
-                EditorGUI.LabelField(tagRect, "BaseTypes");
+                UnityEditor.EditorGUI.LabelField(tagRect, "BaseTypes");
             }
         }
 
@@ -325,9 +326,9 @@ namespace MobX.Utilities.Editor.FactoryWindow
                     DrawColumnDescriptions();
                 }
 
-                _scrollPos = EditorGUILayout.BeginScrollView(_scrollPos);
+                _scrollPos = UnityEditor.EditorGUILayout.BeginScrollView(_scrollPos);
                 _displayedList.DoLayoutList();
-                EditorGUILayout.EndScrollView();
+                UnityEditor.EditorGUILayout.EndScrollView();
             }
         }
 
@@ -408,7 +409,7 @@ namespace MobX.Utilities.Editor.FactoryWindow
 
             SetInputTimeout();
 
-            var keyCode = Event.current.keyCode;
+            KeyCode keyCode = Event.current.keyCode;
 
             if (keyCode == KeyCode.DownArrow)
             {
@@ -438,7 +439,7 @@ namespace MobX.Utilities.Editor.FactoryWindow
                     createdObjects.AddRange(CreateAssetInternal(index));
                 }
 
-                Selection.objects = createdObjects.ToArray();
+                UnityEditor.Selection.objects = createdObjects.ToArray();
                 AssetsCreated?.Invoke(createdObjects);
                 Close();
             }
@@ -463,7 +464,7 @@ namespace MobX.Utilities.Editor.FactoryWindow
 
             if (_amountToCreate > 10)
             {
-                var result = EditorUtility.DisplayDialog("Caution",
+                var result = UnityEditor.EditorUtility.DisplayDialog("Caution",
                     $"You are about to create {_amountToCreate} {creatableObject.Type.Name} assets at <>{path}",
                     "Confirm", "Cancel");
 
@@ -480,7 +481,7 @@ namespace MobX.Utilities.Editor.FactoryWindow
         private void DrawHeader()
         {
             GUIHelper.Space();
-            EditorGUILayout.BeginHorizontal();
+            UnityEditor.EditorGUILayout.BeginHorizontal();
             GUI.SetNextControlName(nameof(_searchFilter));
             var newFilter = GUIHelper.SearchBar(_searchFilter);
             if (newFilter != _searchFilter)
@@ -491,7 +492,7 @@ namespace MobX.Utilities.Editor.FactoryWindow
             _searchFilter = newFilter;
             if (_setInitialFocus)
             {
-                EditorGUI.FocusTextInControl(nameof(_searchFilter));
+                UnityEditor.EditorGUI.FocusTextInControl(nameof(_searchFilter));
                 _setInitialFocus = false;
             }
 
@@ -505,7 +506,7 @@ namespace MobX.Utilities.Editor.FactoryWindow
                 Initialize();
             }
 
-            EditorGUILayout.EndHorizontal();
+            UnityEditor.EditorGUILayout.EndHorizontal();
         }
 
         private void DrawFooter()
@@ -520,11 +521,11 @@ namespace MobX.Utilities.Editor.FactoryWindow
                 {
                     GUILayout.Label("Amount", GUILayout.Width(50));
                     _amountToCreate =
-                        EditorGUILayout.IntSlider(_amountToCreate, MIN_AMOUNT, MAX_AMOUNT, GUILayout.Width(150));
+                        UnityEditor.EditorGUILayout.IntSlider(_amountToCreate, MIN_AMOUNT, MAX_AMOUNT, GUILayout.Width(150));
                 }
 
                 GUILayout.Label("Filename: ", GUILayout.Width(60));
-                _fileName = EditorGUILayout.TextField(_fileName, GUILayout.Width(240));
+                _fileName = UnityEditor.EditorGUILayout.TextField(_fileName, GUILayout.Width(240));
             }
 
             if (GUILayout.Button("Create", GUILayout.Width(120)))
@@ -543,7 +544,7 @@ namespace MobX.Utilities.Editor.FactoryWindow
 
                 for (var i = 0; i < _creatableObjects.Count; i++)
                 {
-                    var creatable = _creatableObjects[i];
+                    CreatableObject creatable = _creatableObjects[i];
                     if (creatable.IsValidForFilter(filter.NoSpace(), ObjectFactorySettings.SearchOptions))
                     {
                         _filteredCreatableObjects.Add(creatable);

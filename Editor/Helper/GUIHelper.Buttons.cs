@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace MobX.Utilities.Editor
+namespace MobX.Utilities.Editor.Helper
 {
     public static partial class GUIHelper
     {
@@ -48,7 +48,10 @@ namespace MobX.Utilities.Editor
                 alignment = TextAnchor.MiddleCenter,
                 padding = new RectOffset(left, right, top, bottom)
             };
-            var options = new[] {GUILayout.Width(size)};
+            GUILayoutOption[] options = new[]
+            {
+                GUILayout.Width(size)
+            };
             return () => GUILayout.Button(content, style, options);
         }
 

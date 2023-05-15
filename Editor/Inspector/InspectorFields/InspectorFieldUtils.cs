@@ -2,34 +2,33 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using UnityEditor;
 using UnityEngine;
 
-namespace MobX.Utilities.Editor.Inspector
+namespace MobX.Utilities.Editor.Inspector.InspectorFields
 {
     public static class InspectorFieldUtils
     {
-        public static InspectorMember[] GetInspectorMembers(SerializedObject target)
+        public static InspectorMember[] GetInspectorMembers(UnityEditor.SerializedObject target)
         {
-            var type = target.targetObject.GetType();
+            Type type = target.targetObject.GetType();
             var list = new List<InspectorMember>();
 
             const BindingFlags Flags = BindingFlags.Instance | BindingFlags.NonPublic |
-                                       BindingFlags.Public | BindingFlags.DeclaredOnly | BindingFlags.Static;
+                BindingFlags.Public | BindingFlags.DeclaredOnly | BindingFlags.Static;
 
-            var fieldInfos = type.GetFieldsIncludeBaseTypes(Flags);
+            FieldInfo[] fieldInfos = type.GetFieldsIncludeBaseTypes(Flags);
             for (var i = 0; i < fieldInfos.Length; i++)
             {
                 HandleFieldInfo(target, fieldInfos[i], ref list);
             }
 
-            var propertyInfos = type.GetPropertiesIncludeBaseTypes(Flags);
+            PropertyInfo[] propertyInfos = type.GetPropertiesIncludeBaseTypes(Flags);
             for (var i = 0; i < propertyInfos.Length; i++)
             {
                 HandlePropertyInfo(target, propertyInfos[i], ref list);
             }
 
-            var methodInfos = type.GetMethodsIncludeBaseTypes(Flags);
+            MethodInfo[] methodInfos = type.GetMethodsIncludeBaseTypes(Flags);
             for (var i = 0; i < methodInfos.Length; i++)
             {
                 HandleMethodInfo(target, methodInfos[i], ref list);
@@ -41,10 +40,10 @@ namespace MobX.Utilities.Editor.Inspector
 
         #region Methods
 
-        private static void HandleMethodInfo(SerializedObject target, MethodInfo methodInfo,
+        private static void HandleMethodInfo(UnityEditor.SerializedObject target, MethodInfo methodInfo,
             ref List<InspectorMember> list)
         {
-            if (methodInfo.TryGetCustomAttribute<ButtonAttribute>(out var buttonAttribute))
+            if (methodInfo.TryGetCustomAttribute<ButtonAttribute>(out ButtonAttribute buttonAttribute))
             {
                 try
                 {
@@ -53,9 +52,9 @@ namespace MobX.Utilities.Editor.Inspector
                 catch (Exception exception)
                 {
                     list.Add(new ExceptionInspectorMember(
-                        exception: exception,
-                        memberInfo: methodInfo,
-                        target: target.targetObject));
+                        exception,
+                        methodInfo,
+                        target.targetObject));
                 }
             }
         }
@@ -65,7 +64,7 @@ namespace MobX.Utilities.Editor.Inspector
 
         #region Properties
 
-        private static void HandlePropertyInfo(SerializedObject target, PropertyInfo propertyInfo, ref List<InspectorMember> list)
+        private static void HandlePropertyInfo(UnityEditor.SerializedObject target, PropertyInfo propertyInfo, ref List<InspectorMember> list)
         {
             try
             {
@@ -104,15 +103,14 @@ namespace MobX.Utilities.Editor.Inspector
                         : new ReadonlyPropertyInspector(propertyInfo, target.targetObject);
 
                     list.Add(inspector);
-                    return;
                 }
             }
             catch (Exception exception)
             {
                 list.Add(new ExceptionInspectorMember(
-                    exception: exception,
-                    memberInfo: propertyInfo,
-                    target: target.targetObject));
+                    exception,
+                    propertyInfo,
+                    target.targetObject));
             }
         }
 
@@ -121,7 +119,7 @@ namespace MobX.Utilities.Editor.Inspector
 
         #region Fields
 
-        private static void HandleFieldInfo(SerializedObject target, FieldInfo fieldInfo, ref List<InspectorMember> list)
+        private static void HandleFieldInfo(UnityEditor.SerializedObject target, FieldInfo fieldInfo, ref List<InspectorMember> list)
         {
             try
             {
@@ -142,15 +140,15 @@ namespace MobX.Utilities.Editor.Inspector
             catch (Exception exception)
             {
                 list.Add(new ExceptionInspectorMember(
-                    exception: exception,
-                    memberInfo: fieldInfo,
-                    target: target.targetObject));
+                    exception,
+                    fieldInfo,
+                    target.targetObject));
             }
         }
 
-        private static void HandleSerializedField(SerializedObject target, FieldInfo fieldInfo, ref List<InspectorMember> list)
+        private static void HandleSerializedField(UnityEditor.SerializedObject target, FieldInfo fieldInfo, ref List<InspectorMember> list)
         {
-            var serializedProperty = target.FindProperty(fieldInfo.Name);
+            UnityEditor.SerializedProperty serializedProperty = target.FindProperty(fieldInfo.Name);
             if (serializedProperty.IsNull())
             {
                 return;
@@ -159,13 +157,13 @@ namespace MobX.Utilities.Editor.Inspector
             list.Add(new SerializedPropertyInspectorMember(serializedProperty, fieldInfo, target.targetObject));
         }
 
-        private static void HandleNonSerializedField(SerializedObject target, FieldInfo fieldInfo, ref List<InspectorMember> list)
+        private static void HandleNonSerializedField(UnityEditor.SerializedObject target, FieldInfo fieldInfo, ref List<InspectorMember> list)
         {
             var showInInspector = fieldInfo.HasAttribute<ShowInInspectorAttribute>();
             var isReadonly = fieldInfo.HasAttribute<ReadonlyAttribute>();
             var conditionalDraw = fieldInfo.HasAttribute<ConditionalDrawerAttribute>();
             var isCollection = fieldInfo.FieldType.IsDictionary() || fieldInfo.FieldType.IsHashSet() ||
-                               fieldInfo.FieldType.IsStack() || fieldInfo.FieldType.IsQueue();
+                fieldInfo.FieldType.IsStack() || fieldInfo.FieldType.IsQueue();
 
             if (!showInInspector && !isReadonly && !conditionalDraw)
             {

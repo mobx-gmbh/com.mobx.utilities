@@ -2,10 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using UnityEditor;
 using UnityEngine;
 
-namespace MobX.Utilities.Editor
+namespace MobX.Utilities.Editor.Helper
 {
     public static class SerializedPropertyExtensions
     {
@@ -14,44 +13,43 @@ namespace MobX.Utilities.Editor
          */
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static SerializedProperty FindPropertyRelativeBacking(this SerializedProperty serializedProperty,
+        public static UnityEditor.SerializedProperty FindPropertyRelativeBacking(this UnityEditor.SerializedProperty serializedProperty,
             string path)
         {
             return serializedProperty.FindPropertyRelative($"<{path}>k__BackingField");
         }
 
         private const BindingFlags FLAGS = BindingFlags.Static |
-                                           BindingFlags.NonPublic |
-                                           BindingFlags.Instance |
-                                           BindingFlags.Public |
-                                           BindingFlags.FlattenHierarchy;
+            BindingFlags.NonPublic |
+            BindingFlags.Instance |
+            BindingFlags.Public |
+            BindingFlags.FlattenHierarchy;
 
-        public static TAttribute GetAttribute<TAttribute>(this SerializedProperty serializedProperty)
+        public static TAttribute GetAttribute<TAttribute>(this UnityEditor.SerializedProperty serializedProperty)
             where TAttribute : Attribute
         {
             return serializedProperty.GetUnderlyingFieldInfo()?.GetCustomAttribute<TAttribute>();
         }
 
-        public static bool TryGetAttribute<TAttribute>(this SerializedProperty serializedProperty,
+        public static bool TryGetAttribute<TAttribute>(this UnityEditor.SerializedProperty serializedProperty,
             out TAttribute attribute) where TAttribute : Attribute
         {
             attribute = GetAttribute<TAttribute>(serializedProperty);
             return attribute != null;
         }
 
-        private static readonly Dictionary<SerializedProperty, Type> spTypeCache =
-            new Dictionary<SerializedProperty, Type>();
+        private static readonly Dictionary<UnityEditor.SerializedProperty, Type> spTypeCache = new();
 
-        public static Type GetUnderlyingType(this SerializedProperty serializedProperty)
+        public static Type GetUnderlyingType(this UnityEditor.SerializedProperty serializedProperty)
         {
-            if (spTypeCache.TryGetValue(serializedProperty, out var type))
+            if (spTypeCache.TryGetValue(serializedProperty, out Type type))
             {
                 return type;
             }
 
-            var targetType = serializedProperty.serializedObject.targetObject.GetType();
+            Type targetType = serializedProperty.serializedObject.targetObject.GetType();
 
-            var fieldInfo = targetType.GetFieldIncludeBaseTypes(serializedProperty.name);
+            FieldInfo fieldInfo = targetType.GetFieldIncludeBaseTypes(serializedProperty.name);
             type = fieldInfo?.FieldType ?? Type.GetType(serializedProperty.type.ToFullTypeName());
 
             if (type != null)
@@ -60,7 +58,7 @@ namespace MobX.Utilities.Editor
                 return type;
             }
 
-            var propertyInfo = targetType.GetPropertyIncludeBaseTypes(serializedProperty.name);
+            PropertyInfo propertyInfo = targetType.GetPropertyIncludeBaseTypes(serializedProperty.name);
             type = propertyInfo?.PropertyType;
 
             if (type != null)
@@ -72,17 +70,17 @@ namespace MobX.Utilities.Editor
             throw new NullReferenceException($"{serializedProperty.name} || {targetType.Name}");
         }
 
-        public static FieldInfo GetUnderlyingFieldInfo(this SerializedProperty serializedProperty)
+        public static FieldInfo GetUnderlyingFieldInfo(this UnityEditor.SerializedProperty serializedProperty)
         {
-            var targetType = serializedProperty.serializedObject.targetObject.GetType();
-            return targetType.GetFieldIncludeBaseTypes(serializedProperty.name, FLAGS);
+            Type targetType = serializedProperty.serializedObject.targetObject.GetType();
+            return targetType.GetFieldIncludeBaseTypes(serializedProperty.name);
         }
 
-        public static SerializedProperty[] GetSerializedProperties(this SerializedObject target)
+        public static UnityEditor.SerializedProperty[] GetSerializedProperties(this UnityEditor.SerializedObject target)
         {
-            var type = target.targetObject.GetType();
-            var list = new List<SerializedProperty>();
-            foreach (var fieldInfo in type.GetFieldsIncludeBaseTypes(BindingFlags.Instance | BindingFlags.NonPublic))
+            Type type = target.targetObject.GetType();
+            var list = new List<UnityEditor.SerializedProperty>();
+            foreach (FieldInfo fieldInfo in type.GetFieldsIncludeBaseTypes(BindingFlags.Instance | BindingFlags.NonPublic))
             {
                 if (fieldInfo.HasAttribute<SerializeField>())
                 {
@@ -90,7 +88,7 @@ namespace MobX.Utilities.Editor
                 }
             }
 
-            foreach (var fieldInfo in type.GetFieldsIncludeBaseTypes(BindingFlags.Instance | BindingFlags.Public))
+            foreach (FieldInfo fieldInfo in type.GetFieldsIncludeBaseTypes(BindingFlags.Instance | BindingFlags.Public))
             {
                 if (!fieldInfo.HasAttribute<HideInInspector>())
                 {
@@ -105,7 +103,7 @@ namespace MobX.Utilities.Editor
          * Array
          */
 
-        public static string[] GetStringArray(this SerializedProperty serializedProperty)
+        public static string[] GetStringArray(this UnityEditor.SerializedProperty serializedProperty)
         {
             var array = new string[serializedProperty.arraySize];
             for (var i = 0; i < array.Length; i++)
@@ -116,7 +114,7 @@ namespace MobX.Utilities.Editor
             return array;
         }
 
-        public static void SetStringArray(this SerializedProperty serializedProperty, string[] array)
+        public static void SetStringArray(this UnityEditor.SerializedProperty serializedProperty, string[] array)
         {
             serializedProperty.ClearArray();
 

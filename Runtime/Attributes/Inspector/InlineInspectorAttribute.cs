@@ -8,6 +8,6 @@ namespace MobX.Utilities.Inspector
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
     public class InlineInspectorAttribute : PropertyAttribute
     {
-        public bool Required { get; set; }
+        public bool Required { get; set; } = true;
     }
 }

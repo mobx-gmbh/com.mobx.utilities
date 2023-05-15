@@ -1,6 +1,6 @@
+using MobX.Utilities.Editor.Helper;
 using System;
 using System.Collections;
-using UnityEditor;
 using UnityEngine;
 
 namespace MobX.Utilities.Editor.Inspector
@@ -33,7 +33,7 @@ namespace MobX.Utilities.Editor.Inspector
 
             if (count <= 0)
             {
-                EditorGUILayout.LabelField("Collection is empty");
+                UnityEditor.EditorGUILayout.LabelField("Collection is empty");
             }
             GUIHelper.EndBox();
         }
@@ -43,14 +43,8 @@ namespace MobX.Utilities.Editor.Inspector
     {
         private IDictionary _dictionary;
 
-        public DictionaryInspector()
-        {
-
-        }
-
         public void DrawGUI()
         {
-
         }
     }
 }

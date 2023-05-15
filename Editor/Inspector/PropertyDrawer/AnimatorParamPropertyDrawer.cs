@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
 
-namespace MobX.Utilities
+namespace MobX.Utilities.Editor.Inspector.PropertyDrawer
 {
     [UnityEditor.CustomPropertyDrawer(typeof(AnimatorParamAttribute))]
     public class AnimatorParamPropertyDrawer : UnityEditor.PropertyDrawer
@@ -179,7 +179,7 @@ namespace MobX.Utilities
                     };
                 }
 
-                return (T[])fieldInfo.GetCustomAttributes(typeof(T), true);
+                return (T[]) fieldInfo.GetCustomAttributes(typeof(T), true);
             }
 
             /// <summary>

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace MobX.Utilities.Editor.Inspector
+namespace MobX.Utilities.Editor.Inspector.PropertyDrawer
 {
     public static class ConditionalShowValidator
     {
@@ -8,7 +8,7 @@ namespace MobX.Utilities.Editor.Inspector
         {
             var convertedRhs = TryConvert(getRhs(), lhs);
 
-            var valueType = getRhs().GetType();
+            Type valueType = getRhs().GetType();
 
             return valueType.IsFlagsEnum()
                 ? negationCondition

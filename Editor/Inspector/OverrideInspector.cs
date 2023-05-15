@@ -1,3 +1,5 @@
+using MobX.Utilities.Editor.Helper;
+using MobX.Utilities.Editor.Inspector.InspectorFields;
 using MobX.Utilities.Inspector;
 using MobX.Utilities.Reflection;
 using System;
@@ -41,8 +43,8 @@ namespace MobX.Utilities.Editor.Inspector
                 return;
             }
 
-            var targetType = target.GetType();
-            var foldoutInspectorAttribute = targetType.GetCustomAttribute<DefaultInspectorAttribute>(true);
+            Type targetType = target.GetType();
+            DefaultInspectorAttribute foldoutInspectorAttribute = targetType.GetCustomAttribute<DefaultInspectorAttribute>(true);
             _useDefaultInspector = foldoutInspectorAttribute != null;
 
             if (_useDefaultInspector)
@@ -64,11 +66,11 @@ namespace MobX.Utilities.Editor.Inspector
 
             FoldoutData activeHeader = null;
 
-            var inspectorMembers = InspectorFieldUtils.GetInspectorMembers(serializedObject);
+            InspectorMember[] inspectorMembers = InspectorFieldUtils.GetInspectorMembers(serializedObject);
             var count = 0;
             for (var i = 0; i < inspectorMembers.Length; i++)
             {
-                var inspectorMember = inspectorMembers[i];
+                InspectorMember inspectorMember = inspectorMembers[i];
 
                 if (inspectorMember.Member.TryGetCustomAttribute(out FoldoutAttribute attribute))
                 {
@@ -82,9 +84,9 @@ namespace MobX.Utilities.Editor.Inspector
                     activeHeader = new FoldoutData(title, attribute.ToolTip);
                     var defaultState = attribute.Unfold;
                     if (!_headerFields.TryAdd(activeHeader, new List<InspectorMember>
-                        {
-                            inspectorMember
-                        }))
+                    {
+                        inspectorMember
+                    }))
                     {
                         _headerFields[activeHeader].Add(inspectorMember);
                     }
@@ -142,7 +144,7 @@ namespace MobX.Utilities.Editor.Inspector
                 GUIHelper.Space();
             }
 
-            if (!_hideMonoScript)
+            if (!_hideMonoScript && !GUIHelper.HideMonoScript)
             {
                 DrawScriptField();
                 GUIHelper.Space();
@@ -176,9 +178,9 @@ namespace MobX.Utilities.Editor.Inspector
         {
             serializedObject.Update();
 
-            var pooledList = ListPool<InspectorMember>.Get();
+            List<InspectorMember> pooledList = ListPool<InspectorMember>.Get();
 
-            foreach (var member in _headerLessFields)
+            foreach (InspectorMember member in _headerLessFields)
             {
                 if (member.Label.text.ContainsIgnoreCaseAndSpace(filter))
                 {
@@ -186,9 +188,9 @@ namespace MobX.Utilities.Editor.Inspector
                 }
             }
 
-            var pooledDictionary = DictionaryPool<FoldoutData, List<InspectorMember>>.Get();
+            Dictionary<FoldoutData, List<InspectorMember>> pooledDictionary = DictionaryPool<FoldoutData, List<InspectorMember>>.Get();
 
-            foreach (var (header, list) in _headerFields)
+            foreach ((FoldoutData header, List<InspectorMember> list) in _headerFields)
             {
                 if (header.Title.ContainsIgnoreCaseAndSpace(filter))
                 {
@@ -200,20 +202,20 @@ namespace MobX.Utilities.Editor.Inspector
                     continue;
                 }
 
-                foreach (var member in list)
+                foreach (InspectorMember member in list)
                 {
                     if (member.Label.text.ContainsIgnoreCaseAndSpace(filter))
                     {
-                        if (pooledDictionary.ContainsKey(header))
+                        if (pooledDictionary.TryGetValue(header, out List<InspectorMember> value))
                         {
-                            pooledDictionary[header].Add(member);
+                            value.Add(member);
                             continue;
                         }
 
                         if (!pooledDictionary.TryAdd(header, new List<InspectorMember>
-                            {
-                                member
-                            }))
+                        {
+                            member
+                        }))
                         {
                             pooledDictionary[header].Add(member);
                         }
@@ -225,7 +227,7 @@ namespace MobX.Utilities.Editor.Inspector
             {
                 GUIHelper.Space();
             }
-            foreach (var member in pooledList)
+            foreach (InspectorMember member in pooledList)
             {
                 member.ProcessGUI();
             }
@@ -234,14 +236,14 @@ namespace MobX.Utilities.Editor.Inspector
                 GUIHelper.Space();
             }
 
-            foreach (var (header, list) in pooledDictionary)
+            foreach ((FoldoutData header, List<InspectorMember> list) in pooledDictionary)
             {
                 Foldout.ForceHeader(header);
                 if (!(list.First()?.HasHeaderAttribute ?? false))
                 {
                     GUIHelper.Space();
                 }
-                foreach (var member in list)
+                foreach (InspectorMember member in list)
                 {
                     member.ProcessGUI();
                 }
@@ -274,7 +276,7 @@ namespace MobX.Utilities.Editor.Inspector
                 GUIHelper.Space();
             }
 
-            foreach (var (header, list) in _headerFields)
+            foreach ((FoldoutData header, List<InspectorMember> list) in _headerFields)
             {
                 if (Foldout[header])
                 {
@@ -282,7 +284,7 @@ namespace MobX.Utilities.Editor.Inspector
                     {
                         GUIHelper.Space();
                     }
-                    foreach (var member in list)
+                    foreach (InspectorMember member in list)
                     {
                         member.ProcessGUI();
                     }

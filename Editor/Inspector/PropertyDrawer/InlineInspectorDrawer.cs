@@ -1,24 +1,26 @@
-﻿using MobX.Utilities.Inspector;
+﻿using MobX.Utilities.Editor.Helper;
+using MobX.Utilities.Inspector;
+using System.Collections.Generic;
 using UnityEngine;
 
-namespace MobX.Utilities.Editor.Inspector
+namespace MobX.Utilities.Editor.Inspector.PropertyDrawer
 {
     [UnityEditor.CustomPropertyDrawer(typeof(InlineInspectorAttribute))]
-    internal class InlineInspectorDrawer : UnityEditor.PropertyDrawer
+    public class InlineInspectorDrawer : UnityEditor.PropertyDrawer
     {
         private UnityEditor.Editor _inspector;
         private InlineInspectorAttribute _inspectorAttribute;
-        private string _key;
-        private bool _required;
+        private static readonly Dictionary<string, bool> foldoutStatuses = new();
 
         public override float GetPropertyHeight(UnityEditor.SerializedProperty property, GUIContent label)
         {
-            return 0;
+            return -2;
         }
 
         public override void OnGUI(Rect position, UnityEditor.SerializedProperty property, GUIContent label)
         {
-            if (_required && property.objectReferenceValue == null)
+            _inspectorAttribute ??= (InlineInspectorAttribute) attribute;
+            if (_inspectorAttribute is { Required: true } && property.objectReferenceValue == null)
             {
                 var message = $"{property.displayName} is Required!";
                 UnityEditor.EditorGUILayout.HelpBox(message, UnityEditor.MessageType.Error);
@@ -29,11 +31,6 @@ namespace MobX.Utilities.Editor.Inspector
             if (property.propertyType != UnityEditor.SerializedPropertyType.ObjectReference)
             {
                 return;
-            }
-
-            if (attribute is InlineInspectorAttribute inlineInspectorAttribute)
-            {
-                _required = inlineInspectorAttribute.Required;
             }
 
             if (property.objectReferenceValue == null)
@@ -47,14 +44,30 @@ namespace MobX.Utilities.Editor.Inspector
                 return;
             }
 
-            _inspectorAttribute ??= (InlineInspectorAttribute) attribute;
-            GetOrCreateInspector(property).OnInspectorGUI();
+            foldoutStatuses.TryGetValue(property.propertyPath, out var foldoutState);
+
+            Rect rect = GUIHelper.GetLastRect();
+
+            if (UnityEditor.EditorGUI.indentLevel > 0)
+            {
+                rect = rect.WithOffset(-13);
+            }
+
+            foldoutState = UnityEditor.EditorGUI.Foldout(rect, foldoutState, "", true);
+            foldoutStatuses[property.propertyPath] = foldoutState;
+
+            if (foldoutState)
+            {
+                GUIHelper.IncreaseIndent();
+                GUIHelper.HideMonoScript = true;
+                GetOrCreateInspector(property).OnInspectorGUI();
+                GUIHelper.HideMonoScript = false;
+                GUIHelper.DecreaseIndent();
+            }
         }
 
         private UnityEditor.Editor GetOrCreateInspector(UnityEditor.SerializedProperty property)
         {
-            _inspectorAttribute ??= (InlineInspectorAttribute) attribute;
-
             if (_inspector && _inspector.target != property.objectReferenceValue)
             {
                 _inspector = null;

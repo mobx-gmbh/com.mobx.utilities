@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace MobX.Utilities.Editor
+namespace MobX.Utilities.Editor.Helper
 {
     public static partial class GUIHelper
     {
@@ -78,7 +78,7 @@ namespace MobX.Utilities.Editor
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static float GetIndentLength(Rect sourceRect)
         {
-            var indentRect = UnityEditor.EditorGUI.IndentedRect(sourceRect);
+            Rect indentRect = UnityEditor.EditorGUI.IndentedRect(sourceRect);
             var indentLength = indentRect.x - sourceRect.x;
 
             return indentLength;
@@ -92,7 +92,7 @@ namespace MobX.Utilities.Editor
         {
             type ??= target.GetType();
             var name = type.GetCustomAttribute<AddComponentMenu>()?.componentMenu?.Split('/').Last() ??
-                       type.Name.Humanize();
+                type.Name.Humanize();
             return new GUIContent(" " + name, UnityEditor.AssetPreview.GetMiniThumbnail(target));
         }
 
@@ -120,7 +120,7 @@ namespace MobX.Utilities.Editor
 
             GUILayout.Box(new GUIContent(title), options);
 
-            var eventType = Event.current.type;
+            EventType eventType = Event.current.type;
             var isAccepted = false;
 
             if (eventType is EventType.DragUpdated or EventType.DragPerform)
@@ -144,7 +144,7 @@ namespace MobX.Utilities.Editor
          * Async
          */
 
-        public static async Task CompleteGUI()
+        public async static Task CompleteGUI()
         {
             await Task.Delay(25);
         }
@@ -220,7 +220,7 @@ namespace MobX.Utilities.Editor
         public static float LineHeight()
         {
             return UnityEditor.EditorGUIUtility.singleLineHeight +
-                   UnityEditor.EditorGUIUtility.standardVerticalSpacing;
+                UnityEditor.EditorGUIUtility.standardVerticalSpacing;
         }
     }
 }

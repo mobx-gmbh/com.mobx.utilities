@@ -1,11 +1,11 @@
 using MobX.Utilities.Editor.FactoryWindow;
+using MobX.Utilities.Editor.Helper;
 using MobX.Utilities.Types;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
 using UnityEngine.Pool;
@@ -13,7 +13,7 @@ using Object = UnityEngine.Object;
 
 namespace MobX.Utilities.Editor.Inspector
 {
-    public abstract class AssetCollectionWindow : EditorWindow
+    public abstract class AssetCollectionWindow : UnityEditor.EditorWindow
     {
         #region Fields & Properties
 
@@ -34,17 +34,17 @@ namespace MobX.Utilities.Editor.Inspector
         private string _filterString = string.Empty;
         private bool _foldout = true;
         private string _createSearchFilter;
-        private bool _isRenameMode = false;
+        private bool _isRenameMode;
         private string _elementName;
         private int _elementCount;
-        private Action<Object> _onEnter;
+        private System.Action<Object> _onEnter;
 
         private readonly Dictionary<Type, Action<Object>> _footerDrawer = new(8);
         private readonly List<(string title, ReorderableList orderedList, IList rawList, ValueObject<bool> show)> _assetCollections = new(8);
 
         private class ActiveSelection
         {
-            public readonly SerializedObject SerializedObject;
+            public readonly UnityEditor.SerializedObject SerializedObject;
             public readonly Object Target;
             public readonly string Path;
 
@@ -53,7 +53,7 @@ namespace MobX.Utilities.Editor.Inspector
 
             public void DrawHeader()
             {
-                EditorGUIUtility.labelWidth = 0;
+                UnityEditor.EditorGUIUtility.labelWidth = 0;
                 GUIHelper.BeginIndentOverride(0);
                 _editor.DrawHeader();
                 GUIHelper.EndIndentOverride();
@@ -67,14 +67,14 @@ namespace MobX.Utilities.Editor.Inspector
             public ActiveSelection(Object target)
             {
                 Target = target;
-                SerializedObject = new SerializedObject(Target);
+                SerializedObject = new UnityEditor.SerializedObject(Target);
                 _editor = UnityEditor.Editor.CreateEditor(Target);
 
                 if (Target is GameObject gameObject)
                 {
                     var targets = new List<(string name, UnityEditor.Editor editor)>();
                     var foldout = new FoldoutHandler(color: new Color(0f, 0f, 0f, 0.27f));
-                    foreach (var component in gameObject.GetComponents(typeof(Component)))
+                    foreach (Component component in gameObject.GetComponents(typeof(Component)))
                     {
                         targets.Add((component.GetType().Name.Humanize(), UnityEditor.Editor.CreateEditor(component)));
                     }
@@ -96,11 +96,12 @@ namespace MobX.Utilities.Editor.Inspector
                 {
                     _drawInspectorGUI = _editor.OnInspectorGUI;
                 }
-                Path = AssetDatabase.GetAssetPath(target);
+                Path = UnityEditor.AssetDatabase.GetAssetPath(target);
             }
         }
 
         #endregion
+
 
         #region API
 
@@ -129,11 +130,13 @@ namespace MobX.Utilities.Editor.Inspector
 
         #endregion
 
+
         #region Virtual & Abstract
 
         protected abstract void Initialize();
 
         #endregion
+
 
         #region Setup
 
@@ -150,8 +153,8 @@ namespace MobX.Utilities.Editor.Inspector
         private void OnDisable()
         {
             ObjectFactoryWindow.AssetsCreated -= OnAssetsCreated;
-            EditorPrefs.SetString(_filterKey, _filterString);
-            EditorPrefs.SetBool(_foldoutKey, _foldout);
+            UnityEditor.EditorPrefs.SetString(_filterKey, _filterString);
+            UnityEditor.EditorPrefs.SetBool(_foldoutKey, _foldout);
         }
 
         private void InitializeInternal()
@@ -159,17 +162,17 @@ namespace MobX.Utilities.Editor.Inspector
             GUI.FocusControl(null);
             _assetCollections.Clear();
             _footerDrawer.Clear();
-            _selection = default;
+            _selection = default(ActiveSelection);
             _isRenameMode = false;
             _onEnter = null;
             _elementCount = 0;
-            _foldout = EditorPrefs.GetBool(_foldoutKey, true);
-            _filterString = EditorPrefs.GetString(_filterKey, _filterString);
+            _foldout = UnityEditor.EditorPrefs.GetBool(_foldoutKey, true);
+            _filterString = UnityEditor.EditorPrefs.GetString(_filterKey, _filterString);
 
             Initialize();
 
-            var lastSelected = EditorPrefs.GetString(_selectionKey);
-            foreach (var (_, reorderableList, _, _) in _assetCollections)
+            var lastSelected = UnityEditor.EditorPrefs.GetString(_selectionKey);
+            foreach ((var _, ReorderableList reorderableList, IList _, ValueObject<bool> _) in _assetCollections)
             {
                 _elementCount += reorderableList.list.Count;
 
@@ -178,7 +181,7 @@ namespace MobX.Utilities.Editor.Inspector
                     if (((Object) reorderableList.list[i]).name == lastSelected)
                     {
                         reorderableList.Select(i);
-                        foreach (var tuple in _assetCollections)
+                        foreach ((string title, ReorderableList orderedList, IList rawList, ValueObject<bool> show) tuple in _assetCollections)
                         {
                             if (tuple.orderedList == reorderableList)
                             {
@@ -190,19 +193,19 @@ namespace MobX.Utilities.Editor.Inspector
 
                         var target = (Object) reorderableList.list[reorderableList.index];
                         _selection = new ActiveSelection(target);
-                        EditorPrefs.SetString(_selectionKey, target.name);
+                        UnityEditor.EditorPrefs.SetString(_selectionKey, target.name);
                         return;
                     }
                 }
             }
-            foreach (var (_, reorderableList, _, _) in _assetCollections)
+            foreach ((var _, ReorderableList reorderableList, IList _, ValueObject<bool> _) in _assetCollections)
             {
                 for (var i = 0; i < reorderableList.list.Count; i++)
                 {
                     if (((Object) reorderableList.list[i]).IsNotNull())
                     {
                         reorderableList.Select(i);
-                        foreach (var tuple in _assetCollections)
+                        foreach ((string title, ReorderableList orderedList, IList rawList, ValueObject<bool> show) tuple in _assetCollections)
                         {
                             if (tuple.orderedList == reorderableList)
                             {
@@ -214,7 +217,7 @@ namespace MobX.Utilities.Editor.Inspector
 
                         var target = (Object) reorderableList.list[reorderableList.index];
                         _selection = new ActiveSelection(target);
-                        EditorPrefs.SetString(_selectionKey, target.name);
+                        UnityEditor.EditorPrefs.SetString(_selectionKey, target.name);
                         return;
                     }
                 }
@@ -223,14 +226,14 @@ namespace MobX.Utilities.Editor.Inspector
 
         private void OnAssetsCreated(IEnumerable<Object> objects)
         {
-            EditorPrefs.SetString(_selectionKey, objects.FirstOrDefault()?.name);
+            UnityEditor.EditorPrefs.SetString(_selectionKey, objects.FirstOrDefault()?.name);
             InitializeInternal();
         }
 
         #endregion
 
-        #region List Setup
 
+        #region List Setup
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void AddAssetCollectionInternal<T>(string collectionTitle, IList list, Action<Object> drawFooter, string emptyCollectionDisplay = null) where T : Object
@@ -250,8 +253,8 @@ namespace MobX.Utilities.Editor.Inspector
                 {
                     try
                     {
-                        Selection.activeObject = _selection.Target;
-                        EditorGUIUtility.PingObject(_selection.Target);
+                        UnityEditor.Selection.activeObject = _selection.Target;
+                        UnityEditor.EditorGUIUtility.PingObject(_selection.Target);
                     }
                     catch (Exception)
                     {
@@ -262,7 +265,7 @@ namespace MobX.Utilities.Editor.Inspector
 
             orderedList.onSelectCallback += reorderableList =>
             {
-                foreach (var tuple in _assetCollections)
+                foreach ((string title, ReorderableList orderedList, IList rawList, ValueObject<bool> show) tuple in _assetCollections)
                 {
                     if (tuple.orderedList == reorderableList)
                     {
@@ -279,7 +282,7 @@ namespace MobX.Utilities.Editor.Inspector
                 }
                 _selection = new ActiveSelection(target);
                 _elementName = target.name;
-                EditorPrefs.SetString(_selectionKey, target.name);
+                UnityEditor.EditorPrefs.SetString(_selectionKey, target.name);
             };
 
             orderedList.drawNoneElementCallback += rect =>
@@ -299,11 +302,11 @@ namespace MobX.Utilities.Editor.Inspector
                 var iconRect = new Rect(rect.x - 2, rect.y + 4, 26, 26);
                 if (element is Component component)
                 {
-                    GUI.Label(iconRect, EditorGUIUtility.ObjectContent(component.gameObject, component.gameObject.GetType()).image);
+                    GUI.Label(iconRect, UnityEditor.EditorGUIUtility.ObjectContent(component.gameObject, component.gameObject.GetType()).image);
                 }
                 else
                 {
-                    GUI.Label(iconRect, EditorGUIUtility.ObjectContent(element, element.GetType()).image);
+                    GUI.Label(iconRect, UnityEditor.EditorGUIUtility.ObjectContent(element, element.GetType()).image);
                 }
 
                 if (active && _isRenameMode)
@@ -311,7 +314,7 @@ namespace MobX.Utilities.Editor.Inspector
                     var labelRect = new Rect(rect.x + 30, rect.y + 7, rect.width - 30, rect.height - 14);
                     GUI.SetNextControlName("textField");
                     _elementName = GUI.TextField(labelRect, _elementName);
-                    EditorGUI.FocusTextInControl("textField");
+                    UnityEditor.EditorGUI.FocusTextInControl("textField");
                 }
                 else
                 {
@@ -326,7 +329,9 @@ namespace MobX.Utilities.Editor.Inspector
 
         #endregion
 
+
         //--------------------------------------------------------------------------------------------------------------
+
 
         #region GUI
 
@@ -339,11 +344,11 @@ namespace MobX.Utilities.Editor.Inspector
 
         private void DrawLeftSide()
         {
-            EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.BeginVertical(GUILayout.Height(position.height - 4), GUILayout.Width(GetMenuWidth()));
+            UnityEditor.EditorGUILayout.BeginHorizontal();
+            UnityEditor.EditorGUILayout.BeginVertical(GUILayout.Height(position.height - 4), GUILayout.Width(GetMenuWidth()));
             {
                 GUIHelper.Space(2);
-                EditorGUILayout.BeginHorizontal();
+                UnityEditor.EditorGUILayout.BeginHorizontal();
 
                 if (GUIHelper.OptionsButton())
                 {
@@ -362,8 +367,8 @@ namespace MobX.Utilities.Editor.Inspector
                     {
                         try
                         {
-                            Selection.activeObject = _selection.Target;
-                            EditorGUIUtility.PingObject(_selection.Target);
+                            UnityEditor.Selection.activeObject = _selection.Target;
+                            UnityEditor.EditorGUIUtility.PingObject(_selection.Target);
                         }
                         catch (Exception)
                         {
@@ -371,16 +376,16 @@ namespace MobX.Utilities.Editor.Inspector
                         }
                     }
 
-                    EditorGUILayout.EndHorizontal();
+                    UnityEditor.EditorGUILayout.EndHorizontal();
                     if (_elementCount > 5)
                     {
                         GUIHelper.Space();
                         _filterString = GUIHelper.SearchBar(_filterString);
                     }
 
-                    _scrollLeft = EditorGUILayout.BeginScrollView(_scrollLeft);
+                    _scrollLeft = UnityEditor.EditorGUILayout.BeginScrollView(_scrollLeft);
 
-                    foreach (var assetCollection in _assetCollections)
+                    foreach ((string title, ReorderableList orderedList, IList rawList, ValueObject<bool> show) assetCollection in _assetCollections)
                     {
                         if (assetCollection.rawList.Count <= 0)
                         {
@@ -389,7 +394,7 @@ namespace MobX.Utilities.Editor.Inspector
 
                         if (_filterString.IsNotNullOrWhitespace())
                         {
-                            var tempList = ListPool<Object>.Get();
+                            List<Object> tempList = ListPool<Object>.Get();
                             foreach (var item in assetCollection.rawList)
                             {
                                 var obj = (Object) item;
@@ -433,10 +438,10 @@ namespace MobX.Utilities.Editor.Inspector
                         }
                     }
 
-                    EditorGUILayout.EndScrollView();
+                    UnityEditor.EditorGUILayout.EndScrollView();
 
                     GUIHelper.DrawLine();
-                    EditorGUILayout.BeginHorizontal();
+                    UnityEditor.EditorGUILayout.BeginHorizontal();
                     if (GUIHelper.AddButton())
                     {
                         ObjectFactoryWindow.OpenWindow(_createSearchFilter);
@@ -445,46 +450,46 @@ namespace MobX.Utilities.Editor.Inspector
                     {
                         if (GUIHelper.DestroyDialogue(_selection.Target))
                         {
-                            EditorGUILayout.EndHorizontal();
-                            EditorGUILayout.EndVertical();
+                            UnityEditor.EditorGUILayout.EndHorizontal();
+                            UnityEditor.EditorGUILayout.EndVertical();
                             InitializeInternal();
                             return;
                         }
                     }
-                    EditorGUILayout.EndHorizontal();
+                    UnityEditor.EditorGUILayout.EndHorizontal();
                 }
                 else
                 {
-                    EditorGUILayout.EndHorizontal();
+                    UnityEditor.EditorGUILayout.EndHorizontal();
                 }
             }
-            EditorGUILayout.EndVertical();
+            UnityEditor.EditorGUILayout.EndVertical();
         }
 
         private void DrawRightSide()
         {
             GUILayout.FlexibleSpace();
             GUIHelper.DrawRect(new Rect(GetMenuWidth() - 1, 0, 1, position.height));
-            EditorGUILayout.BeginVertical(GUILayout.Width(position.width - GetMenuWidth()));
+            UnityEditor.EditorGUILayout.BeginVertical(GUILayout.Width(position.width - GetMenuWidth()));
 
             if (_selection != null && _selection.Target != null)
             {
-                _scrollRight = EditorGUILayout.BeginScrollView(_scrollRight);
-                EditorGUI.indentLevel = IndentLevel;
-                EditorGUIUtility.labelWidth = LabelWidth;
+                _scrollRight = UnityEditor.EditorGUILayout.BeginScrollView(_scrollRight);
+                UnityEditor.EditorGUI.indentLevel = IndentLevel;
+                UnityEditor.EditorGUIUtility.labelWidth = LabelWidth;
                 _selection.SerializedObject.Update();
                 _selection.DrawHeader();
                 _selection.DrawInspectorGUI();
                 _selection.SerializedObject.ApplyModifiedProperties();
                 FoldoutHandler.SetDirty();
-                EditorGUILayout.EndScrollView();
+                UnityEditor.EditorGUILayout.EndScrollView();
                 GUIHelper.DrawLine();
                 GUIHelper.Space(4);
                 GetFooterDrawer(_selection.Target)?.Invoke(_selection.Target);
                 GUI.enabled = false;
-                EditorGUILayout.LabelField(_selection.Path);
+                UnityEditor.EditorGUILayout.LabelField(_selection.Path);
                 GUI.enabled = true;
-                var buttonRect = GUILayoutUtility.GetLastRect();
+                Rect buttonRect = GUILayoutUtility.GetLastRect();
                 buttonRect.x += buttonRect.width - 60;
                 buttonRect.width = 60;
                 GUIHelper.Space(7);
@@ -494,27 +499,27 @@ namespace MobX.Utilities.Editor.Inspector
                 InitializeInternal();
             }
 
-            EditorGUILayout.EndVertical();
-            EditorGUILayout.EndHorizontal();
+            UnityEditor.EditorGUILayout.EndVertical();
+            UnityEditor.EditorGUILayout.EndHorizontal();
             GUIHelper.DrawRect(new Rect(0, 0, position.width, 1));
         }
 
         private void HandleInput()
         {
-            var current = Event.current;
+            Event current = Event.current;
 
             if (_isRenameMode)
             {
                 if (current.keyCode == KeyCode.Return && current.type == EventType.KeyUp)
                 {
-                    AssetDatabase.RenameAsset(AssetDatabase.GetAssetPath(_selection.Target), _elementName);
+                    UnityEditor.AssetDatabase.RenameAsset(UnityEditor.AssetDatabase.GetAssetPath(_selection.Target), _elementName);
                     Repaint();
                     _isRenameMode = false;
                     return;
                 }
                 if (current.isMouse)
                 {
-                    AssetDatabase.RenameAsset(AssetDatabase.GetAssetPath(_selection.Target), _elementName);
+                    UnityEditor.AssetDatabase.RenameAsset(UnityEditor.AssetDatabase.GetAssetPath(_selection.Target), _elementName);
                     Repaint();
                     _isRenameMode = false;
                     return;
@@ -523,7 +528,6 @@ namespace MobX.Utilities.Editor.Inspector
                 {
                     Repaint();
                     _isRenameMode = false;
-                    return;
                 }
             }
             else
@@ -547,14 +551,15 @@ namespace MobX.Utilities.Editor.Inspector
                 {
                     _isRenameMode = true;
                     Repaint();
-                    return;
                 }
             }
         }
 
         #endregion
 
+
         //--------------------------------------------------------------------------------------------------------------
+
 
         #region Helper
 
@@ -565,8 +570,8 @@ namespace MobX.Utilities.Editor.Inspector
 
         private Action<Object> GetFooterDrawer(object target)
         {
-            var type = target.GetType();
-            foreach (var (key, value) in _footerDrawer)
+            Type type = target.GetType();
+            foreach ((Type key, Action<Object> value) in _footerDrawer)
             {
                 if (type.IsSubclassOrAssignable(key))
                 {

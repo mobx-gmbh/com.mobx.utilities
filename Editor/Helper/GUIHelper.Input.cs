@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace MobX.Utilities.Editor
+namespace MobX.Utilities.Editor.Helper
 {
     public static partial class GUIHelper
     {
@@ -27,7 +27,7 @@ namespace MobX.Utilities.Editor
             return result;
         }
 
-        private static async void ResetDoubleClickCache()
+        private async static void ResetDoubleClickCache()
         {
             await Task.Delay(220);
             lastClicked = null;

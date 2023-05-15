@@ -1,4 +1,6 @@
-﻿using MobX.Utilities.Inspector;
+﻿using MobX.Utilities.Editor.Helper;
+using MobX.Utilities.Editor.Inspector.PropertyDrawer;
+using MobX.Utilities.Inspector;
 using System;
 using System.Diagnostics;
 using System.Linq;
@@ -6,7 +8,7 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 
-namespace MobX.Utilities.Editor.Inspector
+namespace MobX.Utilities.Editor.Inspector.InspectorFields
 {
     public abstract class InspectorMember
     {
@@ -23,7 +25,10 @@ namespace MobX.Utilities.Editor.Inspector
         private readonly Action _preDraw;
         private readonly Action _postDraw;
 
-        protected static string[] Prefixes { get; } = {"_", "m_"};
+        protected static string[] Prefixes { get; } =
+        {
+            "_", "m_"
+        };
 
         /*
          * Ctor
@@ -35,13 +40,13 @@ namespace MobX.Utilities.Editor.Inspector
             Member = member;
             HasHeaderAttribute = Member.HasAttribute<HeaderAttribute>();
 
-            var isSerialized = member.HasAttribute<SerializeField>() || member is FieldInfo {IsPublic: true};
+            var isSerialized = member.HasAttribute<SerializeField>() || member is FieldInfo { IsPublic: true };
 
-            var attributes = member.GetCustomAttributes<PropertyAttribute>().ToArray();
+            PropertyAttribute[] attributes = member.GetCustomAttributes<PropertyAttribute>().ToArray();
 
             for (var i = 0; i < attributes.Length; i++)
             {
-                var propertyAttribute = attributes[i];
+                PropertyAttribute propertyAttribute = attributes[i];
 
                 switch (propertyAttribute)
                 {

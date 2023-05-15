@@ -1,14 +1,14 @@
 using System;
-using UnityEditor;
+using System.Reflection;
 using UnityEngine;
 
-namespace MobX.Utilities.Editor
+namespace MobX.Utilities.Editor.Helper
 {
     public static partial class GUIHelper
     {
         public static T EnumButtons<T>(T current) where T : unmanaged, Enum
         {
-            var color = GUI.backgroundColor;
+            Color color = GUI.backgroundColor;
             BeginBox();
             GUILayout.BeginHorizontal();
 
@@ -16,7 +16,7 @@ namespace MobX.Utilities.Editor
             {
                 GUI.backgroundColor = eValue.Equals(current) ? ActiveButtonColor : color;
                 if (!GUILayout.Button(new GUIContent($"{eValue.ToString().Humanize()}",
-                        $"{eValue.GetAttribute<TooltipAttribute>()?.tooltip}")))
+                    $"{eValue.GetAttribute<TooltipAttribute>()?.tooltip}")))
                 {
                     continue;
                 }
@@ -33,7 +33,7 @@ namespace MobX.Utilities.Editor
 
         public static T EnumButtons<T>(GUIContent label, T current) where T : unmanaged, Enum
         {
-            var color = GUI.backgroundColor;
+            Color color = GUI.backgroundColor;
             BeginBox();
             GUILayout.BeginHorizontal();
             GUILayout.Label(label, RichTextStyle);
@@ -41,7 +41,7 @@ namespace MobX.Utilities.Editor
             {
                 GUI.backgroundColor = eValue.Equals(current) ? ActiveButtonColor : color;
                 if (GUILayout.Button(new GUIContent($"{eValue.ToString()}",
-                        $"{eValue.GetAttribute<TooltipAttribute>()?.tooltip}")))
+                    $"{eValue.GetAttribute<TooltipAttribute>()?.tooltip}")))
                 {
                     return eValue;
                 }
@@ -55,7 +55,7 @@ namespace MobX.Utilities.Editor
 
         public static T EnumLabel<T>(string label, T current) where T : unmanaged, Enum
         {
-            return (T) EditorGUILayout.EnumPopup(label, current);
+            return (T) UnityEditor.EditorGUILayout.EnumPopup(label, current);
         }
 
         /*
@@ -67,9 +67,9 @@ namespace MobX.Utilities.Editor
         {
             try
             {
-                var values = Enum.GetValues(typeof(TEnum));
+                Array values = Enum.GetValues(typeof(TEnum));
                 long result = 0;
-                var type = typeof(TEnum);
+                Type type = typeof(TEnum);
 
                 foreach (TEnum value in values)
                 {
@@ -80,8 +80,8 @@ namespace MobX.Utilities.Editor
                         continue;
                     }
 
-                    if (EditorGUILayout.Toggle(Enum.GetName(type, value).HumanizeIf(humanizeLabels),
-                            current.HasFlagUnsafe(value)))
+                    if (UnityEditor.EditorGUILayout.Toggle(Enum.GetName(type, value).HumanizeIf(humanizeLabels),
+                        current.HasFlagUnsafe(value)))
                     {
                         result |= value.ConvertUnsafe<TEnum, long>();
                     }
@@ -97,7 +97,7 @@ namespace MobX.Utilities.Editor
 
             TAttribute GetAttribute<TAttribute>(Type enumType, string name) where TAttribute : Attribute
             {
-                var memInfo = enumType.GetMember(name);
+                MemberInfo[] memInfo = enumType.GetMember(name);
                 var attributes = memInfo[0].GetCustomAttributes(typeof(TAttribute), false);
                 return attributes.Length > 0 ? (TAttribute) attributes[0] : null;
             }
@@ -107,7 +107,7 @@ namespace MobX.Utilities.Editor
         {
             try
             {
-                var values = Enum.GetValues(enumType);
+                Array values = Enum.GetValues(enumType);
                 var result = 0;
 
                 foreach (int value in values)
@@ -118,8 +118,8 @@ namespace MobX.Utilities.Editor
                         continue;
                     }
 
-                    if (EditorGUILayout.Toggle(Enum.GetName(enumType, value).HumanizeIf(humanizeLabels),
-                            current.HasFlagInt(value)))
+                    if (UnityEditor.EditorGUILayout.Toggle(Enum.GetName(enumType, value).HumanizeIf(humanizeLabels),
+                        current.HasFlagInt(value)))
                     {
                         result |= value;
                     }
@@ -135,7 +135,7 @@ namespace MobX.Utilities.Editor
 
             TAttribute GetAttribute<TAttribute>(Type enumType, string name) where TAttribute : Attribute
             {
-                var memInfo = enumType.GetMember(name);
+                MemberInfo[] memInfo = enumType.GetMember(name);
                 var attributes = memInfo[0].GetCustomAttributes(typeof(TAttribute), false);
                 return attributes.Length > 0 ? (TAttribute) attributes[0] : null;
             }

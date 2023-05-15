@@ -1,153 +1,156 @@
-using MobX.Utilities.Editor;
+using MobX.Utilities.Editor.Helper;
 using System;
-using UnityEditor;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Pool;
 using Object = UnityEngine.Object;
 
-namespace MobX.Utilities
+namespace MobX.Utilities.Editor.AssetManagement
 {
-    public class LabelWindow : EditorWindow
-         {
-             private GUIToggle _includeNested;
-             private Vector2 _scrollPosition;
-             private AssetData[] _filteredSelection = Array.Empty<AssetData>();
+    public class LabelWindow : UnityEditor.EditorWindow
+    {
+        private GUIToggle _includeNested;
+        private Vector2 _scrollPosition;
+        private AssetData[] _filteredSelection = Array.Empty<AssetData>();
 
 
-             #region Type Definition
+        #region Type Definition
 
-             private readonly struct AssetData
-             {
-                 public readonly Object Asset;
-                 public readonly string[] Labels;
-                 public readonly string Path;
-                 public readonly string LabelRepresentation;
-                 public readonly AssetData[] SubAssets;
+        private readonly struct AssetData
+        {
+            public readonly Object Asset;
+            public readonly string[] Labels;
+            public readonly string Path;
+            public readonly string LabelRepresentation;
+            public readonly AssetData[] SubAssets;
 
-                 public AssetData(Object asset, bool includeFolder)
-                 {
-                     Asset = asset;
-                     Labels = AssetDatabase.GetLabels(asset);
-                     LabelRepresentation = Labels.CombineToString(", ");
-                     Path = AssetDatabase.GetAssetPath(asset);
+            public AssetData(Object asset, bool includeFolder)
+            {
+                Asset = asset;
+                Labels = UnityEditor.AssetDatabase.GetLabels(asset);
+                LabelRepresentation = Labels.CombineToString(", ");
+                Path = UnityEditor.AssetDatabase.GetAssetPath(asset);
 
-                     if (includeFolder)
-                     {
-                         var buffer = ListPool<AssetData>.Get();
-                         if (AssetDatabase.IsValidFolder(Path))
-                         {
-                             var files = AssetDatabase.FindAssets("t:Object", new[] {Path});
-                             foreach (var file in files)
-                             {
-                                 var assetPath = AssetDatabase.GUIDToAssetPath(file);
-                                 var subAsset = AssetDatabase.LoadAssetAtPath<Object>(assetPath);
-                                 buffer.Add(new AssetData(subAsset, true));
-                             }
-                         }
+                if (includeFolder)
+                {
+                    List<AssetData> buffer = ListPool<AssetData>.Get();
+                    if (UnityEditor.AssetDatabase.IsValidFolder(Path))
+                    {
+                        var files = UnityEditor.AssetDatabase.FindAssets("t:Object", new[]
+                        {
+                            Path
+                        });
+                        foreach (var file in files)
+                        {
+                            var assetPath = UnityEditor.AssetDatabase.GUIDToAssetPath(file);
+                            Object subAsset = UnityEditor.AssetDatabase.LoadAssetAtPath<Object>(assetPath);
+                            buffer.Add(new AssetData(subAsset, true));
+                        }
+                    }
 
-                         SubAssets = buffer.ToArray();
-                         ListPool<AssetData>.Release(buffer);
-                         return;
-                     }
+                    SubAssets = buffer.ToArray();
+                    ListPool<AssetData>.Release(buffer);
+                    return;
+                }
 
-                     SubAssets = Array.Empty<AssetData>();
-                 }
-             }
+                SubAssets = Array.Empty<AssetData>();
+            }
+        }
 
-             #endregion
+        #endregion
 
 
-             [MenuItem("Tools/Asset Labels")]
-             private static void Open()
-             {
-                 GetWindow<LabelWindow>("Asset Labels");
-             }
+        [UnityEditor.MenuItem("Tools/Asset Labels")]
+        private static void Open()
+        {
+            GetWindow<LabelWindow>("Asset Labels");
+        }
 
-             private void OnEnable()
-             {
-                 _includeNested = new GUIToggle("Include Nested", true);
-                 _includeNested.Changed += _ => UpdateSelection();
-                 _includeNested.LoadValue(nameof(_includeNested));
-                 Selection.selectionChanged += UpdateSelection;
-                 UpdateSelection();
-             }
+        private void OnEnable()
+        {
+            _includeNested = new GUIToggle("Include Nested", true);
+            _includeNested.Changed += _ => UpdateSelection();
+            _includeNested.LoadValue(nameof(_includeNested));
+            UnityEditor.Selection.selectionChanged += UpdateSelection;
+            UpdateSelection();
+        }
 
-             private void OnDisable()
-             {
-                 _includeNested.Dispose();
-                 _includeNested.SaveValue(nameof(_includeNested));
-                 Selection.selectionChanged -= UpdateSelection;
-             }
+        private void OnDisable()
+        {
+            _includeNested.Dispose();
+            _includeNested.SaveValue(nameof(_includeNested));
+            UnityEditor.Selection.selectionChanged -= UpdateSelection;
+        }
 
-             private void UpdateSelection()
-             {
-                 var buffer = ListPool<AssetData>.Get();
-                 foreach (var asset in Selection.objects)
-                 {
-                     if (AssetDatabase.Contains(asset) is false)
-                     {
-                         continue;
-                     }
+        private void UpdateSelection()
+        {
+            List<AssetData> buffer = ListPool<AssetData>.Get();
+            foreach (Object asset in UnityEditor.Selection.objects)
+            {
+                if (UnityEditor.AssetDatabase.Contains(asset) is false)
+                {
+                    continue;
+                }
 
-                     buffer.Add(new AssetData(asset, _includeNested));
-                 }
+                buffer.Add(new AssetData(asset, _includeNested));
+            }
 
-                 _filteredSelection = buffer.ToArray();
-                 ListPool<AssetData>.Release(buffer);
-                 Repaint();
-             }
+            _filteredSelection = buffer.ToArray();
+            ListPool<AssetData>.Release(buffer);
+            Repaint();
+        }
 
-             private string _labelString;
+        private string _labelString;
 
-             private void OnGUI()
-             {
-                 _scrollPosition = GUILayout.BeginScrollView(_scrollPosition);
-                 DrawAssetData(_filteredSelection);
-                 GUILayout.EndScrollView();
-                 GUIHelper.DrawLine();
-                 _includeNested.Draw();
-                 _labelString = EditorGUILayout.TextField(_labelString);
-                 if (GUILayout.Button("Add"))
-                 {
-                     AddLabel(_labelString, _filteredSelection);
-                     UpdateSelection();
-                 }
-             }
+        private void OnGUI()
+        {
+            _scrollPosition = GUILayout.BeginScrollView(_scrollPosition);
+            DrawAssetData(_filteredSelection);
+            GUILayout.EndScrollView();
+            GUIHelper.DrawLine();
+            _includeNested.Draw();
+            _labelString = UnityEditor.EditorGUILayout.TextField(_labelString);
+            if (GUILayout.Button("Add"))
+            {
+                AddLabel(_labelString, _filteredSelection);
+                UpdateSelection();
+            }
+        }
 
-             private static void AddLabel(string label, AssetData[] assets)
-             {
-                 foreach (var assetData in assets)
-                 {
-                     var labels = assetData.Labels;
-                     ArrayUtility.Add(ref labels, label);
-                     AssetDatabase.SetLabels(assetData.Asset, labels);
+        private static void AddLabel(string label, AssetData[] assets)
+        {
+            foreach (AssetData assetData in assets)
+            {
+                var labels = assetData.Labels;
+                ArrayUtility.Add(ref labels, label);
+                UnityEditor.AssetDatabase.SetLabels(assetData.Asset, labels);
 
-                     AddLabel(label, assetData.SubAssets);
-                 }
-             }
+                AddLabel(label, assetData.SubAssets);
+            }
+        }
 
-             private static void DrawAssetData(AssetData[] assets)
-             {
-                 foreach (var assetData in assets)
-                 {
-                     var asset = assetData.Asset;
-                     var assetName = asset.name;
-                     var labels = assetData.LabelRepresentation;
+        private static void DrawAssetData(AssetData[] assets)
+        {
+            foreach (AssetData assetData in assets)
+            {
+                Object asset = assetData.Asset;
+                var assetName = asset.name;
+                var labels = assetData.LabelRepresentation;
 
-                     GUILayout.BeginHorizontal();
-                     EditorGUILayout.LabelField(assetName);
-                     EditorGUILayout.LabelField(labels);
-                     GUILayout.EndHorizontal();
+                GUILayout.BeginHorizontal();
+                UnityEditor.EditorGUILayout.LabelField(assetName);
+                UnityEditor.EditorGUILayout.LabelField(labels);
+                GUILayout.EndHorizontal();
 
-                     DrawSubAssets(assetData.SubAssets);
-                 }
+                DrawSubAssets(assetData.SubAssets);
+            }
 
-                 static void DrawSubAssets(AssetData[] subAssets)
-                 {
-                     GUIHelper.IncreaseIndent();
-                     DrawAssetData(subAssets);
-                     GUIHelper.DecreaseIndent();
-                 }
-             }
-         }
+            static void DrawSubAssets(AssetData[] subAssets)
+            {
+                GUIHelper.IncreaseIndent();
+                DrawAssetData(subAssets);
+                GUIHelper.DecreaseIndent();
+            }
+        }
+    }
 }

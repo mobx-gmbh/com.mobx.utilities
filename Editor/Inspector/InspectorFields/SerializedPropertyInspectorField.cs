@@ -1,10 +1,11 @@
-﻿using MobX.Utilities.Inspector;
+﻿using MobX.Utilities.Editor.Helper;
+using MobX.Utilities.Inspector;
 using System;
 using System.Reflection;
 using UnityEditorInternal;
 using UnityEngine;
 
-namespace MobX.Utilities.Editor.Inspector
+namespace MobX.Utilities.Editor.Inspector.InspectorFields
 {
     public class SerializedPropertyInspectorMember : InspectorMember
     {
@@ -27,13 +28,13 @@ namespace MobX.Utilities.Editor.Inspector
             _runtimeReadonly = memberInfo.HasAttribute<RuntimeReadonlyAttribute>();
             _readonly = memberInfo.HasAttribute<ReadonlyAttribute>();
 
-            var label = memberInfo.TryGetCustomAttribute<LabelAttribute>(out var labelAttribute)
+            var label = memberInfo.TryGetCustomAttribute<LabelAttribute>(out LabelAttribute labelAttribute)
                 ? labelAttribute.Label
                 : serializedProperty.name.Humanize(Prefixes);
 
             Label = new GUIContent(label, serializedProperty.tooltip);
 
-            if (memberInfo.TryGetCustomAttribute<ListOptions>(out var listAttribute))
+            if (memberInfo.TryGetCustomAttribute<ListOptions>(out ListOptions listAttribute))
             {
                 _listInspector = true;
                 _reorderableList = new ReorderableList(serializedProperty.serializedObject, serializedProperty,
@@ -53,7 +54,7 @@ namespace MobX.Utilities.Editor.Inspector
         {
             _serializedObject.Update();
             var enabled = GUI.enabled;
-            if (_readonly || (_runtimeReadonly && Application.isPlaying))
+            if (_readonly || _runtimeReadonly && Application.isPlaying)
             {
                 GUI.enabled = false;
             }

@@ -41,7 +41,7 @@ namespace MobX.Utilities.Editor.Inspector
         {
             get;
         }
-        public Dictionary<string, bool> DefaultFoldoutStates { get; } = new Dictionary<string, bool>();
+        public Dictionary<string, bool> DefaultFoldoutStates { get; } = new();
 
         /*
          * Fields
@@ -49,7 +49,7 @@ namespace MobX.Utilities.Editor.Inspector
 
         private readonly string _dataKey;
         private readonly Color? _color;
-        private static readonly HashSet<FoldoutHandler> activeHandlers = new HashSet<FoldoutHandler>(4);
+        private static readonly HashSet<FoldoutHandler> activeHandlers = new(4);
 
         /*
          * Ctor
@@ -261,7 +261,7 @@ namespace MobX.Utilities.Editor.Inspector
         #region Foldout
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool Foldout(bool value, string label, string tooltip = "", Color? color = null)
+        public bool Foldout(bool value, string label, string tooltip = "", Color? color = null)
         {
             UnityEditor.EditorGUILayout.LabelField("");
             Rect lastRect = GetLastRect();
@@ -272,20 +272,28 @@ namespace MobX.Utilities.Editor.Inspector
             EmptyContent.text = label;
             EmptyContent.tooltip = tooltip;
             var result = UnityEditor.EditorGUI.Foldout(foldoutRect, value, EmptyContent, true);
+            if (result != value)
+            {
+                SaveState();
+            }
             return result;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool FoldoutSimple(bool value, string label, string tooltip = "")
+        public bool FoldoutSimple(bool value, string label, string tooltip = "")
         {
             EmptyContent.text = label;
             EmptyContent.tooltip = tooltip;
             var result = UnityEditor.EditorGUILayout.Foldout(value, EmptyContent, true);
+            if (result != value)
+            {
+                SaveState();
+            }
             return result;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static bool LineFoldout(bool value, string label, string tooltip = "", Color? color = null)
+        private bool LineFoldout(bool value, string label, string tooltip = "", Color? color = null)
         {
             UnityEditor.EditorGUILayout.LabelField("");
             Rect lastRect = GetLastRect();
@@ -294,11 +302,15 @@ namespace MobX.Utilities.Editor.Inspector
             EmptyContent.text = label;
             EmptyContent.tooltip = tooltip;
             var result = UnityEditor.EditorGUI.Foldout(foldoutRect, value, EmptyContent, true);
+            if (result != value)
+            {
+                SaveState();
+            }
             return result;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static bool DarkFoldout(bool value, string label, string tooltip = "")
+        private bool DarkFoldout(bool value, string label, string tooltip = "")
         {
             UnityEditor.EditorGUILayout.LabelField("");
             Rect lastRect = GetLastRect();
@@ -309,28 +321,15 @@ namespace MobX.Utilities.Editor.Inspector
             EmptyContent.text = label;
             EmptyContent.tooltip = tooltip;
             var result = UnityEditor.EditorGUI.Foldout(foldoutRect, value, EmptyContent, true);
+            if (result != value)
+            {
+                SaveState();
+            }
             return result;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static bool DarkGradientFoldout(bool value, string label, string tooltip = "")
-        {
-            UnityEditor.EditorGUILayout.LabelField("");
-            Rect lastRect = GetLastRect();
-            var widthRect = new Rect(0, lastRect.y, GetViewWidth(), lastRect.height + 2);
-            var foldoutRect = new Rect(lastRect.x, lastRect.y + 1, GetViewWidth() - 10, lastRect.height);
-            var lineRect = new Rect(0, lastRect.y, GetViewWidth(), 1);
-            GUIHelper.DrawGradient(lineRect, new Color(0f, 0f, 0f, 0.05f), new Color(0f, 0f, 0f, 0.4f), 20, 3);
-            GUIHelper.DrawGradient(widthRect, new Color(0f, 0f, 0f, 0.1f), new Color(0f, 0f, 0f, 0.23f), 20, 1);
-
-            EmptyContent.text = label;
-            EmptyContent.tooltip = tooltip;
-            var result = UnityEditor.EditorGUI.Foldout(foldoutRect, value, EmptyContent, true);
-            return result;
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static bool TitleFoldout(bool value, string label, string tooltip = "")
+        private bool TitleFoldout(bool value, string label, string tooltip = "")
         {
             UnityEditor.EditorGUILayout.LabelField("");
             Rect lastRect = GetLastRect();
@@ -341,21 +340,11 @@ namespace MobX.Utilities.Editor.Inspector
             EmptyContent.text = label;
             EmptyContent.tooltip = tooltip;
             var result = UnityEditor.EditorGUI.Foldout(foldoutRect, value, EmptyContent, true, BoldFoldoutStyle);
+            if (result != value)
+            {
+                SaveState();
+            }
             return result;
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static bool DynamicFoldout(bool value, string label, string tooltip = "")
-        {
-            UnityEditor.EditorGUILayout.LabelField("");
-            Rect lastRect = GetLastRect();
-            var widthRect = new Rect(0, lastRect.y, lastRect.width + 5, lastRect.height + 2);
-            var foldoutRect = new Rect(10, lastRect.y + 1, lastRect.width, lastRect.height);
-            UnityEditor.EditorGUI.DrawRect(new Rect(0, lastRect.y, lastRect.width + 5, 1), new Color(0f, 0f, 0f, 0.3f));
-            UnityEditor.EditorGUI.DrawRect(widthRect, new Color(0f, 0f, 0f, 0.15f));
-            EmptyContent.text = label;
-            EmptyContent.tooltip = tooltip;
-            return UnityEditor.EditorGUI.Foldout(foldoutRect, value, EmptyContent, true);
         }
 
         #endregion
@@ -363,7 +352,7 @@ namespace MobX.Utilities.Editor.Inspector
 
         #region Misc
 
-        private static GUIContent EmptyContent { get; } = new GUIContent();
+        private static GUIContent EmptyContent { get; } = new();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static Rect GetLastRect()
@@ -396,7 +385,7 @@ namespace MobX.Utilities.Editor.Inspector
 
         #region Override Style
 
-        private static readonly Stack<FoldoutStyle> styleOverrides = new Stack<FoldoutStyle>(4);
+        private static readonly Stack<FoldoutStyle> styleOverrides = new(4);
 
         public static void BeginStyleOverride(FoldoutStyle style)
         {

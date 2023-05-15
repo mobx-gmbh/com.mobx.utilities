@@ -11,8 +11,8 @@ namespace MobX.Utilities.Collections
     [Serializable]
     public class Map<TKey, TValue> : Dictionary<TKey, TValue>, ISerializationCallbackReceiver
     {
-        [SerializeField] private List<TKey> keys = new List<TKey>(16);
-        [SerializeField] private List<TValue> values = new List<TValue>(16);
+        [SerializeField] private List<TKey> keys = new(16);
+        [SerializeField] private List<TValue> values = new(16);
 
         public bool TryGetElementAtIndex(int index, out KeyValuePair<TKey, TValue> result)
         {
@@ -23,6 +23,18 @@ namespace MobX.Utilities.Collections
             }
 
             result = default(KeyValuePair<TKey, TValue>);
+            return false;
+        }
+
+        public bool TryGetElementAtIndex(int index, out TValue result)
+        {
+            if (keys.Count < index && values.Count < index)
+            {
+                result = values[index];
+                return true;
+            }
+
+            result = default(TValue);
             return false;
         }
 

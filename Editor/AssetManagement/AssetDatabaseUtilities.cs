@@ -4,10 +4,20 @@ using System.Collections.Generic;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace MobX.Utilities
+namespace MobX.Utilities.Editor.AssetManagement
 {
     public class AssetDatabaseUtilities : MonoBehaviour
     {
+        public static string[] GUIDsToPaths(string[] guids)
+        {
+            var paths = new string[guids.Length];
+            for (var i = 0; i < guids.Length; i++)
+            {
+                paths[i] = UnityEditor.AssetDatabase.GUIDToAssetPath(guids[i]);
+            }
+            return paths;
+        }
+
         [Pure]
         public static List<T> FindAssetsOfType<T>() where T : Object
         {

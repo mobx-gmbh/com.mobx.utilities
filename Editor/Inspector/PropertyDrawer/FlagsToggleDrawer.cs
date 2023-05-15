@@ -1,23 +1,23 @@
-﻿using MobX.Utilities.Inspector;
+﻿using MobX.Utilities.Editor.Helper;
+using MobX.Utilities.Inspector;
 using System;
-using UnityEditor;
 using UnityEngine;
 
-namespace MobX.Utilities.Editor.Inspector
+namespace MobX.Utilities.Editor.Inspector.PropertyDrawer
 {
-    [CustomPropertyDrawer(typeof(FlagsToggleAttribute))]
+    [UnityEditor.CustomPropertyDrawer(typeof(FlagsToggleAttribute))]
     public class FlagsToggleDrawer : UnityEditor.PropertyDrawer
     {
-        private Type _underLying = null;
+        private Type _underLying;
 
-        public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
+        public override float GetPropertyHeight(UnityEditor.SerializedProperty property, GUIContent label)
         {
             return -2f;
         }
 
-        public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
+        public override void OnGUI(Rect position, UnityEditor.SerializedProperty property, GUIContent label)
         {
-            if (property.propertyType != SerializedPropertyType.Enum)
+            if (property.propertyType != UnityEditor.SerializedPropertyType.Enum)
             {
                 GUIHelper.DrawMessageBox("Property must be an enum!");
                 return;

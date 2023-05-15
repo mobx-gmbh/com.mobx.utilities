@@ -1,7 +1,8 @@
 ﻿using MobX.Utilities.Inspector;
+using MobX.Utilities.Types;
 using UnityEngine;
 
-namespace MobX.Utilities.Editor.Inspector
+namespace MobX.Utilities.Editor.Inspector.PropertyDrawer
 {
     [UnityEditor.CustomPropertyDrawer(typeof(RequiredAttribute), true)]
     public class RequiredAttributeDrawer : UnityEditor.PropertyDrawer
@@ -24,7 +25,7 @@ namespace MobX.Utilities.Editor.Inspector
                 var propRect = new Rect(position.x, position.y + baseHeight * 2, position.width, baseHeight);
 
                 var message = requiredAttribute.Message ?? $"{property.displayName} is Required!";
-                var messageType = requiredAttribute.MessageLevel;
+                MessageLevel messageType = requiredAttribute.MessageLevel;
 
                 UnityEditor.EditorGUI.HelpBox(helpRect, message, (UnityEditor.MessageType) messageType);
                 UnityEditor.EditorGUI.PropertyField(propRect, property, label);

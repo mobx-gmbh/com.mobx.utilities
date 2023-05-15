@@ -1,4 +1,4 @@
-namespace MobX.Utilities.Editor
+namespace MobX.Utilities.Editor.ScriptOrderEditor
 {
     public static class MenuItemLayout
     {
@@ -13,7 +13,7 @@ namespace MobX.Utilities.Editor
         {
             HideFlagsUtility.ShowAllHiddenInspector();
         }
-        
+
         [UnityEditor.MenuItem("Tools/HideFlags/Validate Hide Flags", priority = 2300)]
         private static void ValidateAllObjectsHideFlags()
         {

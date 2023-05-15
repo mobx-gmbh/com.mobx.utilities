@@ -1,10 +1,10 @@
 ﻿using MobX.Utilities.Types;
 using UnityEngine;
 
-namespace MobX.Utilities.Editor.Inspector
+namespace MobX.Utilities.Editor.Inspector.PropertyDrawer
 {
     [UnityEditor.CustomPropertyDrawer(typeof(Prefab<>), true)]
-    class PrefabDrawer : UnityEditor.PropertyDrawer
+    internal class PrefabDrawer : UnityEditor.PropertyDrawer
     {
         public override void OnGUI(Rect position, UnityEditor.SerializedProperty property, GUIContent label)
         {

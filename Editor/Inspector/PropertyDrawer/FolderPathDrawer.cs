@@ -1,32 +1,32 @@
+using MobX.Utilities.Editor.Helper;
 using MobX.Utilities.Inspector;
-using UnityEditor;
 using UnityEngine;
 
-namespace MobX.Utilities.Editor.Inspector
+namespace MobX.Utilities.Editor.Inspector.PropertyDrawer
 {
-    [CustomPropertyDrawer(typeof(DrawFolderPathAttribute))]
+    [UnityEditor.CustomPropertyDrawer(typeof(DrawFolderPathAttribute))]
     internal class FolderPathDrawer : UnityEditor.PropertyDrawer
     {
         // Draw the property inside the given rect
-        public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
+        public override void OnGUI(Rect position, UnityEditor.SerializedProperty property, GUIContent label)
         {
-            if (property.propertyType == SerializedPropertyType.String)
+            if (property.propertyType == UnityEditor.SerializedPropertyType.String)
             {
                 var pathAttribute = (DrawFolderPathAttribute) attribute;
                 var buttonWidth = pathAttribute.ButtonWidth;
                 var directEditing = pathAttribute.EnableDirectEditing;
 
                 var path = property.stringValue;
-                var contentRect = EditorGUI.PrefixLabel(position, label);
+                Rect contentRect = UnityEditor.EditorGUI.PrefixLabel(position, label);
 
-                var textRect = contentRect.WithOffset(0, 0, -(buttonWidth + 3));
-                var buttonRect = textRect.WithOffset(textRect.width + 2).WithWidth(buttonWidth);
+                Rect textRect = contentRect.WithOffset(0, 0, -(buttonWidth + 3));
+                Rect buttonRect = textRect.WithOffset(textRect.width + 2).WithWidth(buttonWidth);
 
                 var enabled = GUI.enabled;
                 GUI.enabled = enabled && directEditing;
 
                 GUIHelper.BeginIndentOverride(0);
-                path = EditorGUI.TextField(textRect, path);
+                path = UnityEditor.EditorGUI.TextField(textRect, path);
                 GUIHelper.EndIndentOverride();
                 GUI.enabled = enabled;
 
@@ -40,7 +40,7 @@ namespace MobX.Utilities.Editor.Inspector
 
                 if (GUI.Button(buttonRect, "⊙", style))
                 {
-                    path = EditorUtility.OpenFolderPanel("Select Folder", path.IsNotNullOrWhitespace() ? path : Application.dataPath, "");
+                    path = UnityEditor.EditorUtility.OpenFolderPanel("Select Folder", path.IsNotNullOrWhitespace() ? path : Application.dataPath, "");
                 }
 
                 property.stringValue = path;
@@ -48,7 +48,7 @@ namespace MobX.Utilities.Editor.Inspector
             }
             else
             {
-                EditorGUI.LabelField(position, label.text, "Use FilePathDrawer with string.");
+                UnityEditor.EditorGUI.LabelField(position, label.text, "Use FilePathDrawer with string.");
             }
         }
     }

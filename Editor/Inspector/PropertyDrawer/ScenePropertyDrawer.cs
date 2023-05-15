@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using UnityEngine;
 
-namespace MobX.Utilities
+namespace MobX.Utilities.Editor.Inspector.PropertyDrawer
 {
     [UnityEditor.CustomPropertyDrawer(typeof(SceneAttribute))]
     public class ScenePropertyDrawer : UnityEditor.PropertyDrawer

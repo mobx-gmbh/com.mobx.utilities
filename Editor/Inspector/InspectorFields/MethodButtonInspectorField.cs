@@ -1,10 +1,10 @@
-﻿using MobX.Utilities.Inspector;
+﻿using MobX.Utilities.Editor.Helper;
+using MobX.Utilities.Inspector;
 using System;
 using System.Reflection;
-using UnityEditor;
 using UnityEngine;
 
-namespace MobX.Utilities.Editor.Inspector
+namespace MobX.Utilities.Editor.Inspector.InspectorFields
 {
     public class MethodButtonInspectorMember : InspectorMember
     {
@@ -14,10 +14,10 @@ namespace MobX.Utilities.Editor.Inspector
         public MethodButtonInspectorMember(MethodInfo methodInfo, ButtonAttribute attribute, object target) : base(methodInfo, target)
         {
             var label = attribute.Label ?? methodInfo.Name.Humanize();
-            var tooltip = methodInfo.TryGetCustomAttribute<TooltipAttribute>(out var tooltipAttribute) ? tooltipAttribute.tooltip : null;
+            var tooltip = methodInfo.TryGetCustomAttribute<TooltipAttribute>(out TooltipAttribute tooltipAttribute) ? tooltipAttribute.tooltip : null;
             Label = new GUIContent(label, tooltip);
 
-            var parameterInfos = methodInfo.GetParameters();
+            ParameterInfo[] parameterInfos = methodInfo.GetParameters();
             var showResult = attribute.ShowResult;
             var showArguments = attribute.ShowArguments;
             var showControls = showResult || showArguments;
@@ -27,9 +27,9 @@ namespace MobX.Utilities.Editor.Inspector
 
             for (var index = 0; index < parameterInfos.Length; index++)
             {
-                var parameterInfo = parameterInfos[index];
-                var parameterType = parameterInfo.ParameterType;
-                var underlyingParameterType = parameterType.GetElementType() ?? parameterType;
+                ParameterInfo parameterInfo = parameterInfos[index];
+                Type parameterType = parameterInfo.ParameterType;
+                Type underlyingParameterType = parameterType.GetElementType() ?? parameterType;
 
                 arguments[index] = parameterInfo.HasDefaultValue ? parameterInfo.DefaultValue : null;
                 arguments[index] ??= underlyingParameterType.IsValueType
@@ -39,7 +39,7 @@ namespace MobX.Utilities.Editor.Inspector
 
             if (parameterInfos.Length == 0 || !showControls)
             {
-                var methodCall = methodInfo.IsStatic
+                Delegate methodCall = methodInfo.IsStatic
                     ? methodInfo.CreateMatchingDelegate()
                     : methodInfo.CreateMatchingDelegate(target);
 
@@ -79,7 +79,7 @@ namespace MobX.Utilities.Editor.Inspector
             {
                 _drawGUI += GUIHelper.BeginBox;
 
-                var methodCall = methodInfo.IsStatic?
+                Delegate methodCall = methodInfo.IsStatic ?
                     methodInfo.CreateMatchingDelegate() :
                     methodInfo.CreateMatchingDelegate(target);
 
@@ -90,9 +90,9 @@ namespace MobX.Utilities.Editor.Inspector
                 {
                     for (var index = 0; index < parameterInfos.Length; index++)
                     {
-                        var parameterInfo = parameterInfos[index];
+                        ParameterInfo parameterInfo = parameterInfos[index];
 
-                        var elementEditor = GUIHelper.CreateEditor(new GUIContent(parameterInfo.Name), parameterInfo.ParameterType);
+                        Func<object, object> elementEditor = GUIHelper.CreateEditor(new GUIContent(parameterInfo.Name), parameterInfo.ParameterType);
                         var capturedIndex = index;
 
                         _drawGUI += () =>
@@ -116,7 +116,7 @@ namespace MobX.Utilities.Editor.Inspector
                     _drawGUI += () =>
                     {
                         GUIHelper.BeginEnabledOverride(false);
-                        EditorGUILayout.LabelField("Result", wasCalled ? returnValue.ToNullString() : string.Empty);
+                        UnityEditor.EditorGUILayout.LabelField("Result", wasCalled ? returnValue.ToNullString() : string.Empty);
                         GUIHelper.EndEnabledOverride();
                     };
                 }

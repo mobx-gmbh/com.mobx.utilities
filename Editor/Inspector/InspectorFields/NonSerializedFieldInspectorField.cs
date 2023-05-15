@@ -1,9 +1,10 @@
-﻿using MobX.Utilities.Inspector;
+﻿using MobX.Utilities.Editor.Helper;
+using MobX.Utilities.Inspector;
 using System;
 using System.Reflection;
 using UnityEngine;
 
-namespace MobX.Utilities.Editor.Inspector
+namespace MobX.Utilities.Editor.Inspector.InspectorFields
 {
     public class NonSerializedFieldInspector : InspectorMember
     {
@@ -15,11 +16,11 @@ namespace MobX.Utilities.Editor.Inspector
         {
             _fieldInfo = fieldInfo;
             _target = target;
-            var label = fieldInfo.TryGetCustomAttribute<LabelAttribute>(out var labelAttribute)
+            var label = fieldInfo.TryGetCustomAttribute<LabelAttribute>(out LabelAttribute labelAttribute)
                 ? labelAttribute.Label
                 : fieldInfo.Name.Humanize(Prefixes);
 
-            var tooltip = fieldInfo.TryGetCustomAttribute<TooltipAttribute>(out var tooltipAttribute) ? tooltipAttribute.tooltip : null;
+            var tooltip = fieldInfo.TryGetCustomAttribute<TooltipAttribute>(out TooltipAttribute tooltipAttribute) ? tooltipAttribute.tooltip : null;
 
             Label = new GUIContent(label, tooltip);
             _editor = GUIHelper.CreateEditor(Label, _fieldInfo.FieldType);

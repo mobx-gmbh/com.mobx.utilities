@@ -1,14 +1,14 @@
-﻿using System;
+﻿using MobX.Utilities.Editor.Helper;
+using System;
 using System.Reflection;
-using UnityEditor;
 using UnityEngine;
 
-namespace MobX.Utilities.Editor.Inspector
+namespace MobX.Utilities.Editor.Inspector.InspectorFields
 {
     public class ExceptionInspectorMember : InspectorMember
     {
         private readonly Exception _exception;
-        private bool _foldout = false;
+        private bool _foldout;
 
         public ExceptionInspectorMember(Exception exception, MemberInfo memberInfo, object target) : base(memberInfo, target)
         {
@@ -17,8 +17,8 @@ namespace MobX.Utilities.Editor.Inspector
 
         protected override void DrawGUI()
         {
-            EditorGUILayout.HelpBox(_exception.Message, MessageType.Error);
-            _foldout = EditorGUILayout.Foldout(_foldout, "Stacktrace", true);
+            UnityEditor.EditorGUILayout.HelpBox(_exception.Message, UnityEditor.MessageType.Error);
+            _foldout = UnityEditor.EditorGUILayout.Foldout(_foldout, "Stacktrace", true);
             if (_foldout)
             {
                 GUIHelper.BeginBox();

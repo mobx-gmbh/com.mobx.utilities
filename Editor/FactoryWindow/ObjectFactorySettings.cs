@@ -1,7 +1,7 @@
-﻿using MobX.Utilities.Editor.Inspector;
+﻿using MobX.Utilities.Editor.Helper;
+using MobX.Utilities.Editor.Inspector;
 using System;
 using System.Linq;
-using UnityEditor;
 using UnityEngine;
 
 namespace MobX.Utilities.Editor.FactoryWindow
@@ -12,10 +12,10 @@ namespace MobX.Utilities.Editor.FactoryWindow
         None = 0,
         BaseTypes = 1,
         AssemblyName = 2,
-        CreateAttributePath = 4,
+        CreateAttributePath = 4
     }
 
-    public class ObjectFactorySettings : EditorWindow
+    public class ObjectFactorySettings : UnityEditor.EditorWindow
     {
         #region Data
 
@@ -30,9 +30,9 @@ namespace MobX.Utilities.Editor.FactoryWindow
          */
 
         private static bool isOpen;
-        private SerializedObject _serializedObject;
-        private SerializedProperty _serializedPropertyPrefixes;
-        private SerializedProperty _serializedPropertyNames;
+        private UnityEditor.SerializedObject _serializedObject;
+        private UnityEditor.SerializedProperty _serializedPropertyPrefixes;
+        private UnityEditor.SerializedProperty _serializedPropertyNames;
         [SerializeField] private string[] ignoredAssemblyPrefixes = Array.Empty<string>();
         [SerializeField] private string[] ignoredNames = Array.Empty<string>();
         /*
@@ -43,42 +43,42 @@ namespace MobX.Utilities.Editor.FactoryWindow
 
         internal static string[] GetIgnoredAssemblyPrefixes()
         {
-            var data = EditorPrefs.GetString($"{nameof(ObjectFactorySettings)}{nameof(ignoredAssemblyPrefixes)}", string.Empty);
+            var data = UnityEditor.EditorPrefs.GetString($"{nameof(ObjectFactorySettings)}{nameof(ignoredAssemblyPrefixes)}", string.Empty);
             return data.Split("§").Where(x => x.IsNotNullOrWhitespace()).ToArray();
         }
 
         private static void SetIgnoredAssemblyPrefixes(string[] dataArray)
         {
             var data = dataArray.Aggregate(string.Empty, (current, str) => $"{current}§{str}");
-            EditorPrefs.SetString($"{nameof(ObjectFactorySettings)}{nameof(ignoredAssemblyPrefixes)}", data);
+            UnityEditor.EditorPrefs.SetString($"{nameof(ObjectFactorySettings)}{nameof(ignoredAssemblyPrefixes)}", data);
         }
 
         internal static string[] GetIgnoredNames()
         {
-            var data = EditorPrefs.GetString($"{nameof(ObjectFactorySettings)}{nameof(ignoredNames)}", string.Empty);
+            var data = UnityEditor.EditorPrefs.GetString($"{nameof(ObjectFactorySettings)}{nameof(ignoredNames)}", string.Empty);
             return data.Split("§").Where(x => x.IsNotNullOrWhitespace()).ToArray();
         }
 
         private static void SetIgnoredNames(string[] dataArray)
         {
             var data = dataArray.Aggregate(string.Empty, (current, str) => $"{current}§{str}");
-            EditorPrefs.SetString($"{nameof(ObjectFactorySettings)}{nameof(ignoredNames)}", data);
+            UnityEditor.EditorPrefs.SetString($"{nameof(ObjectFactorySettings)}{nameof(ignoredNames)}", data);
         }
-
 
         internal static bool EnableMultiAssetCreation
         {
-            get => EditorPrefs.GetBool($"{nameof(ObjectFactorySettings)}{nameof(EnableMultiAssetCreation)}", false);
-            set => EditorPrefs.SetBool($"{nameof(ObjectFactorySettings)}{nameof(EnableMultiAssetCreation)}", value);
+            get => UnityEditor.EditorPrefs.GetBool($"{nameof(ObjectFactorySettings)}{nameof(EnableMultiAssetCreation)}", false);
+            set => UnityEditor.EditorPrefs.SetBool($"{nameof(ObjectFactorySettings)}{nameof(EnableMultiAssetCreation)}", value);
         }
 
         internal static SearchOptions SearchOptions
         {
-            get => (SearchOptions) EditorPrefs.GetInt($"{nameof(ObjectFactoryWindow)}{nameof(SearchOptions)}", (int)(SearchOptions.AssemblyName | SearchOptions.CreateAttributePath | SearchOptions.BaseTypes));
-            set => EditorPrefs.SetInt($"{nameof(ObjectFactoryWindow)}{nameof(SearchOptions)}", (int)value);
+            get => (SearchOptions) UnityEditor.EditorPrefs.GetInt($"{nameof(ObjectFactoryWindow)}{nameof(SearchOptions)}", (int) (SearchOptions.AssemblyName | SearchOptions.CreateAttributePath | SearchOptions.BaseTypes));
+            set => UnityEditor.EditorPrefs.SetInt($"{nameof(ObjectFactoryWindow)}{nameof(SearchOptions)}", (int) value);
         }
 
         #endregion
+
 
         #region Setup
 
@@ -86,7 +86,7 @@ namespace MobX.Utilities.Editor.FactoryWindow
         {
             if (!isOpen)
             {
-                var window = GetWindow<ObjectFactorySettings>("Settings");
+                ObjectFactorySettings window = GetWindow<ObjectFactorySettings>("Settings");
                 window.Show(false);
             }
         }
@@ -99,7 +99,7 @@ namespace MobX.Utilities.Editor.FactoryWindow
             ignoredAssemblyPrefixes = GetIgnoredAssemblyPrefixes();
             ignoredNames = GetIgnoredNames();
 
-            _serializedObject = new SerializedObject(this);
+            _serializedObject = new UnityEditor.SerializedObject(this);
             _serializedPropertyPrefixes = _serializedObject.FindProperty(nameof(ignoredAssemblyPrefixes));
             _serializedPropertyNames = _serializedObject.FindProperty(nameof(ignoredNames));
 
@@ -123,37 +123,38 @@ namespace MobX.Utilities.Editor.FactoryWindow
 
         #endregion
 
+
         #region GUI
 
         private void OnGUI()
         {
             var changed = false;
-            EditorGUI.indentLevel--;
+            UnityEditor.EditorGUI.indentLevel--;
 
             if (Foldout["Search Options"])
             {
-                EditorGUI.indentLevel++;
-                EditorGUI.indentLevel++;
+                UnityEditor.EditorGUI.indentLevel++;
+                UnityEditor.EditorGUI.indentLevel++;
                 GUIHelper.Space();
-                var newSearchOptions = GUIHelper.DrawFlagsEnumAsToggle(SearchOptions, true);
+                SearchOptions newSearchOptions = GUIHelper.DrawFlagsEnumAsToggle(SearchOptions, true);
                 if (newSearchOptions != SearchOptions)
                 {
                     changed = true;
                 }
                 SearchOptions = newSearchOptions;
                 GUIHelper.Space();
-                EditorGUI.indentLevel--;
-                EditorGUI.indentLevel--;
+                UnityEditor.EditorGUI.indentLevel--;
+                UnityEditor.EditorGUI.indentLevel--;
             }
 
             if (Foldout["Misc"])
             {
-                EditorGUI.indentLevel++;
-                EditorGUI.indentLevel++;
+                UnityEditor.EditorGUI.indentLevel++;
+                UnityEditor.EditorGUI.indentLevel++;
                 GUIHelper.Space();
 
                 var enableMulti = EnableMultiAssetCreation;
-                var newEnableMulti = EditorGUILayout.Toggle("Multi Asset Creation", enableMulti);
+                var newEnableMulti = UnityEditor.EditorGUILayout.Toggle("Multi Asset Creation", enableMulti);
                 if (newEnableMulti != enableMulti)
                 {
                     changed = true;
@@ -161,23 +162,23 @@ namespace MobX.Utilities.Editor.FactoryWindow
                 EnableMultiAssetCreation = newEnableMulti;
 
                 GUIHelper.Space();
-                EditorGUI.indentLevel--;
-                EditorGUI.indentLevel--;
+                UnityEditor.EditorGUI.indentLevel--;
+                UnityEditor.EditorGUI.indentLevel--;
             }
 
             if (Foldout["Assemblies"])
             {
-                EditorGUI.indentLevel++;
-                EditorGUI.indentLevel++;
+                UnityEditor.EditorGUI.indentLevel++;
+                UnityEditor.EditorGUI.indentLevel++;
                 GUIHelper.Space();
 
                 _serializedObject.Update();
-                EditorGUILayout.PropertyField(_serializedPropertyPrefixes);
-                EditorGUILayout.PropertyField(_serializedPropertyNames);
+                UnityEditor.EditorGUILayout.PropertyField(_serializedPropertyPrefixes);
+                UnityEditor.EditorGUILayout.PropertyField(_serializedPropertyNames);
                 _serializedObject.ApplyModifiedProperties();
                 GUIHelper.Space();
-                EditorGUI.indentLevel--;
-                EditorGUI.indentLevel--;
+                UnityEditor.EditorGUI.indentLevel--;
+                UnityEditor.EditorGUI.indentLevel--;
             }
 
             GUILayout.FlexibleSpace();

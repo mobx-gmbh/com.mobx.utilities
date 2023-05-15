@@ -1,9 +1,11 @@
 ﻿using UnityEngine;
 
-namespace MobX.Utilities.Editor
+namespace MobX.Utilities.Editor.Helper
 {
     public static partial class GUIHelper
     {
+        public static bool HideMonoScript { get; set; } = false;
+
         /*
          * Color
          */
