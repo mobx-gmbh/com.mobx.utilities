@@ -101,5 +101,29 @@ namespace MobX.Utilities.Editor.AssetManagement
 
             return scenePaths;
         }
+
+        [Pure]
+        public static string[] GetAssetPaths(IList<Object> assets)
+        {
+            var result = new string[assets.Count];
+            for (var i = 0; i < assets.Count; i++)
+            {
+                result[i] = UnityEditor.AssetDatabase.GetAssetPath(assets[i]);
+            }
+            return result;
+        }
+
+        [Pure]
+        public static string[] GetAssetPaths(ICollection<Object> assets)
+        {
+            var result = new string[assets.Count];
+            var index = 0;
+            foreach (Object asset in assets)
+            {
+                result[index] = UnityEditor.AssetDatabase.GetAssetPath(asset);
+                index++;
+            }
+            return result;
+        }
     }
 }

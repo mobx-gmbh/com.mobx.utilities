@@ -1,8 +1,6 @@
 ﻿using MobX.Utilities.Editor.AssetManagement;
 using System;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Pool;
 using Object = UnityEngine.Object;
 
 namespace MobX.Utilities.Editor.AssetIcons
@@ -31,21 +29,15 @@ namespace MobX.Utilities.Editor.AssetIcons
                 return;
             }
 
-            HashSet<Object> dirtyAssetBuffer = HashSetPool<Object>.Get();
             foreach ((UnityEditor.MonoScript monoScript, Texture2D value) in mappings.ScriptIcons)
             {
                 Type type = monoScript.GetClass();
                 var guids = UnityEditor.AssetDatabase.FindAssets($"t:{type}");
                 var paths = AssetDatabaseUtilities.GUIDsToPaths(guids);
-                ValidateAssets(paths, type, value, ref dirtyAssetBuffer);
+                ValidateAssets(paths, type, value);
             }
 
-            foreach (Object item in dirtyAssetBuffer)
-            {
-                UnityEditor.EditorUtility.SetDirty(item);
-            }
             UnityEditor.AssetDatabase.SaveAssets();
-            HashSetPool<Object>.Release(dirtyAssetBuffer);
         }
 
         public void ValidateAssetPaths(string[] assetPaths)
@@ -74,7 +66,7 @@ namespace MobX.Utilities.Editor.AssetIcons
             }
         }
 
-        public static void ValidateAssets(string[] importedAssets, Type type, Texture2D icon, ref HashSet<Object> dirtyAssetBuffer)
+        public static void ValidateAssets(string[] importedAssets, Type type, Texture2D icon)
         {
             foreach (var path in importedAssets)
             {
@@ -84,13 +76,12 @@ namespace MobX.Utilities.Editor.AssetIcons
                     continue;
                 }
 
-                UnityEditor.EditorGUIUtility.SetIconForObject(asset, icon);
-                dirtyAssetBuffer.Add(asset);
                 if (asset is ScriptableObject scriptableObject)
                 {
                     var monoScript = UnityEditor.MonoScript.FromScriptableObject(scriptableObject);
+
                     UnityEditor.EditorGUIUtility.SetIconForObject(monoScript, icon);
-                    dirtyAssetBuffer.Add(monoScript);
+                    UnityEditor.EditorUtility.SetDirty(monoScript);
                 }
             }
         }
