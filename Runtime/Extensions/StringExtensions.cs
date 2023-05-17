@@ -1,6 +1,7 @@
 using MobX.Utilities.Pooling;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Text;
 using UnityEngine;
@@ -168,6 +169,27 @@ namespace MobX.Utilities
             return condition ? target.Humanize(prefixes) : target;
         }
 
+        public static string Dehumanize(this string value)
+        {
+            // Trim leading and trailing white space
+            value = value.Trim();
+
+            // Split string by spaces
+            var words = value.Split();
+
+            // Capitalize each word only if it starts with a lowercase letter
+            for (var i = 0; i < words.Length; i++)
+            {
+                if (!string.IsNullOrEmpty(words[i]) && char.IsLower(words[i][0]))
+                {
+                    words[i] = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(words[i]);
+                }
+            }
+
+            // Join words into a single string without spaces
+            return string.Concat(words);
+        }
+
         public static string Humanize(this string target, string[] prefixes = null)
         {
             if (IsConst(target))
@@ -185,7 +207,7 @@ namespace MobX.Utilities
 
             target = target.Replace('_', ' ');
 
-            var chars = ListPool<char>.Get();
+            List<char> chars = ListPool<char>.Get();
 
             for (var i = 0; i < target.Length; i++)
             {
@@ -197,8 +219,8 @@ namespace MobX.Utilities
                 {
                     if (i < target.Length - 1)
                     {
-                        if ((char.IsUpper(target[i]) && !char.IsUpper(target[i + 1]))
-                            || (char.IsUpper(target[i]) && !char.IsUpper(target[i - 1])))
+                        if (char.IsUpper(target[i]) && !char.IsUpper(target[i + 1])
+                            || char.IsUpper(target[i]) && !char.IsUpper(target[i - 1]))
                         {
                             if (i > 1)
                             {
@@ -235,7 +257,7 @@ namespace MobX.Utilities
 
         public static string ReduceWhitespace(this string value)
         {
-            var sb = ConcurrentStringBuilderPool.Get();
+            StringBuilder sb = ConcurrentStringBuilderPool.Get();
             var previousIsWhitespaceFlag = false;
             for (var i = 0; i < value.Length; i++)
             {
@@ -275,7 +297,7 @@ namespace MobX.Utilities
 
         public static string CombineToString(this IEnumerable<string> enumerable, string separator = " ")
         {
-            var stringBuilder = ConcurrentStringBuilderPool.Get();
+            StringBuilder stringBuilder = ConcurrentStringBuilderPool.Get();
             foreach (var argument in enumerable)
             {
                 stringBuilder.Append(argument);
@@ -287,7 +309,7 @@ namespace MobX.Utilities
 
         public static string[] RemoveNullOrWhiteSpace(this IEnumerable<string> enumerable, char separator = ' ')
         {
-            var list = ConcurrentListPool<string>.Get();
+            List<string> list = ConcurrentListPool<string>.Get();
 
             foreach (var value in enumerable)
             {

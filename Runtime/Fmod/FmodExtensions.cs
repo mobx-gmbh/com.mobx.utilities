@@ -34,6 +34,13 @@ namespace MobX.Utilities.Fmod
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void StopAndRelease(this EventInstance eventInstance, STOP_MODE stopMode = STOP_MODE.ALLOWFADEOUT)
+        {
+            eventInstance.stop(stopMode);
+            eventInstance.release();
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void PlayOneShot(this EventReference eventReference, Vector3 position = default)
         {
             RuntimeManager.PlayOneShot(eventReference, position);

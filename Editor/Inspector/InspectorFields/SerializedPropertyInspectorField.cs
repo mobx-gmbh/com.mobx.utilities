@@ -28,18 +28,18 @@ namespace MobX.Utilities.Editor.Inspector.InspectorFields
             _runtimeReadonly = memberInfo.HasAttribute<RuntimeReadonlyAttribute>();
             _readonly = memberInfo.HasAttribute<ReadonlyAttribute>();
 
-            var label = memberInfo.TryGetCustomAttribute<LabelAttribute>(out LabelAttribute labelAttribute)
+            var label = memberInfo.TryGetCustomAttribute(out LabelAttribute labelAttribute)
                 ? labelAttribute.Label
                 : serializedProperty.name.Humanize(Prefixes);
 
             Label = new GUIContent(label, serializedProperty.tooltip);
 
-            if (memberInfo.TryGetCustomAttribute<ListOptions>(out ListOptions listAttribute))
+            if (memberInfo.TryGetCustomAttribute(out ListOptions listAttribute))
             {
                 _listInspector = true;
-                _reorderableList = new ReorderableList(serializedProperty.serializedObject, serializedProperty,
-                    listAttribute.Draggable, listAttribute.DisplayHeader, listAttribute.AddButton,
+                _reorderableList = new ReorderableList(serializedProperty.serializedObject, serializedProperty, listAttribute.Draggable, listAttribute.DisplayHeader, listAttribute.AddButton,
                     listAttribute.RemoveButton);
+
                 _reorderableList.drawHeaderCallback += rect => { UnityEditor.EditorGUI.LabelField(rect, Label); };
                 _reorderableList.elementHeight -= 4;
                 _reorderableList.drawElementCallback += (rect, index, _, _) =>

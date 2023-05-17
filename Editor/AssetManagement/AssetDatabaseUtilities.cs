@@ -19,6 +19,48 @@ namespace MobX.Utilities.Editor.AssetManagement
         }
 
         [Pure]
+        public static List<Object> FindAssetsOfType<T1, T2>() where T1 : Object where T2 : Object
+        {
+            var list = new List<Object>();
+            list.AddRange(FindAssetsOfType<T1>());
+            list.AddRange(FindAssetsOfType<T2>());
+            return list;
+        }
+
+        [Pure]
+        public static List<Object> FindAssetsOfType<T1, T2, T3>() where T1 : Object where T2 : Object where T3 : Object
+        {
+            var list = new List<Object>();
+            list.AddRange(FindAssetsOfType<T1>());
+            list.AddRange(FindAssetsOfType<T2>());
+            list.AddRange(FindAssetsOfType<T3>());
+            return list;
+        }
+
+        [Pure]
+        public static List<Object> FindAssetsOfType<T1, T2, T3, T4>() where T1 : Object where T2 : Object where T3 : Object where T4 : Object
+        {
+            var list = new List<Object>();
+            list.AddRange(FindAssetsOfType<T1>());
+            list.AddRange(FindAssetsOfType<T2>());
+            list.AddRange(FindAssetsOfType<T3>());
+            list.AddRange(FindAssetsOfType<T4>());
+            return list;
+        }
+
+        [Pure]
+        public static List<Object> FindAssetsOfType<T1, T2, T3, T4, T5>() where T1 : Object where T2 : Object where T3 : Object where T4 : Object where T5 : Object
+        {
+            var list = new List<Object>();
+            list.AddRange(FindAssetsOfType<T1>());
+            list.AddRange(FindAssetsOfType<T2>());
+            list.AddRange(FindAssetsOfType<T3>());
+            list.AddRange(FindAssetsOfType<T4>());
+            list.AddRange(FindAssetsOfType<T5>());
+            return list;
+        }
+
+        [Pure]
         public static List<T> FindAssetsOfType<T>() where T : Object
         {
             var assets = new List<T>();
