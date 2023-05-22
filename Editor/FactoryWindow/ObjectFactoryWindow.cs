@@ -4,7 +4,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using System.Threading.Tasks;
 using UnityEditorInternal;
 using UnityEngine;
@@ -47,13 +46,13 @@ namespace MobX.Utilities.Editor.FactoryWindow
         [UnityEditor.MenuItem("Assets/Create/ScriptableObject %&s", priority = -100)]
         public static void OpenWindow()
         {
-            ObjectFactoryWindow window = GetWindow<ObjectFactoryWindow>("Object Factory");
+            var window = GetWindow<ObjectFactoryWindow>("Object Factory");
             window.Show(false);
         }
 
         public static void OpenWindow(string activeFilter)
         {
-            ObjectFactoryWindow window = GetWindow<ObjectFactoryWindow>("Object Factory");
+            var window = GetWindow<ObjectFactoryWindow>("Object Factory");
             window.Show(false);
             window._searchFilter = activeFilter;
         }
@@ -61,7 +60,8 @@ namespace MobX.Utilities.Editor.FactoryWindow
         private void OnEnable()
         {
             _searchFilter =
-                UnityEditor.EditorPrefs.GetString($"{nameof(ObjectFactoryWindow)}{nameof(_searchFilter)}", _searchFilter);
+                UnityEditor.EditorPrefs.GetString($"{nameof(ObjectFactoryWindow)}{nameof(_searchFilter)}",
+                    _searchFilter);
             ObjectFactorySettings.SettingsChanged += OnSettingsChanged;
             Initialize();
         }
@@ -135,19 +135,19 @@ namespace MobX.Utilities.Editor.FactoryWindow
             }
         }
 
-        private async static ValueTask<List<CreatableObject>> ProfileAssemblies()
+        private static async ValueTask<List<CreatableObject>> ProfileAssemblies()
         {
-            Assembly[] assemblies =
+            var assemblies =
                 AssemblyProfiler.GetFilteredAssemblies(null, ObjectFactorySettings.GetIgnoredAssemblyPrefixes());
             var ignoreNames = ObjectFactorySettings.GetIgnoredNames();
 
-            List<CreatableObject> result = await Task.Run(() =>
+            var result = await Task.Run(() =>
             {
                 var creatable = new List<CreatableObject>(100);
                 for (var i = 0; i < assemblies.Length; i++)
                 {
-                    Assembly assembly = assemblies[i];
-                    Type[] assemblyTypes = assembly.GetTypes();
+                    var assembly = assemblies[i];
+                    var assemblyTypes = assembly.GetTypes();
 
                     creatable.AddRange(from type in assemblyTypes
                         where IsTypeValidForCreation(type, ignoreNames)
@@ -254,7 +254,7 @@ namespace MobX.Utilities.Editor.FactoryWindow
         private void DrawColumnDescriptions()
         {
             var rectOffset = COLUMN_WIDTH;
-            Rect rect = GUIHelper.GetControlRect();
+            var rect = GUIHelper.GetControlRect();
             UnityEditor.EditorGUI.LabelField(rect, "Name");
 
             if (ObjectFactorySettings.SearchOptions.HasFlagUnsafe(SearchOptions.AssemblyName))
@@ -409,7 +409,7 @@ namespace MobX.Utilities.Editor.FactoryWindow
 
             SetInputTimeout();
 
-            KeyCode keyCode = Event.current.keyCode;
+            var keyCode = Event.current.keyCode;
 
             if (keyCode == KeyCode.DownArrow)
             {
@@ -521,7 +521,8 @@ namespace MobX.Utilities.Editor.FactoryWindow
                 {
                     GUILayout.Label("Amount", GUILayout.Width(50));
                     _amountToCreate =
-                        UnityEditor.EditorGUILayout.IntSlider(_amountToCreate, MIN_AMOUNT, MAX_AMOUNT, GUILayout.Width(150));
+                        UnityEditor.EditorGUILayout.IntSlider(_amountToCreate, MIN_AMOUNT, MAX_AMOUNT,
+                            GUILayout.Width(150));
                 }
 
                 GUILayout.Label("Filename: ", GUILayout.Width(60));
@@ -544,7 +545,7 @@ namespace MobX.Utilities.Editor.FactoryWindow
 
                 for (var i = 0; i < _creatableObjects.Count; i++)
                 {
-                    CreatableObject creatable = _creatableObjects[i];
+                    var creatable = _creatableObjects[i];
                     if (creatable.IsValidForFilter(filter.NoSpace(), ObjectFactorySettings.SearchOptions))
                     {
                         _filteredCreatableObjects.Add(creatable);

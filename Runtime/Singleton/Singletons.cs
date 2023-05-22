@@ -1,6 +1,7 @@
 using MobX.Utilities.Inspector;
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -48,10 +49,34 @@ namespace MobX.Utilities.Singleton
 
         #region Public
 
+        /// <summary>
+        ///     Register a singleton object. The object is then cached persistently and can be resolved with by its type.
+        /// </summary>
         public static void Register<T>(T instance) where T : Object
         {
+            RegisterInternal(instance);
+        }
+
+        public static T Resolve<T>() where T : Object
+        {
+            return ResolveInternal<T>();
+        }
+
+        public static bool Exists<T>()
+        {
+            return ExistsInternal<T>();
+        }
+
+        #endregion
+
+
+        #region Internal
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static void RegisterInternal<T>(T instance) where T : Object
+        {
 #if UNITY_EDITOR
-            async static Task WaitWhile(Func<bool> condition)
+            static async Task WaitWhile(Func<bool> condition)
             {
                 while (condition())
                 {
@@ -59,7 +84,10 @@ namespace MobX.Utilities.Singleton
                 }
             }
 
-            static bool IsImport() => UnityEditor.EditorApplication.isCompiling || UnityEditor.EditorApplication.isUpdating;
+            static bool IsImport()
+            {
+                return UnityEditor.EditorApplication.isCompiling || UnityEditor.EditorApplication.isUpdating;
+            }
 
             if (IsImport())
             {
@@ -75,6 +103,8 @@ namespace MobX.Utilities.Singleton
                 return;
             }
 #endif
+            Singleton.registry.RemoveNull();
+
             for (var i = 0; i < Singleton.registry.Count; i++)
             {
                 if (Singleton.registry[i].GetType() == typeof(T))
@@ -87,13 +117,15 @@ namespace MobX.Utilities.Singleton
             Singleton.registry.Add(instance);
         }
 
-        public static T Resolve<T>() where T : Object
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static T ResolveInternal<T>() where T : Object
         {
             for (var i = 0; i < Singleton.registry.Count; i++)
             {
-                if (Singleton.registry[i].GetType() == typeof(T))
+                var element = Singleton.registry[i];
+                if (element != null && element.GetType() == typeof(T))
                 {
-                    return (T)Singleton.registry[i];
+                    return (T) Singleton.registry[i];
                 }
             }
 
@@ -102,7 +134,8 @@ namespace MobX.Utilities.Singleton
             return null;
         }
 
-        public static bool Exists<T>()
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static bool ExistsInternal<T>()
         {
             for (var i = 0; i < Singleton.registry.Count; i++)
             {
@@ -142,6 +175,11 @@ namespace MobX.Utilities.Singleton
                     {
                         break;
                     }
+                }
+                if (singleton == null)
+                {
+                    Debug.LogError("Singleton",
+                        "Singleton Registry is null! Please create a new Singleton Registry (ScriptableObject)");
                 }
 #endif
                 return singleton;
