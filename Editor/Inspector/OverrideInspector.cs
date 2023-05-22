@@ -43,8 +43,8 @@ namespace MobX.Utilities.Editor.Inspector
                 return;
             }
 
-            Type targetType = target.GetType();
-            DefaultInspectorAttribute foldoutInspectorAttribute = targetType.GetCustomAttribute<DefaultInspectorAttribute>(true);
+            var targetType = target.GetType();
+            var foldoutInspectorAttribute = targetType.GetCustomAttribute<DefaultInspectorAttribute>(true);
             _useDefaultInspector = foldoutInspectorAttribute != null;
 
             if (_useDefaultInspector)
@@ -66,11 +66,11 @@ namespace MobX.Utilities.Editor.Inspector
 
             FoldoutData activeHeader = null;
 
-            InspectorMember[] inspectorMembers = InspectorFieldUtils.GetInspectorMembers(serializedObject);
+            var inspectorMembers = InspectorFieldUtils.GetInspectorMembers(serializedObject);
             var count = 0;
             for (var i = 0; i < inspectorMembers.Length; i++)
             {
-                InspectorMember inspectorMember = inspectorMembers[i];
+                var inspectorMember = inspectorMembers[i];
 
                 if (inspectorMember.Member.TryGetCustomAttribute(out FoldoutAttribute attribute))
                 {
@@ -84,9 +84,9 @@ namespace MobX.Utilities.Editor.Inspector
                     activeHeader = new FoldoutData(title, attribute.ToolTip);
                     var defaultState = attribute.Unfold;
                     if (!_headerFields.TryAdd(activeHeader, new List<InspectorMember>
-                    {
-                        inspectorMember
-                    }))
+                        {
+                            inspectorMember
+                        }))
                     {
                         _headerFields[activeHeader].Add(inspectorMember);
                     }
@@ -178,9 +178,9 @@ namespace MobX.Utilities.Editor.Inspector
         {
             serializedObject.Update();
 
-            List<InspectorMember> pooledList = ListPool<InspectorMember>.Get();
+            var pooledList = ListPool<InspectorMember>.Get();
 
-            foreach (InspectorMember member in _headerLessFields)
+            foreach (var member in _headerLessFields)
             {
                 if (member.Label.text.ContainsIgnoreCaseAndSpace(filter))
                 {
@@ -188,9 +188,9 @@ namespace MobX.Utilities.Editor.Inspector
                 }
             }
 
-            Dictionary<FoldoutData, List<InspectorMember>> pooledDictionary = DictionaryPool<FoldoutData, List<InspectorMember>>.Get();
+            var pooledDictionary = DictionaryPool<FoldoutData, List<InspectorMember>>.Get();
 
-            foreach ((FoldoutData header, List<InspectorMember> list) in _headerFields)
+            foreach ((var header, var list) in _headerFields)
             {
                 if (header.Title.ContainsIgnoreCaseAndSpace(filter))
                 {
@@ -202,20 +202,20 @@ namespace MobX.Utilities.Editor.Inspector
                     continue;
                 }
 
-                foreach (InspectorMember member in list)
+                foreach (var member in list)
                 {
                     if (member.Label.text.ContainsIgnoreCaseAndSpace(filter))
                     {
-                        if (pooledDictionary.TryGetValue(header, out List<InspectorMember> value))
+                        if (pooledDictionary.TryGetValue(header, out var value))
                         {
                             value.Add(member);
                             continue;
                         }
 
                         if (!pooledDictionary.TryAdd(header, new List<InspectorMember>
-                        {
-                            member
-                        }))
+                            {
+                                member
+                            }))
                         {
                             pooledDictionary[header].Add(member);
                         }
@@ -227,7 +227,7 @@ namespace MobX.Utilities.Editor.Inspector
             {
                 GUIHelper.Space();
             }
-            foreach (InspectorMember member in pooledList)
+            foreach (var member in pooledList)
             {
                 member.ProcessGUI();
             }
@@ -236,14 +236,14 @@ namespace MobX.Utilities.Editor.Inspector
                 GUIHelper.Space();
             }
 
-            foreach ((FoldoutData header, List<InspectorMember> list) in pooledDictionary)
+            foreach ((var header, var list) in pooledDictionary)
             {
                 Foldout.ForceHeader(header);
                 if (!(list.First()?.HasHeaderAttribute ?? false))
                 {
                     GUIHelper.Space();
                 }
-                foreach (InspectorMember member in list)
+                foreach (var member in list)
                 {
                     member.ProcessGUI();
                 }
@@ -276,7 +276,7 @@ namespace MobX.Utilities.Editor.Inspector
                 GUIHelper.Space();
             }
 
-            foreach ((FoldoutData header, List<InspectorMember> list) in _headerFields)
+            foreach ((var header, var list) in _headerFields)
             {
                 if (Foldout[header])
                 {
@@ -284,7 +284,7 @@ namespace MobX.Utilities.Editor.Inspector
                     {
                         GUIHelper.Space();
                     }
-                    foreach (InspectorMember member in list)
+                    foreach (var member in list)
                     {
                         member.ProcessGUI();
                     }
@@ -302,7 +302,7 @@ namespace MobX.Utilities.Editor.Inspector
             {
                 var enabled = GUI.enabled;
                 GUI.enabled = false;
-                if (_script != null)
+                if (_script != null && Event.current.type != EventType.ExecuteCommand)
                 {
                     UnityEditor.EditorGUILayout.PropertyField(_script);
                 }
