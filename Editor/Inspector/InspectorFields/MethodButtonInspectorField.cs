@@ -14,10 +14,10 @@ namespace MobX.Utilities.Editor.Inspector.InspectorFields
         public MethodButtonInspectorMember(MethodInfo methodInfo, ButtonAttribute attribute, object target) : base(methodInfo, target)
         {
             var label = attribute.Label ?? methodInfo.Name.Humanize();
-            var tooltip = methodInfo.TryGetCustomAttribute<TooltipAttribute>(out TooltipAttribute tooltipAttribute) ? tooltipAttribute.tooltip : null;
+            var tooltip = methodInfo.TryGetCustomAttribute(out TooltipAttribute tooltipAttribute) ? tooltipAttribute.tooltip : null;
             Label = new GUIContent(label, tooltip);
 
-            ParameterInfo[] parameterInfos = methodInfo.GetParameters();
+            var parameterInfos = methodInfo.GetParameters();
             var showResult = attribute.ShowResult;
             var showArguments = attribute.ShowArguments;
             var showControls = showResult || showArguments;
@@ -27,9 +27,9 @@ namespace MobX.Utilities.Editor.Inspector.InspectorFields
 
             for (var index = 0; index < parameterInfos.Length; index++)
             {
-                ParameterInfo parameterInfo = parameterInfos[index];
-                Type parameterType = parameterInfo.ParameterType;
-                Type underlyingParameterType = parameterType.GetElementType() ?? parameterType;
+                var parameterInfo = parameterInfos[index];
+                var parameterType = parameterInfo.ParameterType;
+                var underlyingParameterType = parameterType.GetElementType() ?? parameterType;
 
                 arguments[index] = parameterInfo.HasDefaultValue ? parameterInfo.DefaultValue : null;
                 arguments[index] ??= underlyingParameterType.IsValueType
@@ -39,7 +39,7 @@ namespace MobX.Utilities.Editor.Inspector.InspectorFields
 
             if (parameterInfos.Length == 0 || !showControls)
             {
-                Delegate methodCall = methodInfo.IsStatic
+                var methodCall = methodInfo.IsStatic
                     ? methodInfo.CreateMatchingDelegate()
                     : methodInfo.CreateMatchingDelegate(target);
 
@@ -79,7 +79,7 @@ namespace MobX.Utilities.Editor.Inspector.InspectorFields
             {
                 _drawGUI += GUIHelper.BeginBox;
 
-                Delegate methodCall = methodInfo.IsStatic ?
+                var methodCall = methodInfo.IsStatic ?
                     methodInfo.CreateMatchingDelegate() :
                     methodInfo.CreateMatchingDelegate(target);
 
@@ -90,9 +90,9 @@ namespace MobX.Utilities.Editor.Inspector.InspectorFields
                 {
                     for (var index = 0; index < parameterInfos.Length; index++)
                     {
-                        ParameterInfo parameterInfo = parameterInfos[index];
+                        var parameterInfo = parameterInfos[index];
 
-                        Func<object, object> elementEditor = GUIHelper.CreateEditor(new GUIContent(parameterInfo.Name), parameterInfo.ParameterType);
+                        var elementEditor = GUIHelper.CreateEditor(new GUIContent(parameterInfo.Name), parameterInfo.ParameterType);
                         var capturedIndex = index;
 
                         _drawGUI += () =>

@@ -23,5 +23,23 @@ namespace MobX.Utilities.Extensions
         {
             return new Seconds(value);
         }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Seconds Second(this float value)
+        {
+            return new Seconds(value);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Seconds Second(this int value)
+        {
+            return new Seconds(value);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Seconds Second(this TimeSpan value)
+        {
+            return new Seconds(value);
+        }
     }
 }

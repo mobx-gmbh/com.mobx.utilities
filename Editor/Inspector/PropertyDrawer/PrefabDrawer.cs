@@ -17,7 +17,7 @@ namespace MobX.Utilities.Editor.Inspector.PropertyDrawer
                 UnityEngine.Debug.LogWarning("Only prefabs are allowed!");
                 prefabProperty.objectReferenceValue = null;
             }
-            UnityEditor.EditorGUI.PropertyField(position, prefabProperty, GUIContent.none);
+            UnityEditor.EditorGUI.PropertyField(position, prefabProperty, label);
 
             property.serializedObject.ApplyModifiedProperties();
         }

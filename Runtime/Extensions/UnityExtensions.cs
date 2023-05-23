@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using UnityEngine;
@@ -15,12 +14,12 @@ namespace MobX.Utilities
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Transform[] GetChildren(this Transform transform)
         {
-            List<Transform> buffer = ListPool<Transform>.Get();
+            var buffer = ListPool<Transform>.Get();
             foreach (Transform child in transform)
             {
                 buffer.Add(child);
             }
-            Transform[] result = buffer.ToArray();
+            var result = buffer.ToArray();
             ListPool<Transform>.Release(buffer);
             return result;
         }
@@ -287,6 +286,27 @@ namespace MobX.Utilities
         public static void SetPosition(this GameObject gameObject, Vector3 position)
         {
             gameObject.transform.position = position;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool IsPrefab(this Object obj)
+        {
+#if UNITY_EDITOR
+            return UnityEditor.PrefabUtility.GetPrefabInstanceStatus(obj) != UnityEditor.PrefabInstanceStatus.NotAPrefab;
+#else
+        return false;
+#endif
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool IsGameObjectInScene(this Object obj)
+        {
+            if (obj is GameObject gameObject && gameObject != null)
+            {
+                return gameObject.scene.name != null;
+            }
+
+            return false;
         }
 
         #endregion

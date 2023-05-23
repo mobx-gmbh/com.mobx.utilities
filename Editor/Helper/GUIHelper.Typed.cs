@@ -144,8 +144,8 @@ namespace MobX.Utilities.Editor.Helper
 
             if (type.IsGenericIEnumerable())
             {
-                Type elementType = type.GetElementTypeDefinition();
-                Action<object> elementDrawer = CreateDrawer(GUIContent.none, elementType);
+                var elementType = type.GetElementTypeDefinition();
+                var elementDrawer = CreateDrawer(GUIContent.none, elementType);
                 return value => DrawBoxedIEnumerable(label, type, value, elementDrawer);
             }
 
@@ -158,23 +158,26 @@ namespace MobX.Utilities.Editor.Helper
             BeginBox();
             try
             {
-                // ReSharper disable PossibleMultipleEnumeration
-                var enumerable = (IEnumerable) boxedValue;
-                var isEmpty = !enumerable.GetEnumerator().MoveNext();
-
-                if (!isEmpty)
+                if (boxedValue != null)
                 {
-                    UnityEditor.EditorGUILayout.LabelField(label);
-                }
+                    // ReSharper disable PossibleMultipleEnumeration
+                    var enumerable = (IEnumerable) boxedValue;
+                    var isEmpty = !enumerable.GetEnumerator().MoveNext();
 
-                foreach (var element in enumerable)
-                {
-                    elementDrawer(element);
-                }
+                    if (!isEmpty)
+                    {
+                        UnityEditor.EditorGUILayout.LabelField(label);
+                    }
 
-                if (isEmpty)
-                {
-                    UnityEditor.EditorGUILayout.LabelField($"{type.HumanizedName()} is empty");
+                    foreach (var element in enumerable)
+                    {
+                        elementDrawer(element);
+                    }
+
+                    if (isEmpty)
+                    {
+                        UnityEditor.EditorGUILayout.LabelField($"{type.HumanizedName()} is empty");
+                    }
                 }
             }
             catch (Exception exception)
@@ -319,7 +322,12 @@ namespace MobX.Utilities.Editor.Helper
                 return value => UnityEditor.EditorGUILayout.ObjectField(label, (Object) value, type, true, options);
             }
 
-            Action<object> drawer = CreateDrawer(label, type, options);
+            if (type.IsEnum)
+            {
+                return value => UnityEditor.EditorGUILayout.EnumPopup(label, (Enum) value, options);
+            }
+
+            var drawer = CreateDrawer(label, type, options);
 
             return value =>
             {

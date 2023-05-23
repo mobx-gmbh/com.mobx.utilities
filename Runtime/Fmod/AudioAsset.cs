@@ -13,6 +13,7 @@ namespace MobX.Utilities.Fmod
 
         public EventReference EventReference => audioEvent;
 
+        // ReSharper disable Unity.PerformanceAnalysis
         public void Play()
         {
             audioEvent.PlayOneShot();
@@ -23,6 +24,7 @@ namespace MobX.Utilities.Fmod
             audioEvent.PlayOneShotAttached(target, volume.ValueOrDefault(1f));
         }
 
+        // ReSharper disable Unity.PerformanceAnalysis
         public void Play(Vector3 position)
         {
             audioEvent.PlayOneShot(position);

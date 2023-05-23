@@ -10,25 +10,25 @@ namespace MobX.Utilities.Editor.Inspector.InspectorFields
     {
         public static InspectorMember[] GetInspectorMembers(UnityEditor.SerializedObject target)
         {
-            Type type = target.targetObject.GetType();
+            var type = target.targetObject.GetType();
             var list = new List<InspectorMember>();
 
             const BindingFlags Flags = BindingFlags.Instance | BindingFlags.NonPublic |
                 BindingFlags.Public | BindingFlags.DeclaredOnly | BindingFlags.Static;
 
-            FieldInfo[] fieldInfos = type.GetFieldsIncludeBaseTypes(Flags);
+            var fieldInfos = type.GetFieldsIncludeBaseTypes(Flags);
             for (var i = 0; i < fieldInfos.Length; i++)
             {
                 HandleFieldInfo(target, fieldInfos[i], ref list);
             }
 
-            PropertyInfo[] propertyInfos = type.GetPropertiesIncludeBaseTypes(Flags);
+            var propertyInfos = type.GetPropertiesIncludeBaseTypes(Flags);
             for (var i = 0; i < propertyInfos.Length; i++)
             {
                 HandlePropertyInfo(target, propertyInfos[i], ref list);
             }
 
-            MethodInfo[] methodInfos = type.GetMethodsIncludeBaseTypes(Flags);
+            var methodInfos = type.GetMethodsIncludeBaseTypes(Flags);
             for (var i = 0; i < methodInfos.Length; i++)
             {
                 HandleMethodInfo(target, methodInfos[i], ref list);
@@ -43,7 +43,7 @@ namespace MobX.Utilities.Editor.Inspector.InspectorFields
         private static void HandleMethodInfo(UnityEditor.SerializedObject target, MethodInfo methodInfo,
             ref List<InspectorMember> list)
         {
-            if (methodInfo.TryGetCustomAttribute<ButtonAttribute>(out ButtonAttribute buttonAttribute))
+            if (methodInfo.TryGetCustomAttribute<ButtonAttribute>(out var buttonAttribute))
             {
                 try
                 {
@@ -148,7 +148,7 @@ namespace MobX.Utilities.Editor.Inspector.InspectorFields
 
         private static void HandleSerializedField(UnityEditor.SerializedObject target, FieldInfo fieldInfo, ref List<InspectorMember> list)
         {
-            UnityEditor.SerializedProperty serializedProperty = target.FindProperty(fieldInfo.Name);
+            var serializedProperty = target.FindProperty(fieldInfo.Name);
             if (serializedProperty.IsNull())
             {
                 return;

@@ -15,7 +15,7 @@ namespace MobX.Utilities.Fmod
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Play(this EventInstance eventInstance)
         {
-            eventInstance.getPlaybackState(out PLAYBACK_STATE state);
+            eventInstance.getPlaybackState(out var state);
             if (state != PLAYBACK_STATE.PLAYING)
             {
                 eventInstance.start();
@@ -26,7 +26,7 @@ namespace MobX.Utilities.Fmod
         public static void PlayOneShotAttached(this EventReference eventReference, Transform target, float volume = 1f)
         {
             // ReSharper disable once Unity.PerformanceCriticalCodeInvocation
-            EventInstance eventInstance = RuntimeManager.CreateInstance(eventReference);
+            var eventInstance = RuntimeManager.CreateInstance(eventReference);
             eventInstance.set3DAttributes(target.To3DAttributes());
             eventInstance.setVolume(volume);
             eventInstance.start();
@@ -40,6 +40,7 @@ namespace MobX.Utilities.Fmod
             eventInstance.release();
         }
 
+        // ReSharper disable Unity.PerformanceAnalysis
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void PlayOneShot(this EventReference eventReference, Vector3 position = default)
         {
@@ -70,6 +71,7 @@ namespace MobX.Utilities.Fmod
             }
         }
 
+        // ReSharper disable Unity.PerformanceAnalysis
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void PlayOneShotIfNotNull(this EventReference eventReference)
         {
@@ -80,6 +82,7 @@ namespace MobX.Utilities.Fmod
             RuntimeManager.PlayOneShot(eventReference);
         }
 
+        // ReSharper disable Unity.PerformanceAnalysis
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void PlayOneShotAttachedIfNotNull(this EventReference eventReference, Transform target)
         {
@@ -90,6 +93,7 @@ namespace MobX.Utilities.Fmod
             RuntimeManager.PlayOneShotAttached(eventReference.Guid, target.gameObject);
         }
 
+        // ReSharper disable Unity.PerformanceAnalysis
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void PlayOneShotAttachedIfNotNull(this EventReference eventReference, Vector3 pos)
         {
@@ -108,7 +112,7 @@ namespace MobX.Utilities.Fmod
                 Debug.LogError("Provided Event Instance for Target " + target + " was null");
                 return new EventInstance();
             }
-            EventInstance eventInstance = RuntimeManager.CreateInstance(eventReference);
+            var eventInstance = RuntimeManager.CreateInstance(eventReference);
             eventInstance.set3DAttributes(target.To3DAttributes());
             eventInstance.start();
             return eventInstance;
@@ -122,7 +126,7 @@ namespace MobX.Utilities.Fmod
                 Debug.LogError("Provided Event Instance for Target " + target + " was null");
                 return new EventInstance();
             }
-            EventInstance eventInstance = RuntimeManager.CreateInstance(eventReference);
+            var eventInstance = RuntimeManager.CreateInstance(eventReference);
             RuntimeManager.AttachInstanceToGameObject(eventInstance, target);
             eventInstance.start();
             return eventInstance;
@@ -136,7 +140,7 @@ namespace MobX.Utilities.Fmod
                 Debug.LogError("Provided Event Instance for Target " + target + " was null");
                 return new EventInstance();
             }
-            EventInstance eventInstance = RuntimeManager.CreateInstance(eventReference);
+            var eventInstance = RuntimeManager.CreateInstance(eventReference);
             RuntimeManager.AttachInstanceToGameObject(eventInstance, target);
             return eventInstance;
         }
@@ -153,7 +157,7 @@ namespace MobX.Utilities.Fmod
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static EventInstance PlayGlobal(this EventReference eventReference)
         {
-            EventInstance eventInstance = eventReference.CreateGlobalInstance();
+            var eventInstance = eventReference.CreateGlobalInstance();
             if (eventInstance.isValid())
             {
                 eventInstance.start();
@@ -161,6 +165,7 @@ namespace MobX.Utilities.Fmod
             return eventInstance;
         }
 
+        // ReSharper disable Unity.PerformanceAnalysis
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static EventInstance CreateGlobalInstance(this EventReference eventReference)
         {
@@ -169,7 +174,7 @@ namespace MobX.Utilities.Fmod
                 Debug.LogError("Provided Event Instance for Target was null");
                 return new EventInstance();
             }
-            EventInstance eventInstance = RuntimeManager.CreateInstance(eventReference);
+            var eventInstance = RuntimeManager.CreateInstance(eventReference);
             return eventInstance;
         }
     }
