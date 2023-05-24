@@ -8,6 +8,7 @@ using Object = UnityEngine.Object;
 
 namespace MobX.Utilities.Singleton
 {
+    [CreateAssetMenu]
     public sealed class Singletons : ScriptableObject, ISerializationCallbackReceiver
     {
         #region Data
@@ -76,7 +77,7 @@ namespace MobX.Utilities.Singleton
         private static void RegisterInternal<T>(T instance) where T : Object
         {
 #if UNITY_EDITOR
-            static async Task WaitWhile(Func<bool> condition)
+            async static Task WaitWhile(Func<bool> condition)
             {
                 while (condition())
                 {
@@ -84,10 +85,7 @@ namespace MobX.Utilities.Singleton
                 }
             }
 
-            static bool IsImport()
-            {
-                return UnityEditor.EditorApplication.isCompiling || UnityEditor.EditorApplication.isUpdating;
-            }
+            static bool IsImport() => UnityEditor.EditorApplication.isCompiling || UnityEditor.EditorApplication.isUpdating;
 
             if (IsImport())
             {
@@ -115,6 +113,9 @@ namespace MobX.Utilities.Singleton
             }
 
             Singleton.registry.Add(instance);
+#if UNITY_EDITOR
+            UnityEditor.EditorUtility.SetDirty(Singleton);
+#endif
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -129,8 +130,7 @@ namespace MobX.Utilities.Singleton
                 }
             }
 
-            Debug.LogError("Singleton", $"No singleton instance of type {typeof(T)} registered!");
-            Debug.Log(Singleton.registry);
+            Debug.LogError("Singleton", $"No singleton instance of type {typeof(T)} registered!", Singleton);
             return null;
         }
 

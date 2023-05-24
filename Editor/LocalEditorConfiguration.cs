@@ -1,13 +1,12 @@
 using MobX.Utilities.Callbacks;
-using MobX.Utilities.Inspector;
 using System;
 
-namespace MobX.Utilities.Singleton
+namespace MobX.Utilities.Editor
 {
     /// <summary>
     ///     Base type for developer specific configuration files.
     /// </summary>
-    public abstract class LocalConfiguration<T> : RuntimeAsset where T : LocalConfiguration<T>
+    public abstract class LocalEditorConfiguration<T> : RuntimeAsset where T : LocalEditorConfiguration<T>
     {
         private static T local;
 
@@ -15,9 +14,6 @@ namespace MobX.Utilities.Singleton
         {
             get
             {
-#if !UNITY_EDITOR
-                return Global;
-#else
                 if (local == null)
                 {
                     var guid = UnityEditor.EditorPrefs.GetString(typeof(T).FullName);
@@ -50,18 +46,10 @@ namespace MobX.Utilities.Singleton
                     Local = asset;
                 }
 
-                if (local == null)
-                {
-                    UnityEngine.Debug.Log("Set Global");
-                    Local = Global;
-                }
-
                 return local;
-#endif
             }
             private set
             {
-#if UNITY_EDITOR
                 if (value == null)
                 {
                     return;
@@ -70,48 +58,8 @@ namespace MobX.Utilities.Singleton
                 var path = UnityEditor.AssetDatabase.GetAssetPath(value);
                 var guid = UnityEditor.AssetDatabase.AssetPathToGUID(path);
                 UnityEditor.EditorPrefs.SetString(typeof(T).FullName, guid);
-                if (Singletons.Exists<T>() is false)
-                {
-                    Global = value;
-                }
-#endif
                 local = value;
             }
         }
-
-        public static T Global
-        {
-            get => Singletons.Resolve<T>();
-            private set => Singletons.Register(value);
-        }
-
-#if UNITY_EDITOR
-
-        private bool IsLocal()
-        {
-            return this == Local;
-        }
-
-        private bool IsGlobal()
-        {
-            return this == Global;
-        }
-
-        [Button]
-        [Foldout("Configuration")]
-        [ConditionalShow(nameof(IsLocal), false)]
-        public void DeclareAsLocal()
-        {
-            Local = (T) this;
-        }
-
-        [Button]
-        [Foldout("Configuration")]
-        [ConditionalShow(nameof(IsGlobal), false)]
-        public void DeclareAsGlobal()
-        {
-            Global = (T) this;
-        }
-#endif // UNITY_EDITOR
     }
 }

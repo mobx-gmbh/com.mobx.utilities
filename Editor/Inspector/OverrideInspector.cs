@@ -84,9 +84,9 @@ namespace MobX.Utilities.Editor.Inspector
                     activeHeader = new FoldoutData(title, attribute.ToolTip);
                     var defaultState = attribute.Unfold;
                     if (!_headerFields.TryAdd(activeHeader, new List<InspectorMember>
-                        {
-                            inspectorMember
-                        }))
+                    {
+                        inspectorMember
+                    }))
                     {
                         _headerFields[activeHeader].Add(inspectorMember);
                     }
@@ -190,7 +190,7 @@ namespace MobX.Utilities.Editor.Inspector
 
             var pooledDictionary = DictionaryPool<FoldoutData, List<InspectorMember>>.Get();
 
-            foreach ((var header, var list) in _headerFields)
+            foreach (var (header, list) in _headerFields)
             {
                 if (header.Title.ContainsIgnoreCaseAndSpace(filter))
                 {
@@ -213,9 +213,9 @@ namespace MobX.Utilities.Editor.Inspector
                         }
 
                         if (!pooledDictionary.TryAdd(header, new List<InspectorMember>
-                            {
-                                member
-                            }))
+                        {
+                            member
+                        }))
                         {
                             pooledDictionary[header].Add(member);
                         }
@@ -236,7 +236,7 @@ namespace MobX.Utilities.Editor.Inspector
                 GUIHelper.Space();
             }
 
-            foreach ((var header, var list) in pooledDictionary)
+            foreach (var (header, list) in pooledDictionary)
             {
                 Foldout.ForceHeader(header);
                 if (!(list.First()?.HasHeaderAttribute ?? false))
@@ -276,7 +276,7 @@ namespace MobX.Utilities.Editor.Inspector
                 GUIHelper.Space();
             }
 
-            foreach ((var header, var list) in _headerFields)
+            foreach (var (header, list) in _headerFields)
             {
                 if (Foldout[header])
                 {

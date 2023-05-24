@@ -78,11 +78,26 @@ namespace MobX.Utilities.Editor.Helper
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static float GetIndentLength(Rect sourceRect)
         {
-            Rect indentRect = UnityEditor.EditorGUI.IndentedRect(sourceRect);
+            var indentRect = UnityEditor.EditorGUI.IndentedRect(sourceRect);
             var indentLength = indentRect.x - sourceRect.x;
 
             return indentLength;
         }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void BeginLabelWidthOverride(float width)
+        {
+            labelWidthStack.Push(UnityEditor.EditorGUIUtility.labelWidth);
+            UnityEditor.EditorGUIUtility.labelWidth = width;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void EndLabelWidthOverride()
+        {
+            UnityEditor.EditorGUIUtility.labelWidth = labelWidthStack.Pop();
+        }
+
+        private static readonly Stack<float> labelWidthStack = new();
 
         /*
          * Object Specific
@@ -120,7 +135,7 @@ namespace MobX.Utilities.Editor.Helper
 
             GUILayout.Box(new GUIContent(title), options);
 
-            EventType eventType = Event.current.type;
+            var eventType = Event.current.type;
             var isAccepted = false;
 
             if (eventType is EventType.DragUpdated or EventType.DragPerform)

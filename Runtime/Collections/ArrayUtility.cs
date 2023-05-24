@@ -48,5 +48,21 @@ namespace MobX.Utilities
             Array.Resize(ref array, originalToLength + 1);
             array[originalToLength] = item;
         }
+
+        public static T[] Cast<U, T>([NotNull] U[] array)
+        {
+            if (array == null)
+            {
+                throw new ArgumentNullException(nameof(array));
+            }
+
+            var result = new T[array.Length];
+            for (var i = 0; i < array.Length; i++)
+            {
+                result[i] = array[i].Cast<T>();
+            }
+
+            return result;
+        }
     }
 }

@@ -94,7 +94,7 @@ namespace MobX.Utilities.Editor.Windows
 
         private void InitializeEditor()
         {
-            foreach (UnityEditor.Editor editor in _editorCache)
+            foreach (var editor in _editorCache)
             {
                 DestroyImmediate(editor);
             }
@@ -125,7 +125,7 @@ namespace MobX.Utilities.Editor.Windows
                 return;
             }
 
-            FoldoutStyle foldoutStyle = FoldoutHandler.Style;
+            var foldoutStyle = FoldoutHandler.Style;
             DrawHeader();
             DrawBody();
             DrawFooter(foldoutStyle);
@@ -165,7 +165,7 @@ namespace MobX.Utilities.Editor.Windows
                 DrawTitles = UnityEditor.EditorGUILayout.ToggleLeft("Show Titles", DrawTitles);
                 SaveSearchQuery = UnityEditor.EditorGUILayout.ToggleLeft("Save Search Filter", SaveSearchQuery);
 
-                foreach ((GUIContent name, string key) option in _options)
+                foreach (var option in _options)
                 {
                     var current = UnityEditor.EditorPrefs.GetBool(option.key);
                     var result = UnityEditor.EditorGUILayout.ToggleLeft(option.name, current);
@@ -173,7 +173,7 @@ namespace MobX.Utilities.Editor.Windows
                 }
             }
 
-            foreach (Action instruction in _headerInstructions)
+            foreach (var instruction in _headerInstructions)
             {
                 try
                 {
@@ -192,7 +192,7 @@ namespace MobX.Utilities.Editor.Windows
         {
             _scrollPosition = UnityEditor.EditorGUILayout.BeginScrollView(_scrollPosition);
 
-            foreach (Action instruction in _instructions)
+            foreach (var instruction in _instructions)
             {
                 instruction();
             }
@@ -203,7 +203,7 @@ namespace MobX.Utilities.Editor.Windows
 
         private void DrawFooter(FoldoutStyle foldoutStyle)
         {
-            foreach (Action instruction in _footerInstructions)
+            foreach (var instruction in _footerInstructions)
             {
                 instruction();
             }
@@ -247,13 +247,13 @@ namespace MobX.Utilities.Editor.Windows
                 {
                     return;
                 }
-                FoldoutStyle foldoutStyle = FoldoutHandler.Style;
+                var foldoutStyle = FoldoutHandler.Style;
                 FoldoutHandler.Style = FoldoutStyle.Dark;
                 if (Foldout[editorTitle])
                 {
                     UnityEditor.EditorGUIUtility.wideMode = false;
                     UnityEditor.EditorGUIUtility.labelWidth = UnityEditor.EditorGUIUtility.currentViewWidth * 0.4f;
-                    foreach ((UnityEditor.Editor editor, var displayName) in editors)
+                    foreach ((var editor, var displayName) in editors)
                     {
                         FoldoutHandler.Style = FoldoutStyle.Default;
                         if (foldout[displayName])
@@ -300,7 +300,7 @@ namespace MobX.Utilities.Editor.Windows
                 {
                     if (Event.current.type != EventType.Repaint)
                     {
-                        Rect lastRect = GUILayoutUtility.GetLastRect();
+                        var lastRect = GUILayoutUtility.GetLastRect();
                         UnityEditor.EditorGUI.DrawRect(
                             new Rect(0, lastRect.y, UnityEditor.EditorGUIUtility.currentViewWidth, 1),
                             new Color(0f, 0f, 0f, 0.3f));
@@ -334,7 +334,7 @@ namespace MobX.Utilities.Editor.Windows
                     {
                         return;
                     }
-                    FoldoutStyle foldoutStyle = FoldoutHandler.Style;
+                    var foldoutStyle = FoldoutHandler.Style;
                     FoldoutHandler.Style = FoldoutStyle.Dark;
                     if (Foldout[editorTitle])
                     {
@@ -397,7 +397,7 @@ namespace MobX.Utilities.Editor.Windows
                     {
                         return;
                     }
-                    FoldoutStyle foldoutStyle = FoldoutHandler.Style;
+                    var foldoutStyle = FoldoutHandler.Style;
                     FoldoutHandler.Style = FoldoutStyle.Dark;
                     if (Foldout[editorTitle])
                     {
@@ -474,7 +474,7 @@ namespace MobX.Utilities.Editor.Windows
                         return;
                     }
 
-                    FoldoutStyle foldoutStyle = FoldoutHandler.Style;
+                    var foldoutStyle = FoldoutHandler.Style;
                     FoldoutHandler.Style = FoldoutStyle.Dark;
                     if (Foldout[editorTitle])
                     {
@@ -556,7 +556,7 @@ namespace MobX.Utilities.Editor.Windows
                         return;
                     }
 
-                    FoldoutStyle foldoutStyle = FoldoutHandler.Style;
+                    var foldoutStyle = FoldoutHandler.Style;
                     FoldoutHandler.Style = FoldoutStyle.Dark;
                     if (Foldout[editorTitle])
                     {
@@ -641,7 +641,7 @@ namespace MobX.Utilities.Editor.Windows
 
                 if (drawLine)
                 {
-                    Rect lastRect = GUILayoutUtility.GetLastRect();
+                    var lastRect = GUILayoutUtility.GetLastRect();
                     UnityEditor.EditorGUI.DrawRect(
                         new Rect(0, lastRect.y, UnityEditor.EditorGUIUtility.currentViewWidth, 1),
                         new Color(0f, 0f, 0f, 0.3f));
