@@ -22,6 +22,7 @@ namespace MobX.Utilities.Editor.AssetManagement
         [Serializable]
         private struct Replacement
         {
+            public bool enabled;
             public string oldValue;
             public string newValue;
         }
@@ -49,7 +50,7 @@ namespace MobX.Utilities.Editor.AssetManagement
             @"\(\d+\)"
         };
         [SerializeField] private Optional<string>[] gameObjectStringsToRemove;
-        [SerializeField] private Optional<Replacement>[] gameObjectStringsToReplace;
+        [SerializeField] private Replacement[] gameObjectStringsToReplace;
 
         [Header("Example")]
         [Foldout("GameObjects")]
@@ -58,6 +59,10 @@ namespace MobX.Utilities.Editor.AssetManagement
         [ShowInInspector]
         [Foldout("GameObjects")]
         public string GameObjectResult => FormatGameObjectName(gameObjectExampleName, gameObjectStartNumber);
+
+        [ShowInInspector]
+        [Foldout("Assets")]
+        public string SelectedGameObjectResult => FormatGameObjectName(GameObjects.FirstOrDefault()?.name ?? gameObjectExampleName, gameObjectStartNumber);
 
         [Foldout("Assets")]
         [SerializeField] private RenameMode assetRenaming = RenameMode.Dehumanize;
@@ -77,7 +82,7 @@ namespace MobX.Utilities.Editor.AssetManagement
             @"\(\d+\)"
         };
         [SerializeField] private Optional<string>[] assetStringsToRemove;
-        [SerializeField] private Optional<Replacement>[] assetStringsToReplace;
+        [SerializeField] private Replacement[] assetStringsToReplace;
 
         [Header("Example")]
         [Foldout("Assets")]
@@ -86,6 +91,10 @@ namespace MobX.Utilities.Editor.AssetManagement
         [ShowInInspector]
         [Foldout("Assets")]
         public string AssetResult => FormatAssetName(assetExampleName, gameObjectStartNumber);
+
+        [ShowInInspector]
+        [Foldout("Assets")]
+        public string SelectedAssetResult => FormatAssetName(Assets.FirstOrDefault()?.name ?? assetExampleName, gameObjectStartNumber);
 
         #endregion
 
@@ -170,9 +179,9 @@ namespace MobX.Utilities.Editor.AssetManagement
 
                 foreach (var replacement in gameObjectStringsToReplace)
                 {
-                    if (replacement.TryGetValue(out var value))
+                    if (replacement.enabled)
                     {
-                        elementName = elementName.Replace(value.oldValue ?? string.Empty, value.newValue ?? string.Empty, gameObjectIgnoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal);
+                        elementName = elementName.Replace(replacement.oldValue ?? string.Empty, replacement.newValue ?? string.Empty, gameObjectIgnoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal);
                     }
                 }
 
@@ -265,9 +274,9 @@ namespace MobX.Utilities.Editor.AssetManagement
 
                 foreach (var replacement in assetStringsToReplace)
                 {
-                    if (replacement.TryGetValue(out var value))
+                    if (replacement.enabled)
                     {
-                        elementName = elementName.Replace(value.oldValue ?? string.Empty, value.newValue ?? string.Empty, assetIgnoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal);
+                        elementName = elementName.Replace(replacement.oldValue ?? string.Empty, replacement.newValue ?? string.Empty, assetIgnoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal);
                     }
                 }
 
@@ -300,7 +309,7 @@ namespace MobX.Utilities.Editor.AssetManagement
 
         [Foldout("Selection")]
         [ShowInInspector]
-        public GameObject[] GameObjects => UnityEditor.Selection.gameObjects;
+        public GameObject[] GameObjects => UnityEditor.Selection.gameObjects.Where(element => element.IsGameObjectInScene()).ToArray();
 
         [Foldout("Selection")]
         [ShowInInspector]
