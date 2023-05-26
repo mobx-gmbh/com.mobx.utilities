@@ -5,19 +5,22 @@ using System.Runtime.InteropServices;
 
 namespace MobX.Utilities.Types
 {
+    [Serializable]
     [StructLayout(LayoutKind.Auto, Size = 8)]
-    public struct Percentage : IComparable<Percentage>, IComparer<Percentage>, IEquatable<Percentage>,
+    public struct Percentage : IComparable<Percentage>,
+        IComparer<Percentage>,
+        IEquatable<Percentage>,
         IEqualityComparer<Percentage>
     {
         #region Statics
 
-        public static readonly Percentage OneHundredPercent = new Percentage(1);
-        public static readonly Percentage SeventyFivePercent = new Percentage(.75f);
-        public static readonly Percentage FiftyPercent = new Percentage(.5f);
-        public static readonly Percentage TwentyFivePercent = new Percentage(.25f);
-        public static readonly Percentage TwentyPercent = new Percentage(.2f);
-        public static readonly Percentage TenPercent = new Percentage(.1f);
-        public static readonly Percentage Zero = new Percentage(0);
+        public static readonly Percentage OneHundredPercent = new(1);
+        public static readonly Percentage SeventyFivePercent = new(.75f);
+        public static readonly Percentage FiftyPercent = new(.5f);
+        public static readonly Percentage TwentyFivePercent = new(.25f);
+        public static readonly Percentage TwentyPercent = new(.2f);
+        public static readonly Percentage TenPercent = new(.1f);
+        public static readonly Percentage Zero = new(0);
 
         #endregion
 
@@ -213,7 +216,7 @@ namespace MobX.Utilities.Types
         #region Is Methods
 
         /// <summary>
-        /// Returns true if the value is greater or equal to 100%
+        ///     Returns true if the value is greater or equal to 100%
         /// </summary>
         public bool IsComplete => this >= OneHundredPercent;
 

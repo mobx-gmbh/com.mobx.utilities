@@ -103,6 +103,12 @@ namespace MobX.Utilities
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void SetPositionAndRotation<TComponent>(this TComponent component, Vector3 position, Quaternion rotation) where TComponent : Component
+        {
+            component.transform.SetPositionAndRotation(position, rotation);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void SetScale<TComponent>(this TComponent component, float scale) where TComponent : Component
         {
             component.transform.localScale = Vector3.one * scale;

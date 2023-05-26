@@ -96,21 +96,4 @@ namespace MobX.Utilities.Types
             return value.GetHashCode();
         }
     }
-
-#if UNITY_EDITOR
-    // Custom property drawer for Seconds
-    [UnityEditor.CustomPropertyDrawer(typeof(Seconds))]
-    public class SecondsDrawer : UnityEditor.PropertyDrawer
-    {
-        public override float GetPropertyHeight(UnityEditor.SerializedProperty property, GUIContent label)
-        {
-            return 0;
-        }
-
-        public override void OnGUI(Rect position, UnityEditor.SerializedProperty property, GUIContent label)
-        {
-            UnityEditor.EditorGUILayout.PropertyField(property.FindPropertyRelative("value"), label);
-        }
-    }
-#endif
 }
