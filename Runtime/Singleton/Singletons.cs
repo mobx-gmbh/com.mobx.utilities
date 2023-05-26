@@ -77,7 +77,7 @@ namespace MobX.Utilities.Singleton
         private static void RegisterInternal<T>(T instance) where T : Object
         {
 #if UNITY_EDITOR
-            async static Task WaitWhile(Func<bool> condition)
+            static async Task WaitWhile(Func<bool> condition)
             {
                 while (condition())
                 {
@@ -85,7 +85,10 @@ namespace MobX.Utilities.Singleton
                 }
             }
 
-            static bool IsImport() => UnityEditor.EditorApplication.isCompiling || UnityEditor.EditorApplication.isUpdating;
+            static bool IsImport()
+            {
+                return UnityEditor.EditorApplication.isCompiling || UnityEditor.EditorApplication.isUpdating;
+            }
 
             if (IsImport())
             {
@@ -101,11 +104,10 @@ namespace MobX.Utilities.Singleton
                 return;
             }
 #endif
-            Singleton.registry.RemoveNull();
-
             for (var i = 0; i < Singleton.registry.Count; i++)
             {
-                if (Singleton.registry[i].GetType() == typeof(T))
+                var entry = Singleton.registry[i];
+                if (entry != null && entry.GetType() == typeof(T))
                 {
                     Singleton.registry[i] = instance;
                     return;
