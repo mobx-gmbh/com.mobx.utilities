@@ -41,6 +41,11 @@ namespace MobX.Utilities.Callbacks
 
     #region Runtime Callbacks
 
+    public interface IOnAfterLoad : ICallbackInterface
+    {
+        public void OnAfterLoad();
+    }
+
     /// <summary>
     ///     Receive a callback when the game starts.
     /// </summary>

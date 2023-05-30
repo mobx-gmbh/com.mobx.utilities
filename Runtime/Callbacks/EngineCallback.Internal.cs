@@ -22,6 +22,7 @@ namespace MobX.Utilities.Callbacks
 
         private static readonly List<IOnBeginPlay> beginPlayCallbacks = new(DefaultCapacity);
         private static readonly List<IOnEndPlay> endPlayCallbacks = new(DefaultCapacity);
+        private static readonly List<IOnAfterLoad> afterLoadListener = new();
         private static readonly List<Action> beginPlayDelegates = new(DefaultCapacity);
         private static readonly List<Action> endPlayDelegates = new(DefaultCapacity);
 
@@ -31,7 +32,7 @@ namespace MobX.Utilities.Callbacks
         private static void OnBeforeSceneLoad()
         {
 #if DEBUG
-            foreach (IOnBeginPlay listener in beginPlayCallbacks)
+            foreach (var listener in beginPlayCallbacks)
             {
                 try
                 {
@@ -43,7 +44,7 @@ namespace MobX.Utilities.Callbacks
                 }
             }
 
-            foreach (Action listener in beginPlayDelegates)
+            foreach (var listener in beginPlayDelegates)
             {
                 try
                 {
@@ -68,12 +69,36 @@ namespace MobX.Utilities.Callbacks
             initialized = true;
         }
 
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+        private static void OnAfterSceneLoad()
+        {
+#if DEBUG
+            foreach (var listener in afterLoadListener)
+            {
+                try
+                {
+                    listener.OnAfterLoad();
+                }
+                catch (Exception exception)
+                {
+                    Debug.LogException(exception);
+                }
+            }
+#else
+            foreach (var listener in afterLoadListener)
+            {
+                listener.OnAfterLoad();
+            }
+#endif
+            initialized = true;
+        }
+
         private static void OnQuit()
         {
             IsQuitting = true;
             initialized = false;
 #if DEBUG
-            foreach (IOnEndPlay listener in endPlayCallbacks)
+            foreach (var listener in endPlayCallbacks)
             {
                 try
                 {
@@ -85,7 +110,7 @@ namespace MobX.Utilities.Callbacks
                 }
             }
 
-            foreach (Action listener in endPlayDelegates)
+            foreach (var listener in endPlayDelegates)
             {
                 try
                 {
@@ -113,7 +138,7 @@ namespace MobX.Utilities.Callbacks
         {
 #if DEBUG
             var deltaTime = Time.deltaTime;
-            foreach (IOnUpdate listener in updateCallbacks)
+            foreach (var listener in updateCallbacks)
             {
                 try
                 {
@@ -125,7 +150,7 @@ namespace MobX.Utilities.Callbacks
                 }
             }
 
-            foreach (UpdateDelegate listener in updateDelegates)
+            foreach (var listener in updateDelegates)
             {
                 try
                 {
@@ -154,7 +179,7 @@ namespace MobX.Utilities.Callbacks
         {
 #if DEBUG
             var deltaTime = Time.deltaTime;
-            foreach (IOnLateUpdate listener in lateUpdateCallbacks)
+            foreach (var listener in lateUpdateCallbacks)
             {
                 try
                 {
@@ -166,7 +191,7 @@ namespace MobX.Utilities.Callbacks
                 }
             }
 
-            foreach (LateUpdateDelegate listener in lateUpdateDelegates)
+            foreach (var listener in lateUpdateDelegates)
             {
                 try
                 {
@@ -195,7 +220,7 @@ namespace MobX.Utilities.Callbacks
         {
 #if DEBUG
             var deltaTime = Time.fixedDeltaTime;
-            foreach (IOnFixedUpdate listener in fixedUpdateCallbacks)
+            foreach (var listener in fixedUpdateCallbacks)
             {
                 try
                 {
@@ -207,7 +232,7 @@ namespace MobX.Utilities.Callbacks
                 }
             }
 
-            foreach (FixedUpdateDelegate listener in fixedUpdateDelegates)
+            foreach (var listener in fixedUpdateDelegates)
             {
                 try
                 {

@@ -51,6 +51,11 @@ namespace MobX.Utilities.Callbacks
                 AddEndPlayListener(onEndPlay);
             }
 
+            if (listener is IOnAfterLoad onAfterLoad)
+            {
+                AddAfterLoadListener(onAfterLoad);
+            }
+
 #if UNITY_EDITOR
             AddOnExitPlayInternal(listener as IOnExitPlayMode);
             AddOnEnterPlayInternal(listener as IOnEnterPlayMode);
@@ -84,6 +89,11 @@ namespace MobX.Utilities.Callbacks
             if (listener is IOnEndPlay onEndPlay)
             {
                 RemoveEndPlayListener(onEndPlay);
+            }
+
+            if (listener is IOnAfterLoad onAfterLoad)
+            {
+                RemoveAfterLoadListener(onAfterLoad);
             }
 
 #if UNITY_EDITOR
@@ -122,6 +132,16 @@ namespace MobX.Utilities.Callbacks
         public static void RemoveEndPlayListener<T>(T listener) where T : class, IOnEndPlay
         {
             endPlayCallbacks.Remove(listener);
+        }
+
+        public static void AddAfterLoadListener<T>(T listener) where T : class, IOnAfterLoad
+        {
+            afterLoadListener.AddUnique(listener, true);
+        }
+
+        public static void RemoveAfterLoadListener<T>(T listener) where T : class, IOnAfterLoad
+        {
+            afterLoadListener.Remove(listener);
         }
 
         #endregion

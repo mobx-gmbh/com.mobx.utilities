@@ -4,24 +4,9 @@ namespace MobX.Utilities.Callbacks
 {
     public abstract class RuntimeAsset : ScriptableObject
     {
-        private void OnEnable()
+        protected RuntimeAsset()
         {
             EngineCallbacks.AddCallbacks(this);
-            OnAssetEnabled();
-        }
-
-        private void OnDisable()
-        {
-            EngineCallbacks.RemoveCallbacks(this);
-            OnAssetDisabled();
-        }
-
-        protected virtual void OnAssetEnabled()
-        {
-        }
-
-        protected virtual void OnAssetDisabled()
-        {
         }
     }
 }

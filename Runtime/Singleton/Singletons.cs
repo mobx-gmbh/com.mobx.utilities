@@ -23,28 +23,6 @@ namespace MobX.Utilities.Singleton
         [ListOptions]
         [SerializeField] private List<Object> registry;
 
-        [Button]
-        [SpaceBefore]
-        [Tooltip("Remove null objects from the registry")]
-        private void ClearInvalid()
-        {
-            registry.RemoveNull();
-        }
-
-        [Button]
-        [ConditionalShow(nameof(_enableEditing), false)]
-        private void EnableEdit()
-        {
-            _enableEditing = true;
-        }
-
-        [Button]
-        [ConditionalShow(nameof(_enableEditing))]
-        private void DisableEdit()
-        {
-            _enableEditing = false;
-        }
-
         #endregion
 
 
@@ -58,6 +36,11 @@ namespace MobX.Utilities.Singleton
             RegisterInternal(instance);
         }
 
+        /// <summary>
+        ///     Get the singleton instance for T. Use <see cref="Exists{T}" /> to check if an instance is registered.
+        /// </summary>
+        /// <typeparam name="T">The type of the singleton instance to resolve</typeparam>
+        /// <returns>The singleton instance of T</returns>
         public static T Resolve<T>() where T : Object
         {
             return ResolveInternal<T>();
@@ -200,6 +183,33 @@ namespace MobX.Utilities.Singleton
 
         public void OnBeforeSerialize()
         {
+        }
+
+        #endregion
+
+
+        #region Editor
+
+        [Button]
+        [SpaceBefore]
+        [Tooltip("Remove null objects from the registry")]
+        private void ClearInvalid()
+        {
+            registry.RemoveNull();
+        }
+
+        [Button]
+        [ConditionalShow(nameof(_enableEditing), false)]
+        private void EnableEdit()
+        {
+            _enableEditing = true;
+        }
+
+        [Button]
+        [ConditionalShow(nameof(_enableEditing))]
+        private void DisableEdit()
+        {
+            _enableEditing = false;
         }
 
         #endregion

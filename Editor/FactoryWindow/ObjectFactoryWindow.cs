@@ -1,5 +1,6 @@
 ﻿using MobX.Utilities.Editor.Helper;
 using MobX.Utilities.Reflection;
+using MobX.Utilities.Tools;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -137,8 +138,7 @@ namespace MobX.Utilities.Editor.FactoryWindow
 
         private static async ValueTask<List<CreatableObject>> ProfileAssemblies()
         {
-            var assemblies =
-                AssemblyProfiler.GetFilteredAssemblies(null, ObjectFactorySettings.GetIgnoredAssemblyPrefixes());
+            var assemblies = AssemblyProfiler.GetFilteredAssemblies(null, ObjectFactorySettings.GetIgnoredAssemblyPrefixes());
             var ignoreNames = ObjectFactorySettings.GetIgnoredNames();
 
             var result = await Task.Run(() =>

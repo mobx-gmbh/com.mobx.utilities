@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-namespace MobX.Utilities.Input
+namespace MobX.Utilities.Types
 {
     [Serializable]
-    public class ActionMapName
+    public struct ActionMapName
     {
         [SerializeField]
         private string actionMapName;
@@ -25,6 +25,11 @@ namespace MobX.Utilities.Input
         {
             actionMapName = name;
         }
+
+        public override string ToString()
+        {
+            return actionMapName;
+        }
     }
 
 #if UNITY_EDITOR
@@ -40,14 +45,13 @@ namespace MobX.Utilities.Input
                 PopulateActionMapNames();
             }
 
+            var relativeProperty = property.FindPropertyRelative("actionMapName");
+
             var currentIndex =
-                Mathf.Max(_actionMapNames!.IndexOf(property.FindPropertyRelative("actionMapName").stringValue), 0);
+                Mathf.Max(_actionMapNames!.IndexOf(relativeProperty.stringValue), 0);
             var newIndex = UnityEditor.EditorGUI.Popup(position, label.text, currentIndex, _actionMapNames.ToArray());
 
-            if (newIndex != currentIndex)
-            {
-                property.FindPropertyRelative("actionMapName").stringValue = _actionMapNames[newIndex];
-            }
+            relativeProperty.stringValue = _actionMapNames[newIndex];
         }
 
         private void PopulateActionMapNames()

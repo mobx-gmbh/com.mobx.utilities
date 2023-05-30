@@ -9,9 +9,10 @@ namespace MobX.Utilities.Callbacks
     {
         #region Asset Handling
 
-        private static UnityEditor.AssetDeleteResult OnWillDeleteAsset(string assetPath, UnityEditor.RemoveAssetOptions options)
+        private static UnityEditor.AssetDeleteResult OnWillDeleteAsset(string assetPath,
+            UnityEditor.RemoveAssetOptions options)
         {
-            Object asset = UnityEditor.AssetDatabase.LoadAssetAtPath<Object>(assetPath);
+            var asset = UnityEditor.AssetDatabase.LoadAssetAtPath<Object>(assetPath);
 
             if (asset is not ICallbackInterface)
             {
@@ -40,6 +41,12 @@ namespace MobX.Utilities.Callbacks
             if (asset is IOnEnterEditMode enterEditModeCallback)
             {
                 enterEditModeListener.Remove(enterEditModeCallback);
+            }
+
+            // ReSharper disable once SuspiciousTypeConversion.Global
+            if (asset is IOnAfterLoad afterLoadCallback)
+            {
+                afterLoadListener.Remove(afterLoadCallback);
             }
 
             return UnityEditor.AssetDeleteResult.DidNotDelete;

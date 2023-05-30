@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 using UnityEngine.InputSystem;
 using static UnityEngine.InputSystem.InputAction;
 
-namespace MobX.Utilities.Input
+namespace MobX.Utilities.Extensions
 {
     public enum InputActionEventType
     {
@@ -15,7 +15,8 @@ namespace MobX.Utilities.Input
     public static class InputSystemExtensions
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool TryAddListener(this InputActionReference inputActionReference, Action<CallbackContext> listener, InputActionEventType eventType = InputActionEventType.Performed)
+        public static bool TryAddListener(this InputActionReference inputActionReference,
+            Action<CallbackContext> listener, InputActionEventType eventType = InputActionEventType.Performed)
         {
             if (inputActionReference == null)
             {
@@ -39,7 +40,8 @@ namespace MobX.Utilities.Input
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool TryRemoveListener(this InputActionReference inputActionReference, Action<CallbackContext> listener, InputActionEventType eventType = InputActionEventType.Performed)
+        public static bool TryRemoveListener(this InputActionReference inputActionReference,
+            Action<CallbackContext> listener, InputActionEventType eventType = InputActionEventType.Performed)
         {
             if (inputActionReference == null)
             {
