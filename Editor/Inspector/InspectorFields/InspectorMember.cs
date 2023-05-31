@@ -38,15 +38,22 @@ namespace MobX.Utilities.Editor.Inspector.InspectorFields
         {
             Target = target;
             Member = member;
-            HasHeaderAttribute = Member.HasAttribute<HeaderAttribute>();
+            try
+            {
+                HasHeaderAttribute = Member.HasAttribute<HeaderAttribute>();
+            }
+            catch (Exception exception)
+            {
+                Debug.LogException(exception);
+            }
 
-            var isSerialized = member.HasAttribute<SerializeField>() || member is FieldInfo { IsPublic: true };
+            var isSerialized = member.HasAttribute<SerializeField>() || member is FieldInfo {IsPublic: true};
 
-            PropertyAttribute[] attributes = member.GetCustomAttributes<PropertyAttribute>().ToArray();
+            var attributes = member.GetCustomAttributes<PropertyAttribute>().ToArray();
 
             for (var i = 0; i < attributes.Length; i++)
             {
-                PropertyAttribute propertyAttribute = attributes[i];
+                var propertyAttribute = attributes[i];
 
                 switch (propertyAttribute)
                 {

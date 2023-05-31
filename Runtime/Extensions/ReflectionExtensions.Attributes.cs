@@ -39,7 +39,7 @@ namespace MobX.Utilities
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool HasAttribute<T>(this MemberInfo memberInfo) where T : Attribute
         {
-            return memberInfo.GetCustomAttribute<T>() != null;
+            return memberInfo.GetCustomAttributes<T>().Any();
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
