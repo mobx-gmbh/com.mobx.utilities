@@ -20,13 +20,14 @@ namespace MobX.Utilities.Callbacks
         private static readonly List<LateUpdateDelegate> lateUpdateDelegates = new(DefaultCapacity);
         private static readonly List<FixedUpdateDelegate> fixedUpdateDelegates = new(DefaultCapacity);
 
-        private static readonly List<IOnBeginPlay> beginPlayCallbacks = new(DefaultCapacity);
-        private static readonly List<IOnEndPlay> endPlayCallbacks = new(DefaultCapacity);
-        private static readonly List<IOnAfterLoad> afterLoadListener = new();
+        private static readonly List<IOnLoad> beginPlayCallbacks = new(DefaultCapacity);
+        private static readonly List<IOnQuit> endPlayCallbacks = new(DefaultCapacity);
+        private static readonly List<IOnAwake> afterLoadListener = new();
         private static readonly List<Action> beginPlayDelegates = new(DefaultCapacity);
         private static readonly List<Action> endPlayDelegates = new(DefaultCapacity);
 
-        private static bool initialized;
+        private static bool beforeSceneLoadCompleted;
+        private static bool afterSceneLoadCompleted;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void OnBeforeSceneLoad()
@@ -66,7 +67,7 @@ namespace MobX.Utilities.Callbacks
                 listener();
             }
 #endif
-            initialized = true;
+            beforeSceneLoadCompleted = true;
         }
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
@@ -77,7 +78,7 @@ namespace MobX.Utilities.Callbacks
             {
                 try
                 {
-                    listener.OnAfterLoad();
+                    listener.OnAwake();
                 }
                 catch (Exception exception)
                 {
@@ -90,19 +91,20 @@ namespace MobX.Utilities.Callbacks
                 listener.OnAfterLoad();
             }
 #endif
-            initialized = true;
+            afterSceneLoadCompleted = true;
         }
 
         private static void OnQuit()
         {
             IsQuitting = true;
-            initialized = false;
+            beforeSceneLoadCompleted = false;
+            afterSceneLoadCompleted = false;
 #if DEBUG
             foreach (var listener in endPlayCallbacks)
             {
                 try
                 {
-                    listener.OnEndPlay();
+                    listener.OnQuit();
                 }
                 catch (Exception exception)
                 {

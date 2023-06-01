@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace MobX.Utilities.Tools
 {
-    public class Installer : RuntimeAsset, IOnBeginPlay, IOnEndPlay
+    public class Installer : RuntimeAsset, IOnLoad, IOnQuit
     {
         [SerializeField] private bool autoInstall;
         [ListOptions]
@@ -39,7 +39,7 @@ namespace MobX.Utilities.Tools
             }
         }
 
-        public void OnEndPlay()
+        public void OnQuit()
         {
             _installed = false;
         }

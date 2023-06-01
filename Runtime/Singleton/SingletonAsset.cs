@@ -1,4 +1,5 @@
 using MobX.Utilities.Callbacks;
+using System.Diagnostics;
 using UnityEngine;
 
 namespace MobX.Utilities.Singleton
@@ -20,6 +21,14 @@ namespace MobX.Utilities.Singleton
         private void OnDisable()
         {
             EngineCallbacks.RemoveCallbacks(this);
+        }
+
+        [Conditional("UNITY_EDITOR")]
+        protected void Repaint()
+        {
+#if UNITY_EDITOR
+            UnityEditor.EditorUtility.SetDirty(this);
+#endif
         }
     }
 }

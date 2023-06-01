@@ -41,17 +41,17 @@ namespace MobX.Utilities.Callbacks
                 AddFixedUpdateListener(onFixedUpdate);
             }
 
-            if (listener is IOnBeginPlay onBeginPlay)
+            if (listener is IOnLoad onBeginPlay)
             {
-                AddBeginPlayListener(onBeginPlay);
+                AddOnLoadListener(onBeginPlay);
             }
 
-            if (listener is IOnEndPlay onEndPlay)
+            if (listener is IOnQuit onEndPlay)
             {
-                AddEndPlayListener(onEndPlay);
+                AddOnQuitListener(onEndPlay);
             }
 
-            if (listener is IOnAfterLoad onAfterLoad)
+            if (listener is IOnAwake onAfterLoad)
             {
                 AddAfterLoadListener(onAfterLoad);
             }
@@ -81,17 +81,17 @@ namespace MobX.Utilities.Callbacks
                 RemoveFixedUpdateListener(onFixedUpdate);
             }
 
-            if (listener is IOnBeginPlay onBeginPlay)
+            if (listener is IOnLoad onBeginPlay)
             {
                 RemoveBeginPlayListener(onBeginPlay);
             }
 
-            if (listener is IOnEndPlay onEndPlay)
+            if (listener is IOnQuit onEndPlay)
             {
                 RemoveEndPlayListener(onEndPlay);
             }
 
-            if (listener is IOnAfterLoad onAfterLoad)
+            if (listener is IOnAwake onAfterLoad)
             {
                 RemoveAfterLoadListener(onAfterLoad);
             }
@@ -109,9 +109,9 @@ namespace MobX.Utilities.Callbacks
 
         #region Runtime Callbacks
 
-        public static void AddBeginPlayListener<T>(T listener) where T : class, IOnBeginPlay
+        public static void AddOnLoadListener<T>(T listener) where T : class, IOnLoad
         {
-            if (initialized)
+            if (beforeSceneLoadCompleted)
             {
                 listener.OnBeginPlay();
             }
@@ -119,27 +119,31 @@ namespace MobX.Utilities.Callbacks
             beginPlayCallbacks.AddUnique(listener, true);
         }
 
-        public static void RemoveBeginPlayListener<T>(T listener) where T : class, IOnBeginPlay
+        public static void RemoveBeginPlayListener<T>(T listener) where T : class, IOnLoad
         {
             beginPlayCallbacks.Remove(listener);
         }
 
-        public static void AddEndPlayListener<T>(T listener) where T : class, IOnEndPlay
+        public static void AddOnQuitListener<T>(T listener) where T : class, IOnQuit
         {
             endPlayCallbacks.AddUnique(listener, true);
         }
 
-        public static void RemoveEndPlayListener<T>(T listener) where T : class, IOnEndPlay
+        public static void RemoveEndPlayListener<T>(T listener) where T : class, IOnQuit
         {
             endPlayCallbacks.Remove(listener);
         }
 
-        public static void AddAfterLoadListener<T>(T listener) where T : class, IOnAfterLoad
+        public static void AddAfterLoadListener<T>(T listener) where T : class, IOnAwake
         {
+            if (afterSceneLoadCompleted)
+            {
+                listener.OnAwake();
+            }
             afterLoadListener.AddUnique(listener, true);
         }
 
-        public static void RemoveAfterLoadListener<T>(T listener) where T : class, IOnAfterLoad
+        public static void RemoveAfterLoadListener<T>(T listener) where T : class, IOnAwake
         {
             afterLoadListener.Remove(listener);
         }

@@ -109,6 +109,18 @@ namespace MobX.Utilities
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void SetPositionAndRotation<TComponent>(this TComponent component, Transform target) where TComponent : Component
+        {
+            component.transform.SetPositionAndRotation(target.position, target.rotation);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void SetPositionAndRotation(this GameObject gameObject, Transform target)
+        {
+            gameObject.transform.SetPositionAndRotation(target.position, target.rotation);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void SetScale<TComponent>(this TComponent component, float scale) where TComponent : Component
         {
             component.transform.localScale = Vector3.one * scale;
@@ -192,14 +204,14 @@ namespace MobX.Utilities
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool TryGetComponentInChildren<T>(this Component target, out T component, bool includeInactive = false) where T : Component
+        public static bool TryGetComponentInChildren<T>(this Component target, out T component, bool includeInactive = false)
         {
             component = target.GetComponentInChildren<T>(includeInactive);
             return component != null;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool TryGetComponentInParent<T>(this Component target, out T component, bool includeInactive = false) where T : Component
+        public static bool TryGetComponentInParent<T>(this Component target, out T component, bool includeInactive = false)
         {
             component = target.GetComponentInChildren<T>(includeInactive);
             return component != null;

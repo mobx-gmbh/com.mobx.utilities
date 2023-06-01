@@ -253,7 +253,7 @@ namespace MobX.Utilities.Editor.Windows
                 {
                     UnityEditor.EditorGUIUtility.wideMode = false;
                     UnityEditor.EditorGUIUtility.labelWidth = UnityEditor.EditorGUIUtility.currentViewWidth * 0.4f;
-                    foreach ((var editor, var displayName) in editors)
+                    foreach (var (editor, displayName) in editors)
                     {
                         FoldoutHandler.Style = FoldoutStyle.Default;
                         if (foldout[displayName])

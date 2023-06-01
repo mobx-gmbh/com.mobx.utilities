@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using UnityEngine;
 
 namespace MobX.Utilities.Callbacks
@@ -7,6 +8,14 @@ namespace MobX.Utilities.Callbacks
         protected RuntimeAsset()
         {
             EngineCallbacks.AddCallbacks(this);
+        }
+
+        [Conditional("UNITY_EDITOR")]
+        protected void Repaint()
+        {
+#if UNITY_EDITOR
+            UnityEditor.EditorUtility.SetDirty(this);
+#endif
         }
     }
 }

@@ -44,7 +44,7 @@ namespace MobX.Utilities.Callbacks
             }
 
             // ReSharper disable once SuspiciousTypeConversion.Global
-            if (asset is IOnAfterLoad afterLoadCallback)
+            if (asset is IOnAwake afterLoadCallback)
             {
                 afterLoadListener.Remove(afterLoadCallback);
             }

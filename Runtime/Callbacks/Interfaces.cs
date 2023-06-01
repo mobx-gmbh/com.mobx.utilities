@@ -41,15 +41,15 @@ namespace MobX.Utilities.Callbacks
 
     #region Runtime Callbacks
 
-    public interface IOnAfterLoad : ICallbackInterface
+    public interface IOnAwake : ICallbackInterface
     {
-        public void OnAfterLoad();
+        public void OnAwake();
     }
 
     /// <summary>
     ///     Receive a callback when the game starts.
     /// </summary>
-    public interface IOnBeginPlay : ICallbackInterface
+    public interface IOnLoad : ICallbackInterface
     {
         /// <summary>
         ///     Called when the game loads during <see cref="RuntimeInitializeLoadType.BeforeSceneLoad" />
@@ -61,12 +61,12 @@ namespace MobX.Utilities.Callbacks
     /// <summary>
     ///     Receive a callback when the game ends.
     /// </summary>
-    public interface IOnEndPlay : ICallbackInterface
+    public interface IOnQuit : ICallbackInterface
     {
         /// <summary>
         ///     Called at runtime when the game ends.
         /// </summary>
-        public void OnEndPlay();
+        public void OnQuit();
     }
 
     #endregion
