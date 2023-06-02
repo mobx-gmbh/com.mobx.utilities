@@ -88,7 +88,7 @@ namespace MobX.Utilities.Callbacks
 
             if (listener is IOnQuit onEndPlay)
             {
-                RemoveEndPlayListener(onEndPlay);
+                RemoveQuitListener(onEndPlay);
             }
 
             if (listener is IOnAwake onAfterLoad)
@@ -126,12 +126,12 @@ namespace MobX.Utilities.Callbacks
 
         public static void AddOnQuitListener<T>(T listener) where T : class, IOnQuit
         {
-            endPlayCallbacks.AddUnique(listener, true);
+            quitCallbacks.AddUnique(listener, true);
         }
 
-        public static void RemoveEndPlayListener<T>(T listener) where T : class, IOnQuit
+        public static void RemoveQuitListener<T>(T listener) where T : class, IOnQuit
         {
-            endPlayCallbacks.Remove(listener);
+            quitCallbacks.Remove(listener);
         }
 
         public static void AddAfterLoadListener<T>(T listener) where T : class, IOnAwake

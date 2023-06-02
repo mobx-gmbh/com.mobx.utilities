@@ -14,8 +14,8 @@ namespace MobX.Utilities.Callbacks
 
         public static event Action EndPlay
         {
-            add => endPlayDelegates.AddNullChecked(value);
-            remove => endPlayDelegates.Remove(value);
+            add => quitDelegates.AddNullChecked(value);
+            remove => quitDelegates.Remove(value);
         }
 
         #endregion

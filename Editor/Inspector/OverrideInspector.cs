@@ -1,15 +1,14 @@
+using MobX.Utilities.Callbacks;
 using MobX.Utilities.Editor.Helper;
 using MobX.Utilities.Editor.Inspector.InspectorFields;
 using MobX.Utilities.Inspector;
 using MobX.Utilities.Reflection;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityEngine.Pool;
-using Object = UnityEngine.Object;
 
 namespace MobX.Utilities.Editor.Inspector
 {
@@ -84,9 +83,9 @@ namespace MobX.Utilities.Editor.Inspector
                     activeHeader = new FoldoutData(title, attribute.ToolTip);
                     var defaultState = attribute.Unfold;
                     if (!_headerFields.TryAdd(activeHeader, new List<InspectorMember>
-                    {
-                        inspectorMember
-                    }))
+                        {
+                            inspectorMember
+                        }))
                     {
                         _headerFields[activeHeader].Add(inspectorMember);
                     }
@@ -213,9 +212,9 @@ namespace MobX.Utilities.Editor.Inspector
                         }
 
                         if (!pooledDictionary.TryAdd(header, new List<InspectorMember>
-                        {
-                            member
-                        }))
+                            {
+                                member
+                            }))
                         {
                             pooledDictionary[header].Add(member);
                         }
@@ -298,20 +297,13 @@ namespace MobX.Utilities.Editor.Inspector
 
         private void DrawScriptField()
         {
-            try
+            var enabled = GUI.enabled;
+            GUI.enabled = false;
+            if (_script != null && EngineCallbacks.EngineState != 3)
             {
-                var enabled = GUI.enabled;
-                GUI.enabled = false;
-                if (_script != null && Event.current.type != EventType.ExecuteCommand)
-                {
-                    UnityEditor.EditorGUILayout.PropertyField(_script);
-                }
-                GUI.enabled = enabled;
+                UnityEditor.EditorGUILayout.PropertyField(_script);
             }
-            catch (Exception)
-            {
-                // ignored
-            }
+            GUI.enabled = enabled;
         }
 
         private void DrawDescription()

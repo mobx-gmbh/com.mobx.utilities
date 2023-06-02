@@ -1,4 +1,5 @@
-﻿using MobX.Utilities.Editor.Helper;
+﻿using MobX.Utilities.Callbacks;
+using MobX.Utilities.Editor.Helper;
 using MobX.Utilities.Inspector;
 using System;
 using System.Reflection;
@@ -37,7 +38,8 @@ namespace MobX.Utilities.Editor.Inspector.InspectorFields
             if (memberInfo.TryGetCustomAttribute(out ListOptions listAttribute))
             {
                 _listInspector = true;
-                _reorderableList = new ReorderableList(serializedProperty.serializedObject, serializedProperty, listAttribute.Draggable, listAttribute.DisplayHeader, listAttribute.AddButton,
+                _reorderableList = new ReorderableList(serializedProperty.serializedObject, serializedProperty,
+                    listAttribute.Draggable, listAttribute.DisplayHeader, listAttribute.AddButton,
                     listAttribute.RemoveButton);
 
                 _reorderableList.drawHeaderCallback += rect => { UnityEditor.EditorGUI.LabelField(rect, Label); };
@@ -52,9 +54,14 @@ namespace MobX.Utilities.Editor.Inspector.InspectorFields
 
         protected override void DrawGUI()
         {
+            if (EngineCallbacks.EngineState == 3)
+            {
+                return;
+            }
+
             _serializedObject.Update();
             var enabled = GUI.enabled;
-            if (_readonly || _runtimeReadonly && Application.isPlaying)
+            if (_readonly || (_runtimeReadonly && Application.isPlaying))
             {
                 GUI.enabled = false;
             }
@@ -92,15 +99,8 @@ namespace MobX.Utilities.Editor.Inspector.InspectorFields
                 return;
             }
 
-            try
-            {
-                UnityEditor.EditorGUILayout.PropertyField(_serializedProperty, Label);
-                _serializedObject.ApplyModifiedProperties();
-            }
-            catch (Exception)
-            {
-                // ignored
-            }
+            UnityEditor.EditorGUILayout.PropertyField(_serializedProperty, Label);
+            _serializedObject.ApplyModifiedProperties();
 
             GUI.enabled = enabled;
         }

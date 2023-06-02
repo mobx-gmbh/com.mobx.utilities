@@ -119,6 +119,7 @@ namespace MobX.Utilities.Callbacks
 
         private static void EditorApplicationOnplayModeStateChanged(UnityEditor.PlayModeStateChange state)
         {
+            EngineState = (int) state;
             switch (state)
             {
                 case UnityEditor.PlayModeStateChange.EnteredEditMode:

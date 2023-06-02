@@ -8,6 +8,7 @@ namespace MobX.Utilities.Callbacks
     {
         #region Update Callbacks
 
+        public static int EngineState { get; private set; }
         public static bool IsQuitting { get; private set; }
 
         private const int DefaultCapacity = 16;
@@ -21,10 +22,10 @@ namespace MobX.Utilities.Callbacks
         private static readonly List<FixedUpdateDelegate> fixedUpdateDelegates = new(DefaultCapacity);
 
         private static readonly List<IOnLoad> beginPlayCallbacks = new(DefaultCapacity);
-        private static readonly List<IOnQuit> endPlayCallbacks = new(DefaultCapacity);
+        private static readonly List<IOnQuit> quitCallbacks = new(DefaultCapacity);
         private static readonly List<IOnAwake> afterLoadListener = new();
         private static readonly List<Action> beginPlayDelegates = new(DefaultCapacity);
-        private static readonly List<Action> endPlayDelegates = new(DefaultCapacity);
+        private static readonly List<Action> quitDelegates = new(DefaultCapacity);
 
         private static bool beforeSceneLoadCompleted;
         private static bool afterSceneLoadCompleted;
@@ -88,7 +89,7 @@ namespace MobX.Utilities.Callbacks
 #else
             foreach (var listener in afterLoadListener)
             {
-                listener.OnAfterLoad();
+                listener.OnAwake();
             }
 #endif
             afterSceneLoadCompleted = true;
@@ -100,7 +101,7 @@ namespace MobX.Utilities.Callbacks
             beforeSceneLoadCompleted = false;
             afterSceneLoadCompleted = false;
 #if DEBUG
-            foreach (var listener in endPlayCallbacks)
+            foreach (var listener in quitCallbacks)
             {
                 try
                 {
@@ -112,7 +113,7 @@ namespace MobX.Utilities.Callbacks
                 }
             }
 
-            foreach (var listener in endPlayDelegates)
+            foreach (var listener in quitDelegates)
             {
                 try
                 {
@@ -124,12 +125,12 @@ namespace MobX.Utilities.Callbacks
                 }
             }
 #else
-            foreach (var listener in endPlayCallbacks)
+            foreach (var listener in quitCallbacks)
             {
-                listener.OnEndPlay();
+                listener.OnQuit();
             }
 
-            foreach (var listener in endPlayDelegates)
+            foreach (var listener in quitDelegates)
             {
                 listener();
             }
