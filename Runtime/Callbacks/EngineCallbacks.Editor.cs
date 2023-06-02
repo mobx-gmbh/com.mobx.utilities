@@ -44,9 +44,9 @@ namespace MobX.Utilities.Callbacks
             }
 
             // ReSharper disable once SuspiciousTypeConversion.Global
-            if (asset is IOnAwake afterLoadCallback)
+            if (asset is IOnAfterFirstSceneLoad afterLoadCallback)
             {
-                afterLoadListener.Remove(afterLoadCallback);
+                afterFirstSceneLoadListener.Remove(afterLoadCallback);
             }
 
             return UnityEditor.AssetDeleteResult.DidNotDelete;
@@ -124,6 +124,7 @@ namespace MobX.Utilities.Callbacks
             {
                 case UnityEditor.PlayModeStateChange.EnteredEditMode:
                     OnEnterEditMode();
+                    ManualInitializationCompleted = false;
                     break;
                 case UnityEditor.PlayModeStateChange.ExitingEditMode:
                     OnExitEditMode();
@@ -135,7 +136,7 @@ namespace MobX.Utilities.Callbacks
                     break;
                 case UnityEditor.PlayModeStateChange.ExitingPlayMode:
                     OnExitPlayMode();
-
+                    ManualInitializationCompleted = false;
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(state), state, null);

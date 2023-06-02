@@ -1,4 +1,6 @@
-﻿using System.Diagnostics;
+﻿using JetBrains.Annotations;
+using System;
+using System.Diagnostics;
 using UnityEngine;
 
 namespace MobX.Utilities.Callbacks
@@ -41,19 +43,24 @@ namespace MobX.Utilities.Callbacks
                 AddFixedUpdateListener(onFixedUpdate);
             }
 
-            if (listener is IOnLoad onBeginPlay)
+            if (listener is IOnQuit onQuit)
             {
-                AddOnLoadListener(onBeginPlay);
+                AddOnQuitListener(onQuit);
             }
 
-            if (listener is IOnQuit onEndPlay)
+            if (listener is IOnBeforeFirstSceneLoad onBeforeFirstSceneLoad)
             {
-                AddOnQuitListener(onEndPlay);
+                AddBeforeFirstSceneLoadListener(onBeforeFirstSceneLoad);
             }
 
-            if (listener is IOnAwake onAfterLoad)
+            if (listener is IOnAfterFirstSceneLoad onAfterFirstSceneLoad)
             {
-                AddAfterLoadListener(onAfterLoad);
+                AddAfterFirstSceneLoadListener(onAfterFirstSceneLoad);
+            }
+
+            if (listener is IOnInitializationCompleted onInitializationCompleted)
+            {
+                AddInitializationCompletedListener(onInitializationCompleted);
             }
 
 #if UNITY_EDITOR
@@ -81,19 +88,24 @@ namespace MobX.Utilities.Callbacks
                 RemoveFixedUpdateListener(onFixedUpdate);
             }
 
-            if (listener is IOnLoad onBeginPlay)
+            if (listener is IOnQuit onQuit)
             {
-                RemoveBeginPlayListener(onBeginPlay);
+                RemoveQuitListener(onQuit);
             }
 
-            if (listener is IOnQuit onEndPlay)
+            if (listener is IOnBeforeFirstSceneLoad onBeforeFirstSceneLoad)
             {
-                RemoveQuitListener(onEndPlay);
+                RemoveBeforeFirstSceneLoadListener(onBeforeFirstSceneLoad);
             }
 
-            if (listener is IOnAwake onAfterLoad)
+            if (listener is IOnAfterFirstSceneLoad onAfterFirstSceneLoad)
             {
-                RemoveAfterLoadListener(onAfterLoad);
+                RemoveAfterFirstSceneLoadListener(onAfterFirstSceneLoad);
+            }
+
+            if (listener is IOnInitializationCompleted onInitializationCompleted)
+            {
+                RemoveInitializationCompletedListener(onInitializationCompleted);
             }
 
 #if UNITY_EDITOR
@@ -107,45 +119,106 @@ namespace MobX.Utilities.Callbacks
         #endregion
 
 
-        #region Runtime Callbacks
+        #region Before First Scene Loaded
 
-        public static void AddOnLoadListener<T>(T listener) where T : class, IOnLoad
+        [PublicAPI]
+        public static void AddBeforeFirstSceneLoadListener<T>(T listener) where T : class, IOnBeforeFirstSceneLoad
         {
             if (beforeSceneLoadCompleted)
             {
-                listener.OnBeginPlay();
+                listener.OnBeforeFirstSceneLoad();
             }
 
-            beginPlayCallbacks.AddUnique(listener, true);
+            beforeSceneLoadListener.AddUnique(listener, true);
         }
 
-        public static void RemoveBeginPlayListener<T>(T listener) where T : class, IOnLoad
+        [PublicAPI]
+        public static void RemoveBeforeFirstSceneLoadListener<T>(T listener) where T : class, IOnBeforeFirstSceneLoad
         {
-            beginPlayCallbacks.Remove(listener);
+            beforeSceneLoadListener.Remove(listener);
         }
 
-        public static void AddOnQuitListener<T>(T listener) where T : class, IOnQuit
-        {
-            quitCallbacks.AddUnique(listener, true);
-        }
+        #endregion
 
-        public static void RemoveQuitListener<T>(T listener) where T : class, IOnQuit
-        {
-            quitCallbacks.Remove(listener);
-        }
 
-        public static void AddAfterLoadListener<T>(T listener) where T : class, IOnAwake
+        #region After First Scene Loaded
+
+        [PublicAPI]
+        public static void AddAfterFirstSceneLoadListener<T>(T listener) where T : class, IOnAfterFirstSceneLoad
         {
             if (afterSceneLoadCompleted)
             {
-                listener.OnAwake();
+                listener.OnAfterFirstSceneLoad();
             }
-            afterLoadListener.AddUnique(listener, true);
+            afterFirstSceneLoadListener.AddUnique(listener, true);
         }
 
-        public static void RemoveAfterLoadListener<T>(T listener) where T : class, IOnAwake
+        [PublicAPI]
+        public static void RemoveAfterFirstSceneLoadListener<T>(T listener) where T : class, IOnAfterFirstSceneLoad
         {
-            afterLoadListener.Remove(listener);
+            afterFirstSceneLoadListener.Remove(listener);
+        }
+
+        #endregion
+
+
+        #region On Quit
+
+        [PublicAPI]
+        public static void AddOnQuitListener<T>(T listener) where T : class, IOnQuit
+        {
+            quitListener.AddUnique(listener, true);
+        }
+
+        [PublicAPI]
+        public static void RemoveQuitListener<T>(T listener) where T : class, IOnQuit
+        {
+            quitListener.Remove(listener);
+        }
+
+        #endregion
+
+
+        #region After Initialization
+
+        public static void NotifyInitializationCompleted()
+        {
+            if (ManualInitializationCompleted)
+            {
+                Debug.Log("Engine Callbacks", $"{nameof(NotifyInitializationCompleted)} has already been invoked!");
+                return;
+            }
+
+            ManualInitializationCompleted = true;
+
+            foreach (var onInitializationCompleted in initializationCompletedListener)
+            {
+                try
+                {
+                    onInitializationCompleted.OnInitializationCompleted();
+                }
+                catch (Exception exception)
+                {
+                    Debug.LogException(exception);
+                }
+            }
+        }
+
+        [PublicAPI]
+        public static void AddInitializationCompletedListener<T>(T listener) where T : class, IOnInitializationCompleted
+        {
+            if (ManualInitializationCompleted)
+            {
+                listener.OnInitializationCompleted();
+            }
+            initializationCompletedListener.AddUnique(listener, true);
+        }
+
+        [PublicAPI]
+        public static void RemoveInitializationCompletedListener<T>(T listener)
+            where T : class, IOnInitializationCompleted
+        {
+            initializationCompletedListener.Remove(listener);
         }
 
         #endregion
@@ -155,32 +228,32 @@ namespace MobX.Utilities.Callbacks
 
         public static void AddUpdateListener<T>(T listener) where T : class, IOnUpdate
         {
-            updateCallbacks.AddUnique(listener, true);
+            updateListener.AddUnique(listener, true);
         }
 
         public static void AddLateUpdateListener<T>(T listener) where T : class, IOnLateUpdate
         {
-            lateUpdateCallbacks.AddUnique(listener, true);
+            lateUpdateListener.AddUnique(listener, true);
         }
 
         public static void AddFixedUpdateListener<T>(T listener) where T : class, IOnFixedUpdate
         {
-            fixedUpdateCallbacks.AddUnique(listener, true);
+            fixedUpdateListener.AddUnique(listener, true);
         }
 
         public static void RemoveUpdateListener<T>(T listener) where T : class, IOnUpdate
         {
-            updateCallbacks.Remove(listener);
+            updateListener.Remove(listener);
         }
 
         public static void RemoveLateUpdateListener<T>(T listener) where T : class, IOnLateUpdate
         {
-            lateUpdateCallbacks.Remove(listener);
+            lateUpdateListener.Remove(listener);
         }
 
         public static void RemoveFixedUpdateListener<T>(T listener) where T : class, IOnFixedUpdate
         {
-            fixedUpdateCallbacks.Remove(listener);
+            fixedUpdateListener.Remove(listener);
         }
 
         #endregion

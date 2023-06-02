@@ -1,6 +1,4 @@
-﻿using UnityEngine;
-
-namespace MobX.Utilities.Callbacks
+﻿namespace MobX.Utilities.Callbacks
 {
     #region Editor Callbacks
 
@@ -41,21 +39,37 @@ namespace MobX.Utilities.Callbacks
 
     #region Runtime Callbacks
 
-    public interface IOnAwake : ICallbackInterface
+    /// <summary>
+    ///     Called after a manual async initialization process has been completed. Must be manually invoked by custom code.
+    /// </summary>
+    public interface IOnInitializationCompleted : ICallbackInterface
     {
-        public void OnAwake();
+        /// <summary>
+        ///     Called after a manual async initialization process has been completed. Must be manually invoked by custom code.
+        /// </summary>
+        public void OnInitializationCompleted();
     }
 
     /// <summary>
-    ///     Receive a callback when the game starts.
+    ///     Called after the first scene was loaded.
     /// </summary>
-    public interface IOnLoad : ICallbackInterface
+    public interface IOnAfterFirstSceneLoad : ICallbackInterface
     {
         /// <summary>
-        ///     Called when the game loads during <see cref="RuntimeInitializeLoadType.BeforeSceneLoad" />
-        ///     Registering a receiver during an active session will trigger an immediate callback.
+        ///     Called after the first scene was loaded.
         /// </summary>
-        public void OnBeginPlay();
+        public void OnAfterFirstSceneLoad();
+    }
+
+    /// <summary>
+    ///     Called before the first scene is loaded.
+    /// </summary>
+    public interface IOnBeforeFirstSceneLoad : ICallbackInterface
+    {
+        /// <summary>
+        ///     Called before the first scene is loaded.
+        /// </summary>
+        public void OnBeforeFirstSceneLoad();
     }
 
     /// <summary>

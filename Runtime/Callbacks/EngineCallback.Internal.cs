@@ -10,35 +10,44 @@ namespace MobX.Utilities.Callbacks
 
         public static int EngineState { get; private set; }
         public static bool IsQuitting { get; private set; }
+        public static bool ManualInitializationCompleted { get; private set; }
 
         private const int DefaultCapacity = 16;
 
-        private static readonly List<IOnUpdate> updateCallbacks = new(DefaultCapacity);
-        private static readonly List<IOnLateUpdate> lateUpdateCallbacks = new(DefaultCapacity);
-        private static readonly List<IOnFixedUpdate> fixedUpdateCallbacks = new(DefaultCapacity);
+        private static readonly List<IOnUpdate> updateListener = new(DefaultCapacity);
+        private static readonly List<IOnLateUpdate> lateUpdateListener = new(DefaultCapacity);
+        private static readonly List<IOnFixedUpdate> fixedUpdateListener = new(DefaultCapacity);
 
         private static readonly List<UpdateDelegate> updateDelegates = new(DefaultCapacity);
         private static readonly List<LateUpdateDelegate> lateUpdateDelegates = new(DefaultCapacity);
         private static readonly List<FixedUpdateDelegate> fixedUpdateDelegates = new(DefaultCapacity);
 
-        private static readonly List<IOnLoad> beginPlayCallbacks = new(DefaultCapacity);
-        private static readonly List<IOnQuit> quitCallbacks = new(DefaultCapacity);
-        private static readonly List<IOnAwake> afterLoadListener = new();
-        private static readonly List<Action> beginPlayDelegates = new(DefaultCapacity);
+        private static readonly List<IOnBeforeFirstSceneLoad> beforeSceneLoadListener = new(DefaultCapacity);
+        private static readonly List<IOnQuit> quitListener = new(DefaultCapacity);
+        private static readonly List<IOnAfterFirstSceneLoad> afterFirstSceneLoadListener = new();
+        private static readonly List<IOnInitializationCompleted> initializationCompletedListener = new();
+        private static readonly List<Action> beforeSceneLoadDelegates = new(DefaultCapacity);
         private static readonly List<Action> quitDelegates = new(DefaultCapacity);
 
         private static bool beforeSceneLoadCompleted;
         private static bool afterSceneLoadCompleted;
 
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        private static void SetupUpdateCallbacks()
+        {
+            IsQuitting = false;
+            RuntimeHook.Create(OnUpdate, OnLateUpdate, OnFixedUpdate, OnQuit);
+        }
+
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void OnBeforeSceneLoad()
         {
 #if DEBUG
-            foreach (var listener in beginPlayCallbacks)
+            foreach (var listener in beforeSceneLoadListener)
             {
                 try
                 {
-                    listener.OnBeginPlay();
+                    listener.OnBeforeFirstSceneLoad();
                 }
                 catch (Exception exception)
                 {
@@ -46,7 +55,7 @@ namespace MobX.Utilities.Callbacks
                 }
             }
 
-            foreach (var listener in beginPlayDelegates)
+            foreach (var listener in beforeSceneLoadDelegates)
             {
                 try
                 {
@@ -58,12 +67,12 @@ namespace MobX.Utilities.Callbacks
                 }
             }
 #else
-            foreach (var listener in beginPlayCallbacks)
+            foreach (var listener in beforeSceneLoadListener)
             {
-                listener.OnBeginPlay();
+                listener.OnBeforeFirstSceneLoad();
             }
 
-            foreach (var listener in beginPlayDelegates)
+            foreach (var listener in beforeSceneLoadDelegates)
             {
                 listener();
             }
@@ -75,11 +84,11 @@ namespace MobX.Utilities.Callbacks
         private static void OnAfterSceneLoad()
         {
 #if DEBUG
-            foreach (var listener in afterLoadListener)
+            foreach (var listener in afterFirstSceneLoadListener)
             {
                 try
                 {
-                    listener.OnAwake();
+                    listener.OnAfterFirstSceneLoad();
                 }
                 catch (Exception exception)
                 {
@@ -87,9 +96,9 @@ namespace MobX.Utilities.Callbacks
                 }
             }
 #else
-            foreach (var listener in afterLoadListener)
+            foreach (var listener in afterFirstSceneLoadListener)
             {
-                listener.OnAwake();
+                listener.OnAfterFirstSceneLoad();
             }
 #endif
             afterSceneLoadCompleted = true;
@@ -101,7 +110,7 @@ namespace MobX.Utilities.Callbacks
             beforeSceneLoadCompleted = false;
             afterSceneLoadCompleted = false;
 #if DEBUG
-            foreach (var listener in quitCallbacks)
+            foreach (var listener in quitListener)
             {
                 try
                 {
@@ -125,7 +134,7 @@ namespace MobX.Utilities.Callbacks
                 }
             }
 #else
-            foreach (var listener in quitCallbacks)
+            foreach (var listener in quitListener)
             {
                 listener.OnQuit();
             }
@@ -141,7 +150,7 @@ namespace MobX.Utilities.Callbacks
         {
 #if DEBUG
             var deltaTime = Time.deltaTime;
-            foreach (var listener in updateCallbacks)
+            foreach (var listener in updateListener)
             {
                 try
                 {
@@ -166,7 +175,7 @@ namespace MobX.Utilities.Callbacks
             }
 #else
             var deltaTime = Time.deltaTime;
-            foreach (var listener in updateCallbacks)
+            foreach (var listener in updateListener)
             {
                 listener.OnUpdate(deltaTime);
             }
@@ -182,7 +191,7 @@ namespace MobX.Utilities.Callbacks
         {
 #if DEBUG
             var deltaTime = Time.deltaTime;
-            foreach (var listener in lateUpdateCallbacks)
+            foreach (var listener in lateUpdateListener)
             {
                 try
                 {
@@ -207,7 +216,7 @@ namespace MobX.Utilities.Callbacks
             }
 #else
             var deltaTime = Time.deltaTime;
-            foreach (var listener in lateUpdateCallbacks)
+            foreach (var listener in lateUpdateListener)
             {
                 listener.OnLateUpdate(deltaTime);
             }
@@ -223,7 +232,7 @@ namespace MobX.Utilities.Callbacks
         {
 #if DEBUG
             var deltaTime = Time.fixedDeltaTime;
-            foreach (var listener in fixedUpdateCallbacks)
+            foreach (var listener in fixedUpdateListener)
             {
                 try
                 {
@@ -248,7 +257,7 @@ namespace MobX.Utilities.Callbacks
             }
 #else
             var deltaTime = Time.fixedDeltaTime;
-            foreach (var listener in fixedUpdateCallbacks)
+            foreach (var listener in fixedUpdateListener)
             {
                 listener.OnFixedUpdate(deltaTime);
             }
@@ -258,13 +267,6 @@ namespace MobX.Utilities.Callbacks
                 listener(deltaTime);
             }
 #endif
-        }
-
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-        private static void SetupUpdateCallbacks()
-        {
-            IsQuitting = false;
-            RuntimeHook.Create(OnUpdate, OnLateUpdate, OnFixedUpdate, OnQuit);
         }
 
         #endregion

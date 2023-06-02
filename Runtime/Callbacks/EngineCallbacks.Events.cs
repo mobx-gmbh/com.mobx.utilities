@@ -8,8 +8,8 @@ namespace MobX.Utilities.Callbacks
 
         public static event Action BeginPlay
         {
-            add => beginPlayDelegates.AddNullChecked(value);
-            remove => beginPlayDelegates.Remove(value);
+            add => beforeSceneLoadDelegates.AddNullChecked(value);
+            remove => beforeSceneLoadDelegates.Remove(value);
         }
 
         public static event Action EndPlay
