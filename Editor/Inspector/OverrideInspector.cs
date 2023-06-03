@@ -109,7 +109,7 @@ namespace MobX.Utilities.Editor.Inspector
             }
 
             _showFilterField =
-                targetType.TryGetCustomAttribute(out SearchField searchAttribute)
+                targetType.TryGetCustomAttribute(out SearchField searchAttribute, true)
                     ? searchAttribute.Enabled
                     : count > 8;
         }

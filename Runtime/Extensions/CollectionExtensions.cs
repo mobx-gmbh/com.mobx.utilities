@@ -31,25 +31,25 @@ namespace MobX.Utilities
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsNullOrEmpty<T>(this T[] array)
         {
-            return array is not { Length: > 0 };
+            return array is not {Length: > 0};
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsNotNullOrEmpty<T>(this T[] array)
         {
-            return array is { Length: > 0 };
+            return array is {Length: > 0};
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsNullOrEmpty<T>(this IList<T> list)
         {
-            return list is not { Count: > 0 };
+            return list is not {Count: > 0};
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsNotNullOrEmpty<T>(this IList<T> list)
         {
-            return list is { Count: > 0 };
+            return list is {Count: > 0};
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -319,7 +319,7 @@ namespace MobX.Utilities
         ///     Returns true if the enumeration contains no elements.
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool None<T>(this IEnumerable<T> enumerable)
+        public static bool IsEmpty<T>(this IEnumerable<T> enumerable)
         {
             return !enumerable.Any();
         }
@@ -398,6 +398,12 @@ namespace MobX.Utilities
                 dictionary.Add(key, value);
             }
             return value;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void ReleaseToPool<T>(this List<T> list)
+        {
+            ListPool<T>.Release(list);
         }
     }
 }

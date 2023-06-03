@@ -1,9 +1,10 @@
+using System;
 using System.Diagnostics;
 using UnityEngine;
 
 namespace MobX.Utilities.Callbacks
 {
-    public abstract class RuntimeAsset : ScriptableObject
+    public abstract class RuntimeAsset : ScriptableObject, IDisposable
     {
         protected RuntimeAsset()
         {
@@ -16,6 +17,11 @@ namespace MobX.Utilities.Callbacks
 #if UNITY_EDITOR
             UnityEditor.EditorUtility.SetDirty(this);
 #endif
+        }
+
+        public virtual void Dispose()
+        {
+            EngineCallbacks.RemoveCallbacks(this);
         }
     }
 }

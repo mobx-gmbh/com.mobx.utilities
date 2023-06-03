@@ -110,10 +110,11 @@ namespace MobX.Utilities.Callbacks
             beforeSceneLoadCompleted = false;
             afterSceneLoadCompleted = false;
 #if DEBUG
-            foreach (var listener in quitListener)
+            for (var index = quitListener.Count - 1; index >= 0; index--)
             {
                 try
                 {
+                    var listener = quitListener[index];
                     listener.OnQuit();
                 }
                 catch (Exception exception)
@@ -122,10 +123,11 @@ namespace MobX.Utilities.Callbacks
                 }
             }
 
-            foreach (var listener in quitDelegates)
+            for (var index = quitDelegates.Count - 1; index >= 0; index--)
             {
                 try
                 {
+                    var listener = quitDelegates[index];
                     listener();
                 }
                 catch (Exception exception)
@@ -134,13 +136,15 @@ namespace MobX.Utilities.Callbacks
                 }
             }
 #else
-            foreach (var listener in quitListener)
+            for (var index = quitListener.Count - 1; index >= 0; index--)
             {
+                var listener = quitListener[index];
                 listener.OnQuit();
             }
 
-            foreach (var listener in quitDelegates)
+            for (var index = quitDelegates.Count - 1; index >= 0; index--)
             {
+                var listener = quitDelegates[index];
                 listener();
             }
 #endif
@@ -150,10 +154,11 @@ namespace MobX.Utilities.Callbacks
         {
 #if DEBUG
             var deltaTime = Time.deltaTime;
-            foreach (var listener in updateListener)
+            for (var index = updateListener.Count - 1; index >= 0; index--)
             {
                 try
                 {
+                    var listener = updateListener[index];
                     listener.OnUpdate(deltaTime);
                 }
                 catch (Exception exception)
@@ -162,10 +167,11 @@ namespace MobX.Utilities.Callbacks
                 }
             }
 
-            foreach (var listener in updateDelegates)
+            for (var index = updateDelegates.Count - 1; index >= 0; index--)
             {
                 try
                 {
+                    var listener = updateDelegates[index];
                     listener(deltaTime);
                 }
                 catch (Exception exception)
@@ -175,13 +181,15 @@ namespace MobX.Utilities.Callbacks
             }
 #else
             var deltaTime = Time.deltaTime;
-            foreach (var listener in updateListener)
+            for (var index = updateListener.Count - 1; index >= 0; index--)
             {
+                var listener = updateListener[index];
                 listener.OnUpdate(deltaTime);
             }
 
-            foreach (var listener in updateDelegates)
+            for (var index = updateDelegates.Count - 1; index >= 0; index--)
             {
+                var listener = updateDelegates[index];
                 listener(deltaTime);
             }
 #endif
@@ -191,10 +199,11 @@ namespace MobX.Utilities.Callbacks
         {
 #if DEBUG
             var deltaTime = Time.deltaTime;
-            foreach (var listener in lateUpdateListener)
+            for (var index = lateUpdateListener.Count - 1; index >= 0; index--)
             {
                 try
                 {
+                    var listener = lateUpdateListener[index];
                     listener.OnLateUpdate(deltaTime);
                 }
                 catch (Exception exception)
@@ -203,10 +212,11 @@ namespace MobX.Utilities.Callbacks
                 }
             }
 
-            foreach (var listener in lateUpdateDelegates)
+            for (var index = lateUpdateDelegates.Count - 1; index >= 0; index--)
             {
                 try
                 {
+                    var listener = lateUpdateDelegates[index];
                     listener(deltaTime);
                 }
                 catch (Exception exception)
@@ -216,13 +226,15 @@ namespace MobX.Utilities.Callbacks
             }
 #else
             var deltaTime = Time.deltaTime;
-            foreach (var listener in lateUpdateListener)
+            for (var index = lateUpdateListener.Count - 1; index >= 0; index--)
             {
+                var listener = lateUpdateListener[index];
                 listener.OnLateUpdate(deltaTime);
             }
 
-            foreach (var listener in lateUpdateDelegates)
+            for (var index = lateUpdateDelegates.Count - 1; index >= 0; index--)
             {
+                var listener = lateUpdateDelegates[index];
                 listener(deltaTime);
             }
 #endif
@@ -232,10 +244,11 @@ namespace MobX.Utilities.Callbacks
         {
 #if DEBUG
             var deltaTime = Time.fixedDeltaTime;
-            foreach (var listener in fixedUpdateListener)
+            for (var index = 0; index < fixedUpdateListener.Count; index++)
             {
                 try
                 {
+                    var listener = fixedUpdateListener[index];
                     listener.OnFixedUpdate(deltaTime);
                 }
                 catch (Exception exception)
@@ -244,10 +257,11 @@ namespace MobX.Utilities.Callbacks
                 }
             }
 
-            foreach (var listener in fixedUpdateDelegates)
+            for (var index = 0; index < fixedUpdateDelegates.Count; index++)
             {
                 try
                 {
+                    var listener = fixedUpdateDelegates[index];
                     listener(deltaTime);
                 }
                 catch (Exception exception)
@@ -257,13 +271,15 @@ namespace MobX.Utilities.Callbacks
             }
 #else
             var deltaTime = Time.fixedDeltaTime;
-            foreach (var listener in fixedUpdateListener)
+            for (var index = fixedUpdateListener.Count - 1; index >= 0; index--)
             {
+                var listener = fixedUpdateListener[index];
                 listener.OnFixedUpdate(deltaTime);
             }
 
-            foreach (var listener in fixedUpdateDelegates)
+            for (var index = fixedUpdateDelegates.Count - 1; index >= 0; index--)
             {
+                var listener = fixedUpdateDelegates[index];
                 listener(deltaTime);
             }
 #endif

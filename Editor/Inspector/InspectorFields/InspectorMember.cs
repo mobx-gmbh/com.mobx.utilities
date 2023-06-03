@@ -94,6 +94,23 @@ namespace MobX.Utilities.Editor.Inspector.InspectorFields
 
                         break;
 
+                    case DrawLineAfterAttribute drawLineAttribute:
+                        if (drawLineAttribute.SpaceBefore > -1)
+                        {
+                            var space = drawLineAttribute.SpaceBefore;
+                            _postDraw += () => GUIHelper.Space(space);
+                        }
+
+                        _postDraw += GUIHelper.DrawLine;
+
+                        if (drawLineAttribute.SpaceAfter > -1)
+                        {
+                            var space = drawLineAttribute.SpaceBefore;
+                            _postDraw += () => GUIHelper.Space(space);
+                        }
+
+                        break;
+
                     case AnnotationAttribute annotationAttribute:
                         _preDraw += () => UnityEditor.EditorGUILayout.HelpBox(annotationAttribute.Annotation,
                             (UnityEditor.MessageType) annotationAttribute.MessageType);

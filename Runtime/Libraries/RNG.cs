@@ -53,6 +53,10 @@ namespace MobX.Utilities
             {
                 throw new ArgumentNullException(nameof(source));
             }
+            if (source.Count == 1)
+            {
+                return source[0];
+            }
 
             var randomIndex = Range(0, source.Count);
             return source[randomIndex];

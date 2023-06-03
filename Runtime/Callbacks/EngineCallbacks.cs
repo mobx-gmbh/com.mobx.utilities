@@ -28,6 +28,11 @@ namespace MobX.Utilities.Callbacks
 
         public static void AddCallbacks<T>(T listener) where T : class
         {
+            if (listener is not ICallbackInterface)
+            {
+                return;
+            }
+
             if (listener is IOnUpdate onUpdate)
             {
                 AddUpdateListener(onUpdate);
@@ -73,6 +78,11 @@ namespace MobX.Utilities.Callbacks
 
         public static void RemoveCallbacks<T>(T listener) where T : class
         {
+            if (listener is not ICallbackInterface)
+            {
+                return;
+            }
+
             if (listener is IOnUpdate onUpdate)
             {
                 RemoveUpdateListener(onUpdate);

@@ -44,9 +44,9 @@ namespace MobX.Utilities.Editor.Inspector
                 BindingFlags.Public |
                 BindingFlags.NonPublic;
 
-            FieldInfo[] fields = inspector.GetType().GetFields(Flags);
+            var fields = inspector.GetType().GetFields(Flags);
 
-            foreach (FieldInfo fieldInfo in fields)
+            foreach (var fieldInfo in fields)
             {
                 if (fieldInfo.FieldType == typeof(UnityEditor.SerializedProperty))
                 {

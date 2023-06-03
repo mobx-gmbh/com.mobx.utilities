@@ -68,12 +68,8 @@ namespace MobX.Utilities.Editor.Inspector.InspectorFields
 
             if (_textArea)
             {
-                UnityEditor.EditorGUILayout.BeginHorizontal();
                 UnityEditor.EditorGUILayout.LabelField(Label, GUILayout.Width(GUIHelper.GetLabelWidth()));
-                GUIHelper.BeginIndentOverride(0);
                 _serializedProperty.stringValue = UnityEditor.EditorGUILayout.TextArea(_serializedProperty.stringValue);
-                GUIHelper.EndIndentOverride();
-                UnityEditor.EditorGUILayout.EndHorizontal();
                 GUI.enabled = enabled;
                 _serializedObject.ApplyModifiedProperties();
                 return;
