@@ -6,7 +6,7 @@ namespace MobX.Utilities.Inspector
 {
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
     [Conditional("UNITY_EDITOR")]
-    public class ReadonlyAttribute : PropertyAttribute
+    public class ReadonlyInspectorAttribute : PropertyAttribute
     {
     }
 }

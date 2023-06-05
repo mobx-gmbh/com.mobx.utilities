@@ -147,11 +147,19 @@ namespace MobX.Utilities.Callbacks
         {
             for (var i = 0; i < exitPlayModeListener.Count; i++)
             {
+                if (exitPlayModeListener[i] == null)
+                {
+                    continue;
+                }
                 exitPlayModeListener[i].OnExitPlayMode();
             }
 
             for (var i = 0; i < exitPlayModeDelegate.Count; i++)
             {
+                if (exitPlayModeDelegate[i] == null)
+                {
+                    continue;
+                }
                 exitPlayModeDelegate[i]();
             }
         }
@@ -160,11 +168,19 @@ namespace MobX.Utilities.Callbacks
         {
             for (var i = 0; i < enterPlayModeListener.Count; i++)
             {
+                if (enterPlayModeListener[i] == null)
+                {
+                    continue;
+                }
                 enterPlayModeListener[i].OnEnterPlayMode();
             }
 
             for (var i = 0; i < enterPlayModeDelegate.Count; i++)
             {
+                if (enterPlayModeDelegate[i] == null)
+                {
+                    continue;
+                }
                 enterPlayModeDelegate[i]();
             }
         }
@@ -173,11 +189,19 @@ namespace MobX.Utilities.Callbacks
         {
             for (var i = 0; i < exitEditModeListener.Count; i++)
             {
+                if (exitEditModeListener[i] == null)
+                {
+                    continue;
+                }
                 exitEditModeListener[i].OnExitEditMode();
             }
 
             for (var i = 0; i < exitEditModeDelegate.Count; i++)
             {
+                if (exitEditModeDelegate[i] == null)
+                {
+                    continue;
+                }
                 exitEditModeDelegate[i]();
             }
         }
@@ -186,11 +210,19 @@ namespace MobX.Utilities.Callbacks
         {
             for (var i = 0; i < enterEditModeListener.Count; i++)
             {
+                if (enterEditModeListener[i] == null)
+                {
+                    continue;
+                }
                 enterEditModeListener[i].OnEnterEditMode();
             }
 
             for (var i = 0; i < enterEditModeDelegate.Count; i++)
             {
+                if (enterEditModeDelegate[i] == null)
+                {
+                    continue;
+                }
                 enterEditModeDelegate[i]();
             }
         }

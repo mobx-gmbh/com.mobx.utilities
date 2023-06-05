@@ -24,24 +24,7 @@ namespace MobX.Utilities.Singleton
                     var path = UnityEditor.AssetDatabase.GUIDToAssetPath(guid);
                     var asset = UnityEditor.AssetDatabase.LoadAssetAtPath<T>(path);
 
-                    if (asset == null && typeof(T).TryGetCustomAttribute<FormerTypeName>(out var formerTypeName))
-                    {
-                        guid = UnityEditor.EditorPrefs.GetString(formerTypeName.TypeName);
-                        path = UnityEditor.AssetDatabase.GUIDToAssetPath(guid);
-                        asset = UnityEditor.AssetDatabase.LoadAssetAtPath<T>(path);
-
-                        if (asset != null)
-                        {
-                            UnityEditor.AssetDatabase.RenameAsset(path, $"{typeof(T).Name}.{Environment.UserName.Trim()}");
-                            UnityEditor.AssetDatabase.Refresh();
-                            UnityEditor.EditorUtility.SetDirty(asset);
-                        }
-                    }
-
-                    if (asset != null)
-                    {
-                        Local = asset;
-                    }
+                    Local = asset;
                 }
 
                 if (local == null)

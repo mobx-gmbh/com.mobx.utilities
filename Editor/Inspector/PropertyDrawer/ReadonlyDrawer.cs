@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace MobX.Utilities.Editor.Inspector.PropertyDrawer
 {
-    [UnityEditor.CustomPropertyDrawer(typeof(ReadonlyAttribute), true)]
+    [UnityEditor.CustomPropertyDrawer(typeof(ReadonlyInspectorAttribute), true)]
     public class ReadonlyDrawer : UnityEditor.PropertyDrawer
     {
         public override void OnGUI(Rect position, UnityEditor.SerializedProperty property, GUIContent label)

@@ -27,7 +27,7 @@ namespace MobX.Utilities.Editor.Inspector.InspectorFields
             _hideLabel = memberInfo.HasAttribute<HideLabelAttribute>();
             _textArea = memberInfo.HasAttribute<TextAreaAttribute>();
             _runtimeReadonly = memberInfo.HasAttribute<RuntimeReadonlyAttribute>();
-            _readonly = memberInfo.HasAttribute<ReadonlyAttribute>();
+            _readonly = memberInfo.HasAttribute<ReadonlyInspectorAttribute>();
 
             var label = memberInfo.TryGetCustomAttribute(out LabelAttribute labelAttribute)
                 ? labelAttribute.Label

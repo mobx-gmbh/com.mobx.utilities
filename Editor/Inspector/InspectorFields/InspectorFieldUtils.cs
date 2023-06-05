@@ -14,7 +14,7 @@ namespace MobX.Utilities.Editor.Inspector.InspectorFields
             var list = new List<InspectorMember>();
 
             const BindingFlags Flags = BindingFlags.Instance | BindingFlags.NonPublic |
-                BindingFlags.Public | BindingFlags.DeclaredOnly | BindingFlags.Static;
+                                       BindingFlags.Public | BindingFlags.DeclaredOnly | BindingFlags.Static;
 
             var fieldInfos = type.GetFieldsIncludeBaseTypes(Flags);
             for (var i = 0; i < fieldInfos.Length; i++)
@@ -64,13 +64,14 @@ namespace MobX.Utilities.Editor.Inspector.InspectorFields
 
         #region Properties
 
-        private static void HandlePropertyInfo(UnityEditor.SerializedObject target, PropertyInfo propertyInfo, ref List<InspectorMember> list)
+        private static void HandlePropertyInfo(UnityEditor.SerializedObject target, PropertyInfo propertyInfo,
+            ref List<InspectorMember> list)
         {
             try
             {
                 var hasSetAccess = propertyInfo.SetMethod != null;
 
-                if (propertyInfo.HasAttribute<ReadonlyAttribute>())
+                if (propertyInfo.HasAttribute<ReadonlyInspectorAttribute>())
                 {
                     list.Add(new ReadonlyPropertyInspector(propertyInfo, target.targetObject));
                     return;
@@ -119,7 +120,8 @@ namespace MobX.Utilities.Editor.Inspector.InspectorFields
 
         #region Fields
 
-        private static void HandleFieldInfo(UnityEditor.SerializedObject target, FieldInfo fieldInfo, ref List<InspectorMember> list)
+        private static void HandleFieldInfo(UnityEditor.SerializedObject target, FieldInfo fieldInfo,
+            ref List<InspectorMember> list)
         {
             try
             {
@@ -146,7 +148,8 @@ namespace MobX.Utilities.Editor.Inspector.InspectorFields
             }
         }
 
-        private static void HandleSerializedField(UnityEditor.SerializedObject target, FieldInfo fieldInfo, ref List<InspectorMember> list)
+        private static void HandleSerializedField(UnityEditor.SerializedObject target, FieldInfo fieldInfo,
+            ref List<InspectorMember> list)
         {
             var serializedProperty = target.FindProperty(fieldInfo.Name);
             if (serializedProperty.IsNull())
@@ -157,13 +160,14 @@ namespace MobX.Utilities.Editor.Inspector.InspectorFields
             list.Add(new SerializedPropertyInspectorMember(serializedProperty, fieldInfo, target.targetObject));
         }
 
-        private static void HandleNonSerializedField(UnityEditor.SerializedObject target, FieldInfo fieldInfo, ref List<InspectorMember> list)
+        private static void HandleNonSerializedField(UnityEditor.SerializedObject target, FieldInfo fieldInfo,
+            ref List<InspectorMember> list)
         {
             var showInInspector = fieldInfo.HasAttribute<ShowInInspectorAttribute>();
-            var isReadonly = fieldInfo.HasAttribute<ReadonlyAttribute>();
+            var isReadonly = fieldInfo.HasAttribute<ReadonlyInspectorAttribute>();
             var conditionalDraw = fieldInfo.HasAttribute<ConditionalDrawerAttribute>();
             var isCollection = fieldInfo.FieldType.IsDictionary() || fieldInfo.FieldType.IsHashSet() ||
-                fieldInfo.FieldType.IsStack() || fieldInfo.FieldType.IsQueue();
+                               fieldInfo.FieldType.IsStack() || fieldInfo.FieldType.IsQueue();
 
             if (!showInInspector && !isReadonly && !conditionalDraw)
             {

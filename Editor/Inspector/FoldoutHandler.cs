@@ -37,10 +37,8 @@ namespace MobX.Utilities.Editor.Inspector
         public static FoldoutStyle Style { get; set; } = FoldoutStyle.Default;
 
         public bool DefaultState { get; set; } = true;
-        private Dictionary<string, bool> Data
-        {
-            get;
-        }
+        private Dictionary<string, bool> Data { get; }
+
         public Dictionary<string, bool> DefaultFoldoutStates { get; } = new();
 
         /*
@@ -115,7 +113,9 @@ namespace MobX.Utilities.Editor.Inspector
 
                 if (!Data.TryGetValue(data.Title, out var currentValue))
                 {
-                    var defaultState = DefaultFoldoutStates.TryGetValue(data.Title, out var state) ? state : DefaultState;
+                    var defaultState = DefaultFoldoutStates.TryGetValue(data.Title, out var state)
+                        ? state
+                        : DefaultState;
                     Data.Add(data.Title, currentValue = defaultState);
                 }
 
@@ -155,7 +155,10 @@ namespace MobX.Utilities.Editor.Inspector
 
                 if (!Data.TryGetValue(title, out var currentValue))
                 {
-                    Data.Add(title, currentValue = !DefaultFoldoutStates.TryGetValue(title, out var state) || state);
+                    var defaultState = DefaultFoldoutStates.TryGetValue(title, out var state)
+                        ? state
+                        : DefaultState;
+                    Data.Add(title, currentValue = defaultState);
                 }
 
                 if (ForceFoldout)
@@ -192,7 +195,10 @@ namespace MobX.Utilities.Editor.Inspector
 
                 if (!Data.TryGetValue(title, out var currentValue))
                 {
-                    Data.Add(title, currentValue = !DefaultFoldoutStates.TryGetValue(title, out var state) || state);
+                    var defaultState = DefaultFoldoutStates.TryGetValue(title, out var state)
+                        ? state
+                        : DefaultState;
+                    Data.Add(title, currentValue = defaultState);
                 }
 
                 if (ForceFoldout)
@@ -241,7 +247,7 @@ namespace MobX.Utilities.Editor.Inspector
 
         private static void SetAll(bool open, FoldoutHandler handler)
         {
-            foreach (FoldoutHandler foldoutHandler in activeHandlers)
+            foreach (var foldoutHandler in activeHandlers)
             {
                 var keys = foldoutHandler.Data.Keys.Select(key => key).ToArray();
 
@@ -264,7 +270,7 @@ namespace MobX.Utilities.Editor.Inspector
         public bool Foldout(bool value, string label, string tooltip = "", Color? color = null)
         {
             UnityEditor.EditorGUILayout.LabelField("");
-            Rect lastRect = GetLastRect();
+            var lastRect = GetLastRect();
             var widthRect = new Rect(0, lastRect.y, GetViewWidth(), lastRect.height + 2);
             var foldoutRect = new Rect(20, lastRect.y + 1, GetViewWidth() - 10, lastRect.height);
             UnityEditor.EditorGUI.DrawRect(new Rect(0, lastRect.y, GetViewWidth(), 1), new Color(0f, 0f, 0f, 0.3f));
@@ -296,7 +302,7 @@ namespace MobX.Utilities.Editor.Inspector
         private bool LineFoldout(bool value, string label, string tooltip = "", Color? color = null)
         {
             UnityEditor.EditorGUILayout.LabelField("");
-            Rect lastRect = GetLastRect();
+            var lastRect = GetLastRect();
             var foldoutRect = new Rect(20, lastRect.y + 1, GetViewWidth() - 10, lastRect.height);
             UnityEditor.EditorGUI.DrawRect(new Rect(0, lastRect.y, GetViewWidth(), 1), new Color(0f, 0f, 0f, 0.3f));
             EmptyContent.text = label;
@@ -313,7 +319,7 @@ namespace MobX.Utilities.Editor.Inspector
         private bool DarkFoldout(bool value, string label, string tooltip = "")
         {
             UnityEditor.EditorGUILayout.LabelField("");
-            Rect lastRect = GetLastRect();
+            var lastRect = GetLastRect();
             var widthRect = new Rect(0, lastRect.y, GetViewWidth(), lastRect.height + 2);
             var foldoutRect = new Rect(20, lastRect.y + 1, GetViewWidth() - 10, lastRect.height);
             UnityEditor.EditorGUI.DrawRect(new Rect(0, lastRect.y, GetViewWidth(), 1), new Color(0f, 0f, 0f, 0.4f));
@@ -332,7 +338,7 @@ namespace MobX.Utilities.Editor.Inspector
         private bool TitleFoldout(bool value, string label, string tooltip = "")
         {
             UnityEditor.EditorGUILayout.LabelField("");
-            Rect lastRect = GetLastRect();
+            var lastRect = GetLastRect();
             var widthRect = new Rect(0, lastRect.y, GetViewWidth(), lastRect.height + 6);
             var foldoutRect = new Rect(20, lastRect.y - 2, GetViewWidth() - 10, lastRect.height + 8);
             UnityEditor.EditorGUI.DrawRect(new Rect(0, lastRect.y, GetViewWidth(), 1), new Color(0f, 0f, 0f, 0.4f));
@@ -366,9 +372,11 @@ namespace MobX.Utilities.Editor.Inspector
             return UnityEditor.EditorGUIUtility.currentViewWidth;
         }
 
-        private static GUIStyle BoldFoldoutStyle => boldFoldoutStyle ??= Create("Foldout", fontStyle: FontStyle.Normal, fontSize: 14);
+        private static GUIStyle BoldFoldoutStyle =>
+            boldFoldoutStyle ??= Create("Foldout", fontStyle: FontStyle.Normal, fontSize: 14);
 
-        private static GUIStyle Create(GUIStyle other, int? fontSize = null, FontStyle? fontStyle = null, bool? richText = null)
+        private static GUIStyle Create(GUIStyle other, int? fontSize = null, FontStyle? fontStyle = null,
+            bool? richText = null)
         {
             return new GUIStyle(other)
             {
@@ -389,20 +397,21 @@ namespace MobX.Utilities.Editor.Inspector
 
         public static void BeginStyleOverride(FoldoutStyle style)
         {
-            FoldoutStyle current = Style;
+            var current = Style;
             styleOverrides.Push(current);
             Style = style;
         }
 
         public static void EndStyleOverride()
         {
-            if (styleOverrides.TryPop(out FoldoutStyle cached))
+            if (styleOverrides.TryPop(out var cached))
             {
                 Style = cached;
             }
             else
             {
-                UnityEngine.Debug.LogError($"Mismatched calls of {nameof(BeginStyleOverride)} & {nameof(EndStyleOverride)}!");
+                UnityEngine.Debug.LogError(
+                    $"Mismatched calls of {nameof(BeginStyleOverride)} & {nameof(EndStyleOverride)}!");
             }
         }
 
