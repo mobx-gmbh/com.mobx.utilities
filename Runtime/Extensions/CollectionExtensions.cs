@@ -31,25 +31,25 @@ namespace MobX.Utilities
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsNullOrEmpty<T>(this T[] array)
         {
-            return array is not {Length: > 0};
+            return array is not { Length: > 0 };
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsNotNullOrEmpty<T>(this T[] array)
         {
-            return array is {Length: > 0};
+            return array is { Length: > 0 };
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsNullOrEmpty<T>(this IList<T> list)
         {
-            return list is not {Count: > 0};
+            return list is not { Count: > 0 };
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsNotNullOrEmpty<T>(this IList<T> list)
         {
-            return list is {Count: > 0};
+            return list is { Count: > 0 };
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -102,6 +102,21 @@ namespace MobX.Utilities
                     list.RemoveAt(i);
                 }
             }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static List<T> WithoutNullItems<T>(this IList<T> list)
+        {
+            var result = new List<T>();
+            for (var i = list.Count - 1; i >= 0; i--)
+            {
+                if (list[i].IsNull())
+                {
+                    continue;
+                }
+                result.Add(list[i]);
+            }
+            return result;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
