@@ -4,34 +4,42 @@
 
     public interface IOnEnterPlayMode : ICallbackInterface
     {
+#if UNITY_EDITOR
         /// <summary>
         ///     Called in the editor when play mode is entered.
         /// </summary>
         void OnEnterPlayMode();
+#endif
     }
 
     public interface IOnExitPlayMode : ICallbackInterface
     {
+#if UNITY_EDITOR
         /// <summary>
         ///     Called in the editor when play mode is exited.
         /// </summary>
         void OnExitPlayMode();
+#endif
     }
 
     public interface IOnEnterEditMode : ICallbackInterface
     {
+#if UNITY_EDITOR
         /// <summary>
         ///     Called in the editor when edit mode is entered.
         /// </summary>
         void OnEnterEditMode();
+#endif
     }
 
     public interface IOnExitEditMode : ICallbackInterface
     {
+#if UNITY_EDITOR
         /// <summary>
         ///     Called in the editor when edit mode is exited.
         /// </summary>
         void OnExitEditMode();
+#endif
     }
 
     #endregion
