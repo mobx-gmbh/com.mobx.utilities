@@ -32,7 +32,7 @@ namespace MobX.Utilities.Callbacks
         private static bool beforeSceneLoadCompleted;
         private static bool afterSceneLoadCompleted;
 
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void SetupUpdateCallbacks()
         {
             IsQuitting = false;
