@@ -263,7 +263,7 @@ namespace MobX.Utilities.Editor.Helper
 
             if (type == typeof(ulong))
             {
-                return value => UnityEditor.EditorGUILayout.LongField(label, (long) (ulong) value, options);
+                return value => UnityEditor.EditorGUILayout.LongField(label, long.Parse(value.ToString()), options);
             }
 
             if (type == typeof(Vector2))

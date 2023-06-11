@@ -12,8 +12,6 @@ namespace MobX.Utilities.Types
     [Serializable]
     public struct Optional<T>
     {
-        // Configuration
-
         [SerializeField] private bool enabled;
         [SerializeField] private T value;
 

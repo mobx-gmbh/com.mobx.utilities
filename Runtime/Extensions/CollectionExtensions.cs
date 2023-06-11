@@ -31,25 +31,25 @@ namespace MobX.Utilities
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsNullOrEmpty<T>(this T[] array)
         {
-            return array is not { Length: > 0 };
+            return array is not {Length: > 0};
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsNotNullOrEmpty<T>(this T[] array)
         {
-            return array is { Length: > 0 };
+            return array is {Length: > 0};
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsNullOrEmpty<T>(this IList<T> list)
         {
-            return list is not { Count: > 0 };
+            return list is not {Count: > 0};
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsNotNullOrEmpty<T>(this IList<T> list)
         {
-            return list is { Count: > 0 };
+            return list is {Count: > 0};
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -419,6 +419,19 @@ namespace MobX.Utilities
         public static void ReleaseToPool<T>(this List<T> list)
         {
             ListPool<T>.Release(list);
+        }
+
+        public static bool TryGetValueAs<TKey, TValue, TResult>(this IDictionary<TKey, TValue> dictionary, TKey key,
+            out TResult result)
+        {
+            if (dictionary.TryGetValue(key, out var value) && value is TResult casted)
+            {
+                result = casted;
+                return true;
+            }
+
+            result = default(TResult);
+            return false;
         }
     }
 }

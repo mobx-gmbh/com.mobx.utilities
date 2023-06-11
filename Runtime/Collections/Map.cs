@@ -41,9 +41,9 @@ namespace MobX.Utilities.Collections
         public int IndexOf(TKey key)
         {
             var index = 0;
-            EqualityComparer<TKey> comparer = EqualityComparer<TKey>.Default;
+            var comparer = EqualityComparer<TKey>.Default;
 
-            foreach (TKey keyEntry in Keys)
+            foreach (var keyEntry in Keys)
             {
                 if (comparer.Equals(key, keyEntry))
                 {
@@ -73,7 +73,7 @@ namespace MobX.Utilities.Collections
         {
             keys.Clear();
             values.Clear();
-            foreach ((TKey key, TValue value) in this)
+            foreach (var (key, value) in this)
             {
                 keys.Add(key);
                 values.Add(value);
@@ -83,7 +83,8 @@ namespace MobX.Utilities.Collections
         public void OnAfterDeserialize()
         {
             Clear();
-            Assert.IsTrue(keys.Count == values.Count, $"there are {keys.Count.ToString()} keys and {values.Count.ToString()} values after deserialization. Make sure that both key and value types are serializable.");
+            Assert.IsTrue(keys.Count == values.Count,
+                $"there are {keys.Count.ToString()} keys and {values.Count.ToString()} values after deserialization. Make sure that both key and value types are serializable.");
 
             for (var i = 0; i < keys.Count; i++)
             {

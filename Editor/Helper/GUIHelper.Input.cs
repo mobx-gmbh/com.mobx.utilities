@@ -27,9 +27,9 @@ namespace MobX.Utilities.Editor.Helper
             return result;
         }
 
-        private async static void ResetDoubleClickCache()
+        private static async void ResetDoubleClickCache()
         {
-            await Task.Delay(220);
+            await Task.Delay(160);
             lastClicked = null;
         }
     }
