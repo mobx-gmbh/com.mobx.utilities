@@ -49,17 +49,17 @@ namespace MobX.Utilities
             array[originalToLength] = item;
         }
 
-        public static T[] Cast<U, T>([NotNull] U[] array)
+        public static TTo[] Cast<TFrom, TTo>([NotNull] TFrom[] array)
         {
             if (array == null)
             {
                 throw new ArgumentNullException(nameof(array));
             }
 
-            var result = new T[array.Length];
+            var result = new TTo[array.Length];
             for (var i = 0; i < array.Length; i++)
             {
-                result[i] = array[i].Cast<T>();
+                result[i] = array[i].Cast<TTo>();
             }
 
             return result;
