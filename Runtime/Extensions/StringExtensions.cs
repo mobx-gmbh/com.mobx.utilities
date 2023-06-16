@@ -171,23 +171,29 @@ namespace MobX.Utilities
 
         public static string Dehumanize(this string value)
         {
-            // Trim leading and trailing white space
             value = value.Trim();
 
-            // Split string by spaces
-            var words = value.Split();
+            var result = new StringBuilder();
+            var shouldCapitalizeNext = true;
 
-            // Capitalize each word only if it starts with a lowercase letter
-            for (var i = 0; i < words.Length; i++)
+            foreach (var character in value)
             {
-                if (!string.IsNullOrEmpty(words[i]) && char.IsLower(words[i][0]))
+                if (character is '_' or ' ')
                 {
-                    words[i] = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(words[i]);
+                    shouldCapitalizeNext = true;
+                }
+                else if (shouldCapitalizeNext)
+                {
+                    result.Append(char.ToUpper(character, CultureInfo.CurrentCulture));
+                    shouldCapitalizeNext = false;
+                }
+                else
+                {
+                    result.Append(character);
                 }
             }
 
-            // Join words into a single string without spaces
-            return string.Concat(words);
+            return result.ToString().Replace(" ", "");
         }
 
         public static string Humanize(this string target, string[] prefixes = null)
@@ -207,7 +213,7 @@ namespace MobX.Utilities
 
             target = target.Replace('_', ' ');
 
-            List<char> chars = ListPool<char>.Get();
+            var chars = ListPool<char>.Get();
 
             for (var i = 0; i < target.Length; i++)
             {
@@ -257,7 +263,7 @@ namespace MobX.Utilities
 
         public static string ReduceWhitespace(this string value)
         {
-            StringBuilder sb = ConcurrentStringBuilderPool.Get();
+            var sb = ConcurrentStringBuilderPool.Get();
             var previousIsWhitespaceFlag = false;
             for (var i = 0; i < value.Length; i++)
             {
@@ -297,7 +303,7 @@ namespace MobX.Utilities
 
         public static string CombineToString(this IEnumerable<string> enumerable, string separator = " ")
         {
-            StringBuilder stringBuilder = ConcurrentStringBuilderPool.Get();
+            var stringBuilder = ConcurrentStringBuilderPool.Get();
             foreach (var argument in enumerable)
             {
                 stringBuilder.Append(argument);
@@ -309,7 +315,7 @@ namespace MobX.Utilities
 
         public static string[] RemoveNullOrWhiteSpace(this IEnumerable<string> enumerable, char separator = ' ')
         {
-            List<string> list = ConcurrentListPool<string>.Get();
+            var list = ConcurrentListPool<string>.Get();
 
             foreach (var value in enumerable)
             {

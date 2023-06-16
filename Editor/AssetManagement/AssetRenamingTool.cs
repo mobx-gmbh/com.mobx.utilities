@@ -148,7 +148,7 @@ namespace MobX.Utilities.Editor.AssetManagement
         {
             try
             {
-                var elementName = gameObjectPrefix.ValueOrDefault(string.Empty) + currentName + gameObjectSuffix.ValueOrDefault(string.Empty);
+                var elementName = currentName;
 
                 foreach (var pattern in gameObjectPatternsToRemove)
                 {
@@ -184,6 +184,8 @@ namespace MobX.Utilities.Editor.AssetManagement
                         elementName = elementName.Replace(replacement.oldValue ?? string.Empty, replacement.newValue ?? string.Empty, gameObjectIgnoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal);
                     }
                 }
+
+                elementName = gameObjectPrefix.ValueOrDefault(string.Empty) + elementName + gameObjectSuffix.ValueOrDefault(string.Empty);
 
                 if (numberGameObjects)
                 {
@@ -243,7 +245,7 @@ namespace MobX.Utilities.Editor.AssetManagement
         {
             try
             {
-                var elementName = assetPrefix.ValueOrDefault(string.Empty) + currentName + assetSuffix.ValueOrDefault(string.Empty);
+                var elementName = currentName;
 
                 foreach (var pattern in assetPatternsToRemove)
                 {
@@ -279,6 +281,8 @@ namespace MobX.Utilities.Editor.AssetManagement
                         elementName = elementName.Replace(replacement.oldValue ?? string.Empty, replacement.newValue ?? string.Empty, assetIgnoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal);
                     }
                 }
+
+                elementName = assetPrefix.ValueOrDefault(string.Empty) + elementName + assetSuffix.ValueOrDefault(string.Empty);
 
                 if (numberAssets)
                 {
