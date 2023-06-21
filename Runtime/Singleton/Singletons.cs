@@ -60,7 +60,7 @@ namespace MobX.Utilities.Singleton
         private static void RegisterInternal<T>(T instance) where T : Object
         {
 #if UNITY_EDITOR
-            static async Task WaitWhile(Func<bool> condition)
+            async static Task WaitWhile(Func<bool> condition)
             {
                 while (condition())
                 {
@@ -68,10 +68,7 @@ namespace MobX.Utilities.Singleton
                 }
             }
 
-            static bool IsImport()
-            {
-                return UnityEditor.EditorApplication.isCompiling || UnityEditor.EditorApplication.isUpdating;
-            }
+            static bool IsImport() => UnityEditor.EditorApplication.isCompiling || UnityEditor.EditorApplication.isUpdating;
 
             if (IsImport())
             {
@@ -90,9 +87,12 @@ namespace MobX.Utilities.Singleton
             for (var i = 0; i < Singleton.registry.Count; i++)
             {
                 var entry = Singleton.registry[i];
-                if (entry != null && entry.GetType() == typeof(T))
+                if (entry != null && entry is T)
                 {
                     Singleton.registry[i] = instance;
+#if UNITY_EDITOR
+                    UnityEditor.EditorUtility.SetDirty(Singleton);
+#endif
                     return;
                 }
             }
@@ -109,9 +109,9 @@ namespace MobX.Utilities.Singleton
             for (var i = 0; i < Singleton.registry.Count; i++)
             {
                 var element = Singleton.registry[i];
-                if (element != null && element.GetType() == typeof(T))
+                if (element != null && element is T instance)
                 {
-                    return (T) Singleton.registry[i];
+                    return instance;
                 }
             }
 
@@ -124,9 +124,16 @@ namespace MobX.Utilities.Singleton
         {
             for (var i = 0; i < Singleton.registry.Count; i++)
             {
-                if (Singleton.registry[i].GetType() == typeof(T))
+                var entry = Singleton.registry[i];
+
+                if (entry == null)
                 {
-                    return Singleton.registry[i];
+                    continue;
+                }
+
+                if (entry.GetType() is T)
+                {
+                    return true;
                 }
             }
 

@@ -15,13 +15,18 @@ namespace MobX.Utilities.Singleton
         protected virtual void OnEnable()
         {
             EngineCallbacks.AddCallbacks(this);
-            Singleton = (T) this;
+            if (Singletons.Exists<T>() is false)
+            {
+                Singleton = (T) this;
+            }
         }
 
         private void OnDisable()
         {
             EngineCallbacks.RemoveCallbacks(this);
         }
+
+        public bool IsSingleton => Singletons.Exists<T>() && Singletons.Resolve<T>() == this;
 
         [Conditional("UNITY_EDITOR")]
         protected void Repaint()

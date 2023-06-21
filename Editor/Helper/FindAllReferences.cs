@@ -4,7 +4,7 @@ using UnityEngine.Audio;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-namespace MobX.Utilities.Unity
+namespace MobX.Utilities.Editor.Helper
 {
     public class FindAllReferences : UnityEditor.EditorWindow
     {

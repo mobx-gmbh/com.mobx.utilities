@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using UnityEngine;
 
-namespace MobX.Utilities.Unity
+namespace MobX.Utilities.Editor.Helper
 {
     [UnityEditor.InitializeOnLoadAttribute]
     public class FindAllReferencesHelper : UnityEditor.AssetPostprocessor
