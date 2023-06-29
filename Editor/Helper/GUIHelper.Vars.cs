@@ -34,9 +34,10 @@ namespace MobX.Utilities.Editor.Helper
             boldFoldoutStyle ??= Create("Foldout", fontStyle: FontStyle.Normal, fontSize: 14);
 
         public static GUIStyle RichTextStyle => richTextStyle ??= Create(GUI.skin.label, 15, default(FontStyle?), true);
-        public static GUIStyle RichTextArea => richTextArea ??= Create(GUI.skin.textArea, 15, default(FontStyle?), true);
+        public static GUIStyle RichTextArea =>
+            richTextArea ??= Create(GUI.skin.textArea, 15, default(FontStyle?), true);
         public static GUIStyle TextArea => textArea ??= Create(GUI.skin.textArea, 15, default(FontStyle?), false);
-        public static GUIStyle SearchBarStyle => searchBarStyle ??= Create("ToolbarSeachTextField");
+        public static GUIStyle SearchBarStyle => searchBarStyle ??= Create("SearchTextField");
 
         private static GUIStyle Create(GUIStyle other, int? fontSize = null, FontStyle? fontStyle = null,
             bool? richText = null)
