@@ -3,6 +3,7 @@ using MobX.Utilities.Types;
 using System;
 using System.Runtime.CompilerServices;
 using UnityEngine;
+using UnityEngine.ResourceManagement.AsyncOperations;
 
 namespace MobX.Utilities.Task
 {
@@ -38,7 +39,7 @@ namespace MobX.Utilities.Task
             particleSystem.FadeOutAsync().Forget();
         }
 
-        public async static UniTask FadeOutAsync(this ParticleSystem particleSystem)
+        public static async UniTask FadeOutAsync(this ParticleSystem particleSystem)
         {
             particleSystem.Stop(true, ParticleSystemStopBehavior.StopEmitting);
             await UniTask.WaitWhile(() => particleSystem && particleSystem.particleCount > 0);
@@ -47,6 +48,12 @@ namespace MobX.Utilities.Task
                 return;
             }
             particleSystem.SetActive(false);
+        }
+
+        public static async UniTask<T> AsUniTask<T>(this AsyncOperationHandle<T> operationHandle)
+        {
+            var result = await operationHandle.Task;
+            return result;
         }
 
         #endregion

@@ -1,4 +1,5 @@
 using MobX.Utilities.Callbacks;
+using System;
 using System.Diagnostics;
 using UnityEngine;
 
@@ -6,18 +7,14 @@ namespace MobX.Utilities.Singleton
 {
     public abstract class SingletonAsset<T> : ScriptableObject where T : SingletonAsset<T>
     {
-        public static T Singleton
-        {
-            get => Singletons.Resolve<T>();
-            private set => Singletons.Register(value);
-        }
+        public static T Singleton => Singletons.Resolve<T>();
 
         protected virtual void OnEnable()
         {
             EngineCallbacks.AddCallbacks(this);
             if (Singletons.Exists<T>() is false)
             {
-                Singleton = (T) this;
+                Singletons.Register(this);
             }
         }
 

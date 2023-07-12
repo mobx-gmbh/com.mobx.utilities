@@ -6,17 +6,22 @@ namespace MobX.Utilities.Callbacks
 {
     public abstract class RuntimeAsset : ScriptableObject, IDisposable
     {
-        protected RuntimeAsset()
-        {
-            EngineCallbacks.AddCallbacks(this);
-        }
-
         [Conditional("UNITY_EDITOR")]
         protected void Repaint()
         {
 #if UNITY_EDITOR
             UnityEditor.EditorUtility.SetDirty(this);
 #endif
+        }
+
+        protected virtual void OnEnable()
+        {
+            EngineCallbacks.AddCallbacks(this);
+        }
+
+        protected virtual void OnDisable()
+        {
+            EngineCallbacks.RemoveCallbacks(this);
         }
 
         public virtual void Dispose()

@@ -60,7 +60,7 @@ namespace MobX.Utilities.Singleton
         private static void RegisterInternal<T>(T instance) where T : Object
         {
 #if UNITY_EDITOR
-            async static Task WaitWhile(Func<bool> condition)
+            static async Task WaitWhile(Func<bool> condition)
             {
                 while (condition())
                 {
@@ -84,6 +84,12 @@ namespace MobX.Utilities.Singleton
                 return;
             }
 #endif
+            if (IsLoaded is false)
+            {
+                Debug.LogError("Singleton", $"Singleton Registry is not loaded yet! Cannot register instance for {typeof(T)}", instance);
+                return;
+            }
+
             for (var i = 0; i < Singleton.registry.Count; i++)
             {
                 var entry = Singleton.registry[i];
@@ -122,6 +128,12 @@ namespace MobX.Utilities.Singleton
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static bool ExistsInternal<T>()
         {
+            if (Singleton.registry == null)
+            {
+                Debug.LogError("Singleton", $"Registry is null! Attempted to access singleton for {typeof(T)}");
+                return false;
+            }
+
             for (var i = 0; i < Singleton.registry.Count; i++)
             {
                 var entry = Singleton.registry[i];
@@ -131,7 +143,7 @@ namespace MobX.Utilities.Singleton
                     continue;
                 }
 
-                if (entry.GetType() is T)
+                if (entry.GetType() == typeof(T))
                 {
                     return true;
                 }
@@ -182,6 +194,11 @@ namespace MobX.Utilities.Singleton
 
 
         #region Serialization
+
+        private void OnEnable()
+        {
+            singleton = this;
+        }
 
         public void OnAfterDeserialize()
         {

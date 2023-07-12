@@ -13,7 +13,6 @@ namespace MobX.Utilities.Editor.Inspector.InspectorFields
         private readonly UnityEditor.SerializedObject _serializedObject;
         private readonly UnityEditor.SerializedProperty _serializedProperty;
         private readonly bool _hideLabel;
-        private readonly bool _textArea;
         private readonly bool _listInspector;
         private readonly bool _runtimeReadonly;
         private readonly bool _readonly;
@@ -25,7 +24,6 @@ namespace MobX.Utilities.Editor.Inspector.InspectorFields
             _serializedProperty = serializedProperty ?? throw new ArgumentNullException(nameof(serializedProperty));
             _serializedObject = serializedProperty.serializedObject;
             _hideLabel = memberInfo.HasAttribute<HideLabelAttribute>();
-            _textArea = memberInfo.HasAttribute<TextAreaAttribute>();
             _runtimeReadonly = memberInfo.HasAttribute<RuntimeReadonlyAttribute>();
             _readonly = memberInfo.HasAttribute<ReadonlyInspectorAttribute>();
 
@@ -61,18 +59,9 @@ namespace MobX.Utilities.Editor.Inspector.InspectorFields
 
             _serializedObject.Update();
             var enabled = GUI.enabled;
-            if (_readonly || (_runtimeReadonly && Application.isPlaying))
+            if (_readonly || _runtimeReadonly && Application.isPlaying)
             {
                 GUI.enabled = false;
-            }
-
-            if (_textArea)
-            {
-                UnityEditor.EditorGUILayout.LabelField(Label, GUILayout.Width(GUIHelper.GetLabelWidth()));
-                _serializedProperty.stringValue = UnityEditor.EditorGUILayout.TextArea(_serializedProperty.stringValue);
-                GUI.enabled = enabled;
-                _serializedObject.ApplyModifiedProperties();
-                return;
             }
 
             if (_listInspector)

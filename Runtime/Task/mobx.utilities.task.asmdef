@@ -3,7 +3,8 @@
     "rootNamespace": "MobX.Utilities",
     "references": [
         "GUID:f51ebe6a0ceec4240a699833d6309b23",
-        "GUID:451c7863c31cdec4fbc99d53f3082b53"
+        "GUID:451c7863c31cdec4fbc99d53f3082b53",
+        "GUID:84651a3751eca9349aac36a66bba901b"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

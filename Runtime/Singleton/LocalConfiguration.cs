@@ -11,12 +11,15 @@ namespace MobX.Utilities.Singleton
     {
         private static T local;
 
+        /// <summary>
+        ///     The locally saved/applied configuration file.
+        /// </summary>
         public static T Local
         {
             get
             {
 #if !UNITY_EDITOR
-                return Global;
+                return Singletons.Resolve<T>();
 #else
                 if (local == null)
                 {
@@ -49,8 +52,7 @@ namespace MobX.Utilities.Singleton
 
                 if (local == null)
                 {
-                    UnityEngine.Debug.Log("Set Global");
-                    Local = Global;
+                    Local = Singletons.Resolve<T>();
                 }
 
                 return local;
@@ -69,17 +71,11 @@ namespace MobX.Utilities.Singleton
                 UnityEditor.EditorPrefs.SetString(typeof(T).FullName, guid);
                 if (Singletons.Exists<T>() is false)
                 {
-                    Global = value;
+                    Singletons.Register(value);
                 }
 #endif
                 local = value;
             }
-        }
-
-        public static T Global
-        {
-            get => Singletons.Resolve<T>();
-            private set => Singletons.Register(value);
         }
 
 #if UNITY_EDITOR
@@ -91,7 +87,7 @@ namespace MobX.Utilities.Singleton
 
         private bool IsGlobal()
         {
-            return this == Global;
+            return this == Singletons.Resolve<T>();
         }
 
         [Button]
@@ -107,7 +103,7 @@ namespace MobX.Utilities.Singleton
         [ConditionalShow(nameof(IsGlobal), false)]
         public void DeclareAsGlobal()
         {
-            Global = (T) this;
+            Singletons.Register((T) this);
         }
 #endif // UNITY_EDITOR
     }

@@ -217,9 +217,7 @@ namespace MobX.Utilities.Editor.Helper
             }
             else
             {
-                // ReSharper disable once Unity.PerformanceCriticalCodeInvocation
-                UnityEngine.Debug.LogError(
-                    $"Mismatched calls of {nameof(BeginEnabledOverride)} & {nameof(EndEnabledOverride)}!");
+                Debug.LogError($"Mismatched calls of {nameof(BeginEnabledOverride)} & {nameof(EndEnabledOverride)}!");
             }
         }
 
