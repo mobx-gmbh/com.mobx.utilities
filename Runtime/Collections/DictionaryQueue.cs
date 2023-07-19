@@ -10,6 +10,8 @@ namespace MobX.Utilities.Collections
 
         public Dictionary<TKey, TValue> Dictionary { get; }
 
+        public ICollection<TValue> Values => Dictionary.Values;
+
         public DictionaryQueue(int capacity = 4)
         {
             Queue = new Queue<TKey>(capacity);

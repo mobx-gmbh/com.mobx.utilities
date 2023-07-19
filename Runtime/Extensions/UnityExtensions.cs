@@ -301,6 +301,17 @@ namespace MobX.Utilities
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool TrySetActive(this GameObject obj, bool activeState)
+        {
+            if (obj != null)
+            {
+                obj.SetActive(activeState);
+                return true;
+            }
+            return false;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void SetPosition(this GameObject gameObject, Vector3 position)
         {
             gameObject.transform.position = position;

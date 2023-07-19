@@ -31,25 +31,25 @@ namespace MobX.Utilities
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsNullOrEmpty<T>(this T[] array)
         {
-            return array is not {Length: > 0};
+            return array is not { Length: > 0 };
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsNotNullOrEmpty<T>(this T[] array)
         {
-            return array is {Length: > 0};
+            return array is { Length: > 0 };
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsNullOrEmpty<T>(this IList<T> list)
         {
-            return list is not {Count: > 0};
+            return list is not { Count: > 0 };
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsNotNullOrEmpty<T>(this IList<T> list)
         {
-            return list is {Count: > 0};
+            return list is { Count: > 0 };
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -386,6 +386,18 @@ namespace MobX.Utilities
             out TValue value)
         {
             if (dictionary.TryGetValue(key, out value))
+            {
+                dictionary.Remove(key);
+                return true;
+            }
+
+            return false;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool TryRemove<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key)
+        {
+            if (dictionary.ContainsKey(key))
             {
                 dictionary.Remove(key);
                 return true;
