@@ -1,4 +1,6 @@
 using MobX.Utilities.Callbacks;
+using MobX.Utilities.Registry;
+using MobX.Utilities.Types;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -33,6 +35,24 @@ namespace MobX.Utilities.Unity
 #if UNITY_EDITOR
             UnityEditor.EditorUtility.SetDirty(scriptableObject);
 #endif
+        }
+
+        public static RuntimeGUID GetRuntimeGUID<T>(this T scriptableObject) where T : ScriptableObject
+        {
+#if UNITY_EDITOR
+            var assetGuid = UnityEditor.AssetDatabase.AssetPathToGUID(UnityEditor.AssetDatabase.GetAssetPath(scriptableObject));
+            return new RuntimeGUID(assetGuid);
+#endif
+#pragma warning disable
+            foreach (var (guid, value) in AssetRegistry.Registry)
+            {
+                if (value == scriptableObject)
+                {
+                    return guid;
+                }
+            }
+
+            return default(RuntimeGUID);
         }
     }
 }

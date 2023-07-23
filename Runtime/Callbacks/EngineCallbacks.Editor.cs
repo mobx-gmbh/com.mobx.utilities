@@ -9,10 +9,22 @@ namespace MobX.Utilities.Callbacks
     {
         #region Asset Handling
 
+        public delegate void WillDeleteAssetCallback(string assetPath, Object asset);
+        public static event WillDeleteAssetCallback BeforeDeleteAsset;
+
         private static UnityEditor.AssetDeleteResult OnWillDeleteAsset(string assetPath,
             UnityEditor.RemoveAssetOptions options)
         {
             var asset = UnityEditor.AssetDatabase.LoadAssetAtPath<Object>(assetPath);
+
+            try
+            {
+                BeforeDeleteAsset?.Invoke(assetPath, asset);
+            }
+            catch (Exception exception)
+            {
+                Debug.LogException(exception);
+            }
 
             if (asset is not ICallbackInterface)
             {

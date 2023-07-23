@@ -10,6 +10,25 @@ namespace MobX.Utilities
 {
     public static class CollectionExtensions
     {
+        public static int InstanceCount<T>(this IEnumerable<T> enumerable, T element)
+        {
+            var count = 0;
+            foreach (var entry in enumerable)
+            {
+                if (EqualityComparer<T>.Default.Equals(entry, element))
+                {
+                    count++;
+                }
+            }
+
+            return count;
+        }
+
+        public static IEnumerable<T> TakeLast<T>(this IList<T> source, int amount)
+        {
+            return source.Skip(Math.Max(0, source.Count - amount));
+        }
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void ForEach<T>(this IEnumerable<T> enumerable, Action<T> action)
         {

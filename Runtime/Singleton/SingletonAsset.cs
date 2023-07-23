@@ -1,5 +1,4 @@
 using MobX.Utilities.Callbacks;
-using System;
 using System.Diagnostics;
 using UnityEngine;
 
@@ -7,7 +6,8 @@ namespace MobX.Utilities.Singleton
 {
     public abstract class SingletonAsset<T> : ScriptableObject where T : SingletonAsset<T>
     {
-        public static T Singleton => Singletons.Resolve<T>();
+        public static T Singleton => singleton ??= Singletons.Resolve<T>();
+        private static T singleton;
 
         protected virtual void OnEnable()
         {

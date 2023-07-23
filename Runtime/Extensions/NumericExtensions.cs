@@ -10,6 +10,12 @@ namespace MobX.Utilities
         #region Math
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static int RoundToInt(this float origin)
+        {
+            return Mathf.RoundToInt(origin);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int Clamp(this int origin, int min, int max)
         {
             return Mathf.Clamp(origin, min, max);
@@ -182,7 +188,7 @@ namespace MobX.Utilities
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int SecondsToMilliseconds(this float seconds)
         {
-            return (int)(seconds * 1000);
+            return (int) (seconds * 1000);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

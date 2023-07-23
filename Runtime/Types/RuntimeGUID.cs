@@ -4,32 +4,32 @@ using UnityEngine;
 namespace MobX.Utilities.Types
 {
     [Serializable]
-    public struct RuntimeGuid
+    public struct RuntimeGUID
     {
         public string Value => value;
 
         [SerializeField] private string value;
 
-        public RuntimeGuid(string value)
+        public RuntimeGUID(string value)
         {
             this.value = value;
         }
 
-        public static implicit operator RuntimeGuid(string value)
+        public static implicit operator RuntimeGUID(string value)
         {
-            return new RuntimeGuid(value);
+            return new RuntimeGUID(value);
         }
 
-        public static implicit operator string(RuntimeGuid guid)
+        public static implicit operator string(RuntimeGUID guid)
         {
             return guid.value;
         }
 
 #if UNITY_EDITOR
 
-        public static implicit operator RuntimeGuid(UnityEditor.GUID value)
+        public static implicit operator RuntimeGUID(UnityEditor.GUID value)
         {
-            return new RuntimeGuid(value.ToString());
+            return new RuntimeGUID(value.ToString());
         }
 
 #endif

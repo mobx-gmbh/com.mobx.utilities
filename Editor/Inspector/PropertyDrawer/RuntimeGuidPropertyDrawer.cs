@@ -4,24 +4,25 @@ using UnityEngine;
 
 namespace MobX.Utilities.Editor.Inspector.PropertyDrawer
 {
-    [UnityEditor.CustomPropertyDrawer(typeof(RuntimeGuid))]
-    public class RuntimeGuidPropertyDrawer : UnityEditor.PropertyDrawer
+    [UnityEditor.CustomPropertyDrawer(typeof(RuntimeGUID))]
+    public class RuntimeGUIDPropertyDrawer : UnityEditor.PropertyDrawer
     {
         private UnityEditor.SerializedProperty _stringProperty;
+        private bool _isGuidSet;
 
         public override void OnGUI(Rect position, UnityEditor.SerializedProperty property, GUIContent label)
         {
             _stringProperty ??= property.FindPropertyRelative("value");
             GUIHelper.BeginEnabledOverride(false);
+            label.text = "GUID";
             UnityEditor.EditorGUI.TextField(position, label, _stringProperty.stringValue);
             GUIHelper.EndEnabledOverride();
 
-            // TODO: Add button to update GUID manually
-
-            if (_stringProperty.stringValue.IsNullOrWhitespace())
+            if (_isGuidSet)
             {
-                UpdateGuid(property);
+                return;
             }
+            UpdateGuid(property);
         }
 
         private void UpdateGuid(UnityEditor.SerializedProperty property)
@@ -29,6 +30,7 @@ namespace MobX.Utilities.Editor.Inspector.PropertyDrawer
             var path = UnityEditor.AssetDatabase.GetAssetPath(property.serializedObject.targetObject);
             var guid = UnityEditor.AssetDatabase.AssetPathToGUID(path);
             _stringProperty.stringValue = guid;
+            _isGuidSet = true;
         }
     }
 }
