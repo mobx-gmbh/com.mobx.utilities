@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using UnityEngine.Assertions;
 using UnityEngine.Pool;
 using static UnityEngine.Random;
 
@@ -79,15 +80,8 @@ namespace MobX.Utilities
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static T[] RandomItems<T>(this IList<T> source, int count)
         {
-            if (source == null)
-            {
-                throw new ArgumentNullException(nameof(source));
-            }
-            if (source.Count < count)
-            {
-                throw new InvalidOperationException(
-                    $"Cannot select {count} random items from a collection with {source.Count} items!");
-            }
+            Assert.IsNotNull(source);
+            Assert.IsTrue(source.Count >= count, $"Cannot select {count} random items from a collection with {source.Count} items!");
 
             var buffer = HashSetPool<T>.Get();
 
@@ -99,6 +93,48 @@ namespace MobX.Utilities
             var selection = buffer.ToArray();
             HashSetPool<T>.Release(buffer);
             return selection;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void RandomItemsNoAlloc<T>(this IList<T> source, int count, ref List<T> results)
+        {
+            Assert.IsNotNull(source);
+            Assert.IsNotNull(results);
+            Assert.IsTrue(source.Count >= count, $"Cannot select {count} random items from a collection with {source.Count} items!");
+
+            results.Clear();
+
+            while (results.Count < count)
+            {
+                results.Add(source[Range(0, source.Count)]);
+            }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void RandomUniqueItemsNoAlloc<T>(this IList<T> source, ref List<T> results, int count)
+        {
+            Assert.IsNotNull(source);
+            Assert.IsNotNull(results);
+            Assert.IsTrue(source.Count >= count, $"Cannot select {count} random items from a collection with {source.Count} items!");
+
+            results.Clear();
+            var buffer = ListPool<T>.Get();
+            buffer.AddRange(source);
+
+            // Fisher-Yates shuffle
+            for (var index = buffer.Count - 1; index > 0; index--)
+            {
+                var randomIndex = Range(0, index + 1);
+
+                (buffer[index], buffer[randomIndex]) = (buffer[randomIndex], buffer[index]);
+            }
+
+            for (var i = 0; i < count; i++)
+            {
+                results.Add(buffer[i]);
+            }
+
+            ListPool<T>.Release(buffer);
         }
 
         #endregion

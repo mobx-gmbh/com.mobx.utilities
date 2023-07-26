@@ -20,7 +20,6 @@ namespace MobX.Utilities.Singleton
 #pragma warning restore
 
         [ConditionalShow(nameof(_enableEditing), ReadOnly = true)]
-        [ListOptions]
         [SerializeField] private List<Object> registry;
 
         #endregion

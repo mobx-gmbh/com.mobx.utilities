@@ -2,7 +2,7 @@ using JetBrains.Annotations;
 using System;
 using System.Collections.Generic;
 
-namespace MobX.Utilities
+namespace MobX.Utilities.Collections
 {
     public class ArrayUtility
     {

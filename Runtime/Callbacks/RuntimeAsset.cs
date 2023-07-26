@@ -7,7 +7,7 @@ namespace MobX.Utilities.Callbacks
     public abstract class RuntimeAsset : ScriptableObject, IDisposable
     {
         [Conditional("UNITY_EDITOR")]
-        protected void Repaint()
+        public void Repaint()
         {
 #if UNITY_EDITOR
             UnityEditor.EditorUtility.SetDirty(this);

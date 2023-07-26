@@ -1,5 +1,4 @@
 ﻿using MobX.Utilities.Callbacks;
-using MobX.Utilities.Editor.Helper;
 using MobX.Utilities.Inspector;
 using System;
 using System.Reflection;
@@ -13,7 +12,6 @@ namespace MobX.Utilities.Editor.Inspector.InspectorFields
         private readonly UnityEditor.SerializedObject _serializedObject;
         private readonly UnityEditor.SerializedProperty _serializedProperty;
         private readonly bool _hideLabel;
-        private readonly bool _listInspector;
         private readonly bool _runtimeReadonly;
         private readonly bool _readonly;
         private readonly ReorderableList _reorderableList;
@@ -32,22 +30,6 @@ namespace MobX.Utilities.Editor.Inspector.InspectorFields
                 : serializedProperty.name.Humanize(Prefixes);
 
             Label = new GUIContent(label, serializedProperty.tooltip);
-
-            if (memberInfo.TryGetCustomAttribute(out ListOptions listAttribute))
-            {
-                _listInspector = true;
-                _reorderableList = new ReorderableList(serializedProperty.serializedObject, serializedProperty,
-                    listAttribute.Draggable, listAttribute.DisplayHeader, listAttribute.AddButton,
-                    listAttribute.RemoveButton);
-
-                _reorderableList.drawHeaderCallback += rect => { UnityEditor.EditorGUI.LabelField(rect, Label); };
-                _reorderableList.elementHeight -= 4;
-                _reorderableList.drawElementCallback += (rect, index, _, _) =>
-                {
-                    UnityEditor.EditorGUI.PropertyField(rect, serializedProperty.GetArrayElementAtIndex(index),
-                        GUIContent.none);
-                };
-            }
         }
 
         protected override void DrawGUI()
@@ -62,18 +44,6 @@ namespace MobX.Utilities.Editor.Inspector.InspectorFields
             if (_readonly || _runtimeReadonly && Application.isPlaying)
             {
                 GUI.enabled = false;
-            }
-
-            if (_listInspector)
-            {
-                GUILayout.BeginHorizontal();
-                GUIHelper.IndentSpace();
-                _reorderableList.DoLayoutList();
-                GUIHelper.IndentSpace();
-                GUILayout.EndHorizontal();
-                GUI.enabled = enabled;
-                _serializedObject.ApplyModifiedProperties();
-                return;
             }
 
             if (_hideLabel)

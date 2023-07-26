@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using UnityEngine.Pool;
+using Random = UnityEngine.Random;
 
 namespace MobX.Utilities
 {
@@ -463,6 +464,39 @@ namespace MobX.Utilities
 
             result = default(TResult);
             return false;
+        }
+
+        public static void PopulateBufferWithUniqueRandomIndices(this List<int> resultBuffer, int maxIndex, int indicesToSelect)
+        {
+            // Check for valid inputs
+            if (maxIndex <= 0 || resultBuffer == null || indicesToSelect > maxIndex)
+            {
+                throw new ArgumentException("Invalid arguments provided");
+            }
+
+            // Generate indices
+            var allIndices = ListPool<int>.Get();
+            for (var i = 0; i < maxIndex; ++i)
+            {
+                allIndices.Add(i);
+            }
+
+            // Shuffle indices using Fisher-Yates algorithm
+            for (var i = maxIndex - 1; i > 0; i--)
+            {
+                var j = Random.Range(0, i + 1);
+
+                // Swap elements at i and j
+                (allIndices[i], allIndices[j]) = (allIndices[j], allIndices[i]);
+            }
+
+            // Select requested number of indices
+            for (var i = 0; i < indicesToSelect; i++)
+            {
+                resultBuffer.Add(allIndices[i]);
+            }
+
+            ListPool<int>.Release(allIndices);
         }
     }
 }

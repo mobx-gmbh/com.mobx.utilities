@@ -1,5 +1,4 @@
 using MobX.Utilities.Callbacks;
-using MobX.Utilities.Inspector;
 using MobX.Utilities.Types;
 using System;
 using UnityEngine;
@@ -9,7 +8,6 @@ namespace MobX.Utilities.Tools
     public class Installer : RuntimeAsset, IOnBeforeFirstSceneLoad, IOnQuit
     {
         [SerializeField] private bool autoInstall;
-        [ListOptions]
         [SerializeField] private Optional<GameObject>[] systems;
 
         [NonSerialized] private bool _installed;

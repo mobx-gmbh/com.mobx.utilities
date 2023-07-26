@@ -1,6 +1,6 @@
+using MobX.Utilities.Collections;
 using MobX.Utilities.Editor.Helper;
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Pool;
 using Object = UnityEngine.Object;
@@ -33,7 +33,7 @@ namespace MobX.Utilities.Editor.AssetManagement
 
                 if (includeFolder)
                 {
-                    List<AssetData> buffer = ListPool<AssetData>.Get();
+                    var buffer = ListPool<AssetData>.Get();
                     if (UnityEditor.AssetDatabase.IsValidFolder(Path))
                     {
                         var files = UnityEditor.AssetDatabase.FindAssets("t:Object", new[]
@@ -43,7 +43,7 @@ namespace MobX.Utilities.Editor.AssetManagement
                         foreach (var file in files)
                         {
                             var assetPath = UnityEditor.AssetDatabase.GUIDToAssetPath(file);
-                            Object subAsset = UnityEditor.AssetDatabase.LoadAssetAtPath<Object>(assetPath);
+                            var subAsset = UnityEditor.AssetDatabase.LoadAssetAtPath<Object>(assetPath);
                             buffer.Add(new AssetData(subAsset, true));
                         }
                     }
@@ -84,8 +84,8 @@ namespace MobX.Utilities.Editor.AssetManagement
 
         private void UpdateSelection()
         {
-            List<AssetData> buffer = ListPool<AssetData>.Get();
-            foreach (Object asset in UnityEditor.Selection.objects)
+            var buffer = ListPool<AssetData>.Get();
+            foreach (var asset in UnityEditor.Selection.objects)
             {
                 if (UnityEditor.AssetDatabase.Contains(asset) is false)
                 {
@@ -119,7 +119,7 @@ namespace MobX.Utilities.Editor.AssetManagement
 
         private static void AddLabel(string label, AssetData[] assets)
         {
-            foreach (AssetData assetData in assets)
+            foreach (var assetData in assets)
             {
                 var labels = assetData.Labels;
                 ArrayUtility.Add(ref labels, label);
@@ -131,9 +131,9 @@ namespace MobX.Utilities.Editor.AssetManagement
 
         private static void DrawAssetData(AssetData[] assets)
         {
-            foreach (AssetData assetData in assets)
+            foreach (var assetData in assets)
             {
-                Object asset = assetData.Asset;
+                var asset = assetData.Asset;
                 var assetName = asset.name;
                 var labels = assetData.LabelRepresentation;
 
