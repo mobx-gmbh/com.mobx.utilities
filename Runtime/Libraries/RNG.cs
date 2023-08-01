@@ -48,7 +48,7 @@ namespace MobX.Utilities
         #region Extensions
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static T RandomItem<T>(this IList<T> source)
+        public static T RandomItem<T>(this IReadOnlyList<T> source)
         {
             if (source == null)
             {

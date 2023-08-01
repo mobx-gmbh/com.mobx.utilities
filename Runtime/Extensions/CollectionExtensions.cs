@@ -67,7 +67,7 @@ namespace MobX.Utilities
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool IsNotNullOrEmpty<T>(this IList<T> list)
+        public static bool IsNotNullOrEmpty<T>(this IReadOnlyList<T> list)
         {
             return list is { Count: > 0 };
         }
