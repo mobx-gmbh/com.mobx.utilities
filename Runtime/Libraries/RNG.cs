@@ -137,6 +137,29 @@ namespace MobX.Utilities
             ListPool<T>.Release(buffer);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static T RandomItemWeighted<T>(this IReadOnlyList<T> source) where T : IWeighted
+        {
+            var totalWeight = 0f;
+            foreach (var weightedElement in source)
+            {
+                totalWeight += weightedElement.Weight;
+            }
+
+            var randomWeight = Float(0, totalWeight);
+            var weight = 0f;
+            foreach (var weightedElement in source)
+            {
+                weight += weightedElement.Weight;
+                if (weight >= randomWeight)
+                {
+                    return weightedElement;
+                }
+            }
+
+            return source.RandomItem();
+        }
+
         #endregion
     }
 }

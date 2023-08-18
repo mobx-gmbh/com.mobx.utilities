@@ -13,7 +13,7 @@ namespace MobX.Utilities.Task
             }
         }
 
-        public static async System.Threading.Tasks.Task WaitUnit(Func<bool> condition, CancellationToken cancellationToken = new())
+        public static async System.Threading.Tasks.Task WaitUntil(Func<bool> condition, CancellationToken cancellationToken = new())
         {
             while (!condition())
             {
