@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
-using UnityEngine;
 using Object = UnityEngine.Object;
 
 namespace MobX.Utilities
@@ -76,7 +75,7 @@ namespace MobX.Utilities
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool EqualsNone<T>(this T target, T otherA) where T : class
         {
-            return !(target.Equals(otherA));
+            return !target.Equals(otherA);
         }
 
         #endregion
@@ -126,7 +125,7 @@ namespace MobX.Utilities
         #region Convert
 
         /// <summary>
-        /// Converts the target <see cref="object"/> to be of the specified <see cref="Type"/>
+        ///     Converts the target <see cref="object" /> to be of the specified <see cref="Type" />
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static T ConvertTo<T>(this object value)
@@ -136,7 +135,7 @@ namespace MobX.Utilities
                 return (T) Convert.ChangeType(value, typeof(T));
             }
 
-            return default;
+            return default(T);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -145,8 +144,21 @@ namespace MobX.Utilities
             return (T) value;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static T TryCast<T>(this object value) where T : new()
+        {
+            try
+            {
+                return (T) value;
+            }
+            catch (Exception)
+            {
+                return new T();
+            }
+        }
+
         /// <summary>
-        /// Converts the target <see cref="object"/> to be of the specified <see cref="Type"/>
+        ///     Converts the target <see cref="object" /> to be of the specified <see cref="Type" />
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static T[] ConvertTo<T>(this Object[] value) where T : Object
@@ -183,7 +195,7 @@ namespace MobX.Utilities
         #region Null Checks
 
         /// <summary>
-        /// Unity object sensitive null check.
+        ///     Unity object sensitive null check.
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsNull<T>(this T target)
@@ -192,7 +204,7 @@ namespace MobX.Utilities
         }
 
         /// <summary>
-        /// Unity object sensitive null check.
+        ///     Unity object sensitive null check.
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsNotNull<T>(this T target) where T : class
@@ -201,7 +213,7 @@ namespace MobX.Utilities
         }
 
         /// <summary>
-        /// Unity object sensitive null check.
+        ///     Unity object sensitive null check.
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsNull(this Object target)
@@ -210,7 +222,7 @@ namespace MobX.Utilities
         }
 
         /// <summary>
-        /// Unity object sensitive null check.
+        ///     Unity object sensitive null check.
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsNotNull(this Object target)
@@ -219,7 +231,7 @@ namespace MobX.Utilities
         }
 
         /// <summary>
-        /// Returns the targets string representation or a string indicating that the target is null.
+        ///     Returns the targets string representation or a string indicating that the target is null.
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static string ToNullString<T>(this T target) where T : class

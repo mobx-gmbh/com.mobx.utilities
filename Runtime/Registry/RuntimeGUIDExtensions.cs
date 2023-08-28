@@ -9,5 +9,10 @@ namespace MobX.Utilities.Registry
         {
             return AssetRegistry.Resolve<T>(guid);
         }
+
+        public static bool TryToAsset<T>(this RuntimeGUID guid, out T result) where T : Object
+        {
+            return AssetRegistry.TryResolve(guid, out result);
+        }
     }
 }

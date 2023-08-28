@@ -24,10 +24,12 @@ namespace MobX.Utilities.Callbacks
 
         private static readonly List<IOnBeforeFirstSceneLoad> beforeSceneLoadListener = new(DefaultCapacity);
         private static readonly List<IOnQuit> quitListener = new(DefaultCapacity);
+        private static readonly List<IOnApplicationFocusChanged> focusListener = new(DefaultCapacity);
         private static readonly List<IOnAfterFirstSceneLoad> afterFirstSceneLoadListener = new();
         private static readonly List<IOnInitializationCompleted> initializationCompletedListener = new();
         private static readonly List<Action> beforeSceneLoadDelegates = new(DefaultCapacity);
         private static readonly List<Action> quitDelegates = new(DefaultCapacity);
+        private static readonly List<Action<bool>> focusDelegates = new(DefaultCapacity);
 
         private static bool beforeSceneLoadCompleted;
         private static bool afterSceneLoadCompleted;
@@ -36,7 +38,7 @@ namespace MobX.Utilities.Callbacks
         private static void SetupUpdateCallbacks()
         {
             IsQuitting = false;
-            RuntimeHook.Create(OnUpdate, OnLateUpdate, OnFixedUpdate, OnQuit);
+            RuntimeHook.Create(OnUpdate, OnLateUpdate, OnFixedUpdate, OnQuit, OnApplicationFocus);
         }
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
@@ -148,6 +150,35 @@ namespace MobX.Utilities.Callbacks
                 listener();
             }
 #endif
+        }
+
+        private static void OnApplicationFocus(bool hasFocus)
+        {
+            for (var index = focusListener.Count - 1; index >= 0; index--)
+            {
+                try
+                {
+                    var listener = focusListener[index];
+                    listener.OnApplicationFocusChanged(hasFocus);
+                }
+                catch (Exception exception)
+                {
+                    Debug.LogException(exception);
+                }
+            }
+
+            for (var index = focusDelegates.Count - 1; index >= 0; index--)
+            {
+                try
+                {
+                    var listener = focusDelegates[index];
+                    listener(hasFocus);
+                }
+                catch (Exception exception)
+                {
+                    Debug.LogException(exception);
+                }
+            }
         }
 
         private static void OnUpdate()

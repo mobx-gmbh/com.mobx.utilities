@@ -1,6 +1,7 @@
 using JetBrains.Annotations;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -61,6 +62,12 @@ namespace MobX.Utilities.Editor.AssetManagement
         }
 
         [Pure]
+        public static T FindAssetOfType<T>() where T : Object
+        {
+            return FindAssetsOfType<T>().FirstOrDefault();
+        }
+
+        [Pure]
         public static List<T> FindAssetsOfType<T>() where T : Object
         {
             var assets = new List<T>();
@@ -68,7 +75,7 @@ namespace MobX.Utilities.Editor.AssetManagement
             for (var i = 0; i < guids.Length; i++)
             {
                 var assetPath = UnityEditor.AssetDatabase.GUIDToAssetPath(guids[i]);
-                T asset = UnityEditor.AssetDatabase.LoadAssetAtPath<T>(assetPath);
+                var asset = UnityEditor.AssetDatabase.LoadAssetAtPath<T>(assetPath);
                 if (asset != null)
                 {
                     assets.Add(asset);
@@ -104,7 +111,7 @@ namespace MobX.Utilities.Editor.AssetManagement
             for (var i = 0; i < guids.Length; i++)
             {
                 var assetPath = UnityEditor.AssetDatabase.GUIDToAssetPath(guids[i]);
-                ScriptableObject asset = UnityEditor.AssetDatabase.LoadAssetAtPath<ScriptableObject>(assetPath);
+                var asset = UnityEditor.AssetDatabase.LoadAssetAtPath<ScriptableObject>(assetPath);
                 if (asset != null)
                 {
                     assets.Add(asset);
@@ -122,10 +129,31 @@ namespace MobX.Utilities.Editor.AssetManagement
             for (var i = 0; i < guids.Length; i++)
             {
                 var assetPath = UnityEditor.AssetDatabase.GUIDToAssetPath(guids[i]);
-                GameObject gameObject = UnityEditor.AssetDatabase.LoadAssetAtPath<GameObject>(assetPath);
-                if (gameObject != null && gameObject.TryGetComponents(componentType, out Component[] components))
+                var gameObject = UnityEditor.AssetDatabase.LoadAssetAtPath<GameObject>(assetPath);
+                if (gameObject != null && gameObject.TryGetComponents(componentType, out var components))
                 {
                     assets.AddRange(components);
+                }
+            }
+
+            return assets;
+        }
+
+        [Pure]
+        public static List<T> FindPrefabsOfType<T>()
+        {
+            var assets = new List<T>();
+            var guids = UnityEditor.AssetDatabase.FindAssets("t:prefab", new[]
+            {
+                "Assets/Content/Systems"
+            });
+            for (var i = 0; i < guids.Length; i++)
+            {
+                var assetPath = UnityEditor.AssetDatabase.GUIDToAssetPath(guids[i]);
+                var gameObject = UnityEditor.AssetDatabase.LoadAssetAtPath<GameObject>(assetPath);
+                if (gameObject != null && gameObject.TryGetComponent<T>(out var components))
+                {
+                    assets.Add(components);
                 }
             }
 
@@ -160,7 +188,7 @@ namespace MobX.Utilities.Editor.AssetManagement
         {
             var result = new string[assets.Count];
             var index = 0;
-            foreach (Object asset in assets)
+            foreach (var asset in assets)
             {
                 result[index] = UnityEditor.AssetDatabase.GetAssetPath(asset);
                 index++;

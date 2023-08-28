@@ -1,3 +1,4 @@
+using MobX.Utilities.Registry;
 using System;
 using System.Diagnostics;
 using UnityEngine;
@@ -17,6 +18,10 @@ namespace MobX.Utilities.Callbacks
         protected virtual void OnEnable()
         {
             EngineCallbacks.AddCallbacks(this);
+
+#if UNITY_EDITOR
+            AssetRegistry.RegisterRuntimeAsset(this);
+#endif
         }
 
         protected virtual void OnDisable()

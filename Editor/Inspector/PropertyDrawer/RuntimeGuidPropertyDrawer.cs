@@ -27,6 +27,16 @@ namespace MobX.Utilities.Editor.Inspector.PropertyDrawer
 
         private void UpdateGuid(UnityEditor.SerializedProperty property)
         {
+            if (UnityEditor.PrefabUtility.IsPartOfAnyPrefab(property.serializedObject.targetObject))
+            {
+                var prefabPath = UnityEditor.PrefabUtility.GetPrefabAssetPathOfNearestInstanceRoot(property.serializedObject.targetObject);
+                var prefabGuid = UnityEditor.AssetDatabase.AssetPathToGUID(prefabPath);
+                _stringProperty.serializedObject.Update();
+                _stringProperty.stringValue = prefabGuid;
+                _stringProperty.serializedObject.ApplyModifiedProperties();
+                _isGuidSet = true;
+                return;
+            }
             var path = UnityEditor.AssetDatabase.GetAssetPath(property.serializedObject.targetObject);
             var guid = UnityEditor.AssetDatabase.AssetPathToGUID(path);
             _stringProperty.stringValue = guid;

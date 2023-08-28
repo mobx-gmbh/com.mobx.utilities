@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.Pool;
 using static UnityEngine.Random;
@@ -40,6 +41,16 @@ namespace MobX.Utilities
         public static float Float(float min = float.MinValue, float max = float.MaxValue)
         {
             return Range(min, max);
+        }
+
+        public static Vector3 Vector()
+        {
+            return new Vector3(Float(-1, 1), Float(-1, 1), Float(-1, 1));
+        }
+
+        public static Vector3 VectorNormalized()
+        {
+            return new Vector3(Float(-1, 1), Float(-1, 1), Float(-1, 1)).normalized;
         }
 
         #endregion

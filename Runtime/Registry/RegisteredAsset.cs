@@ -15,8 +15,8 @@ namespace MobX.Utilities.Registry
             base.OnEnable();
 #if UNITY_EDITOR
             guid = this.GetRuntimeGUID();
-#endif
             AssetRegistry.Register(this);
+#endif
         }
     }
 }

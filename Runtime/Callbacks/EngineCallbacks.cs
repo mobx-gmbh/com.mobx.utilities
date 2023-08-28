@@ -68,6 +68,11 @@ namespace MobX.Utilities.Callbacks
                 AddInitializationCompletedListener(onInitializationCompleted);
             }
 
+            if (listener is IOnApplicationFocusChanged onApplicationFocusChanged)
+            {
+                AddApplicationFocusChangedListener(onApplicationFocusChanged);
+            }
+
 #if UNITY_EDITOR
             AddOnExitPlayInternal(listener as IOnExitPlayMode);
             AddOnEnterPlayInternal(listener as IOnEnterPlayMode);
@@ -116,6 +121,11 @@ namespace MobX.Utilities.Callbacks
             if (listener is IOnInitializationCompleted onInitializationCompleted)
             {
                 RemoveInitializationCompletedListener(onInitializationCompleted);
+            }
+
+            if (listener is IOnApplicationFocusChanged onApplicationFocusChanged)
+            {
+                RemoveApplicationFocusChangedListener(onApplicationFocusChanged);
             }
 
 #if UNITY_EDITOR
@@ -229,6 +239,20 @@ namespace MobX.Utilities.Callbacks
             where T : class, IOnInitializationCompleted
         {
             initializationCompletedListener.Remove(listener);
+        }
+
+        [PublicAPI]
+        public static void AddApplicationFocusChangedListener<T>(T listener)
+            where T : class, IOnApplicationFocusChanged
+        {
+            focusListener.AddUnique(listener, true);
+        }
+
+        [PublicAPI]
+        public static void RemoveApplicationFocusChangedListener<T>(T listener)
+            where T : class, IOnApplicationFocusChanged
+        {
+            focusListener.Remove(listener);
         }
 
         #endregion

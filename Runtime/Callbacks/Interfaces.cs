@@ -48,6 +48,17 @@
     #region Runtime Callbacks
 
     /// <summary>
+    ///     Called when the focus of the application has changed.
+    /// </summary>
+    public interface IOnApplicationFocusChanged : ICallbackInterface
+    {
+        /// <summary>
+        ///     Called when the focus of the application has changed.
+        /// </summary>
+        public void OnApplicationFocusChanged(bool hasFocus);
+    }
+
+    /// <summary>
     ///     Called after a manual async initialization process has been completed. Must be manually invoked by custom code.
     /// </summary>
     public interface IOnInitializationCompleted : ICallbackInterface

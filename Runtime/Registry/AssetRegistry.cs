@@ -4,6 +4,7 @@ using MobX.Utilities.Inspector;
 using MobX.Utilities.Singleton;
 using MobX.Utilities.Types;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace MobX.Utilities.Registry
@@ -13,10 +14,16 @@ namespace MobX.Utilities.Registry
 #endif
     public class AssetRegistry : SingletonAsset<AssetRegistry>
     {
+        #region Inspector & Properties
+
         [Annotation("Don't modify this map manually!")]
         [SerializeField] private Map<string, Object> registry = new();
+        [SerializeField] private List<RuntimeAsset> runtimeAssetRegistry = new();
 
         public static IReadOnlyDictionary<string, Object> Registry => Singleton.registry;
+        public static IReadOnlyList<RuntimeAsset> RuntimeAssets => Singleton.runtimeAssetRegistry;
+
+        #endregion
 
 
         #region Public
@@ -26,7 +33,12 @@ namespace MobX.Utilities.Registry
         /// </summary>
         public static void Register<T>(T asset) where T : Object, IUniqueAsset
         {
-            Singleton.registry.Update(asset.GUID.Value, asset);
+#if UNITY_EDITOR
+            UnityEditor.EditorApplication.delayCall += () =>
+            {
+                Singleton.registry.Update(asset.GUID.Value, asset);
+            };
+#endif
         }
 
         /// <summary>
@@ -38,9 +50,9 @@ namespace MobX.Utilities.Registry
         }
 
         /// <summary>
-        ///     Resolve an asset of type T by its GUID
+        ///     Resolve an asset of type T by its GUID as a UnityEngine.Object
         /// </summary>
-        public static Object ResolveFast(string guid)
+        public static Object ResolveObject(string guid)
         {
             return Singleton.registry[guid];
         }
@@ -63,9 +75,53 @@ namespace MobX.Utilities.Registry
         #endregion
 
 
+        #region Runtime Assets
+
+        /// <summary>
+        ///     Method registers runtime assets to its own unique list to ensure that runtime assets are loaded properly in a
+        ///     build.
+        /// </summary>
+        /// <param name="runtimeAsset"></param>
+        internal static void RegisterRuntimeAsset(RuntimeAsset runtimeAsset)
+        {
+#if UNITY_EDITOR
+            UnityEditor.EditorApplication.delayCall += () =>
+            {
+                Singleton.runtimeAssetRegistry.AddUnique(runtimeAsset);
+            };
+#endif
+        }
+
+        #endregion
+
+
         #region Editor
 
 #if UNITY_EDITOR
+
+        [Button]
+        public void Validate()
+        {
+            var assets = registry.ToArray();
+            foreach (var (key, value) in assets)
+            {
+                if (value == null || value is not IUniqueAsset)
+                {
+                    Debug.Log("Asset Registry", "Removing invalid unique asset registry entry!");
+                    registry.Remove(key);
+                }
+            }
+
+            var runtimeAssets = runtimeAssetRegistry.ToArray();
+            foreach (var runtimeAsset in runtimeAssets)
+            {
+                if (runtimeAsset == null || runtimeAsset is not IUniqueAsset)
+                {
+                    Debug.Log("Asset Registry", "Removing invalid runtime asset registry entry!");
+                    runtimeAssetRegistry.Remove(runtimeAsset);
+                }
+            }
+        }
 
         static AssetRegistry()
         {
@@ -76,6 +132,10 @@ namespace MobX.Utilities.Registry
         {
             var guid = UnityEditor.AssetDatabase.AssetPathToGUID(assetPath);
             Singleton.registry.TryRemove(guid);
+            if (asset is RuntimeAsset runtimeAsset)
+            {
+                Singleton.runtimeAssetRegistry.Remove(runtimeAsset);
+            }
         }
 
 #endif

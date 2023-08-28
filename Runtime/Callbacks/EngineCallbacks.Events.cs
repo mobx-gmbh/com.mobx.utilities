@@ -18,6 +18,12 @@ namespace MobX.Utilities.Callbacks
             remove => quitDelegates.Remove(value);
         }
 
+        public static event Action<bool> ApplicationFocusChanged
+        {
+            add => focusDelegates.AddNullChecked(value);
+            remove => focusDelegates.Remove(value);
+        }
+
         #endregion
 
 

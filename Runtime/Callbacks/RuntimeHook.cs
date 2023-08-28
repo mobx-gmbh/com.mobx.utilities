@@ -10,6 +10,7 @@ namespace MobX.Utilities.Callbacks
         private Action _onLateUpdate;
         private Action _onQuit;
         private Action _onUpdate;
+        private Action<bool> _onFocus;
 
         private void Update()
         {
@@ -31,7 +32,12 @@ namespace MobX.Utilities.Callbacks
             _onQuit();
         }
 
-        internal static void Create(Action onUpdate, Action onLateUpdate, Action onFixedUpdate, Action onQuit)
+        private void OnApplicationFocus(bool hasFocus)
+        {
+            _onFocus(hasFocus);
+        }
+
+        internal static void Create(Action onUpdate, Action onLateUpdate, Action onFixedUpdate, Action onQuit, Action<bool> onFocus)
         {
             var gameObject = new GameObject(nameof(RuntimeHook));
             var instance = gameObject.AddComponent<RuntimeHook>();
@@ -42,6 +48,7 @@ namespace MobX.Utilities.Callbacks
             instance._onLateUpdate = onLateUpdate;
             instance._onFixedUpdate = onFixedUpdate;
             instance._onQuit = onQuit;
+            instance._onFocus = onFocus;
         }
     }
 }

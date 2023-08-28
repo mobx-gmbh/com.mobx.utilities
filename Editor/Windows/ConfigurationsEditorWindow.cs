@@ -90,6 +90,12 @@ namespace MobX.Utilities.Editor.Windows
         protected virtual void OnDisable()
         {
             Foldout?.SaveState();
+            _headerInstructions.Clear();
+            _footerInstructions.Clear();
+            _instructions.Clear();
+            _editorCache.Clear();
+            _options.Clear();
+            _initialized = false;
         }
 
         private void InitializeEditor()
@@ -226,15 +232,21 @@ namespace MobX.Utilities.Editor.Windows
             _footerInstructions.AddUnique(instruction);
         }
 
-        protected void AddEditorGroup<T>(List<T> group, string editorTitle) where T : Object
+        protected void AddEditorGroup<T>(Func<List<T>> group, string editorTitle) where T : Object
         {
-            var editors = new (UnityEditor.Editor editor, string name)[group.Count];
-            for (var i = 0; i < group.Count; i++)
+            (UnityEditor.Editor editor, string name)[] editors = null;
+
+            Action init = () =>
             {
-                var editor = UnityEditor.Editor.CreateEditor(group[i]);
-                _editorCache.Add(editor);
-                editors[i] = (editor, editor.target.name.Humanize());
-            }
+                var list = group();
+                editors = new (UnityEditor.Editor editor, string name)[list.Count];
+                for (var i = 0; i < list.Count; i++)
+                {
+                    var editor = UnityEditor.Editor.CreateEditor(list[i]);
+                    _editorCache.Add(editor);
+                    editors[i] = (editor, editor.target.name.Humanize());
+                }
+            };
 
             var foldout = new FoldoutHandler(typeof(T).Name)
             {
@@ -251,6 +263,8 @@ namespace MobX.Utilities.Editor.Windows
                 FoldoutHandler.Style = FoldoutStyle.Dark;
                 if (Foldout[editorTitle])
                 {
+                    init?.Invoke();
+                    init = null;
                     UnityEditor.EditorGUIUtility.wideMode = false;
                     UnityEditor.EditorGUIUtility.labelWidth = UnityEditor.EditorGUIUtility.currentViewWidth * 0.4f;
                     foreach (var (editor, displayName) in editors)
@@ -379,7 +393,7 @@ namespace MobX.Utilities.Editor.Windows
             }
         }
 
-        protected void AddEditor<T>(T target, string editorTitle) where T : Object
+        protected void __AddEditor<T>(T target, string editorTitle) where T : Object
         {
             if (target == null)
             {
