@@ -25,11 +25,13 @@ namespace MobX.Utilities.Callbacks
         private static readonly List<IOnBeforeFirstSceneLoad> beforeSceneLoadListener = new(DefaultCapacity);
         private static readonly List<IOnQuit> quitListener = new(DefaultCapacity);
         private static readonly List<IOnApplicationFocusChanged> focusListener = new(DefaultCapacity);
+        private static readonly List<IOnApplicationPause> pauseListener = new(DefaultCapacity);
         private static readonly List<IOnAfterFirstSceneLoad> afterFirstSceneLoadListener = new();
         private static readonly List<IOnInitializationCompleted> initializationCompletedListener = new();
         private static readonly List<Action> beforeSceneLoadDelegates = new(DefaultCapacity);
         private static readonly List<Action> quitDelegates = new(DefaultCapacity);
         private static readonly List<Action<bool>> focusDelegates = new(DefaultCapacity);
+        private static readonly List<Action<bool>> pauseDelegates = new(DefaultCapacity);
 
         private static bool beforeSceneLoadCompleted;
         private static bool afterSceneLoadCompleted;
@@ -38,7 +40,7 @@ namespace MobX.Utilities.Callbacks
         private static void SetupUpdateCallbacks()
         {
             IsQuitting = false;
-            RuntimeHook.Create(OnUpdate, OnLateUpdate, OnFixedUpdate, OnQuit, OnApplicationFocus);
+            RuntimeHook.Create(OnUpdate, OnLateUpdate, OnFixedUpdate, OnQuit, OnApplicationFocus, OnApplicationPause);
         }
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
@@ -173,6 +175,35 @@ namespace MobX.Utilities.Callbacks
                 {
                     var listener = focusDelegates[index];
                     listener(hasFocus);
+                }
+                catch (Exception exception)
+                {
+                    Debug.LogException(exception);
+                }
+            }
+        }
+
+        private static void OnApplicationPause(bool pauseStatus)
+        {
+            for (var index = pauseListener.Count - 1; index >= 0; index--)
+            {
+                try
+                {
+                    var listener = pauseListener[index];
+                    listener.OnApplicationPauseChanged(pauseStatus);
+                }
+                catch (Exception exception)
+                {
+                    Debug.LogException(exception);
+                }
+            }
+
+            for (var index = pauseDelegates.Count - 1; index >= 0; index--)
+            {
+                try
+                {
+                    var listener = pauseDelegates[index];
+                    listener(pauseStatus);
                 }
                 catch (Exception exception)
                 {

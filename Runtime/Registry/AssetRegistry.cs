@@ -6,6 +6,7 @@ using MobX.Utilities.Types;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Scripting;
 
 namespace MobX.Utilities.Registry
 {
@@ -17,7 +18,9 @@ namespace MobX.Utilities.Registry
         #region Inspector & Properties
 
         [Annotation("Don't modify this map manually!")]
+        [Preserve]
         [SerializeField] private Map<string, Object> registry = new();
+        [Preserve]
         [SerializeField] private List<RuntimeAsset> runtimeAssetRegistry = new();
 
         public static IReadOnlyDictionary<string, Object> Registry => Singleton.registry;
@@ -98,6 +101,12 @@ namespace MobX.Utilities.Registry
         #region Editor
 
 #if UNITY_EDITOR
+
+        [Button]
+        public bool Contains(Object obj)
+        {
+            return runtimeAssetRegistry.Contains(obj);
+        }
 
         [Button]
         public void Validate()

@@ -48,6 +48,17 @@
     #region Runtime Callbacks
 
     /// <summary>
+    ///     Called when the pause state of the application has changed.
+    /// </summary>
+    public interface IOnApplicationPause : ICallbackInterface
+    {
+        /// <summary>
+        ///     Called when the pause state of the application has changed.
+        /// </summary>
+        public void OnApplicationPauseChanged(bool pauseState);
+    }
+
+    /// <summary>
     ///     Called when the focus of the application has changed.
     /// </summary>
     public interface IOnApplicationFocusChanged : ICallbackInterface

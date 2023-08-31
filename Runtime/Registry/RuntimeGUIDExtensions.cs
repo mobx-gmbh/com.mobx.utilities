@@ -14,5 +14,10 @@ namespace MobX.Utilities.Registry
         {
             return AssetRegistry.TryResolve(guid, out result);
         }
+
+        public static RuntimeGUID ToGUID(this string value)
+        {
+            return new RuntimeGUID(value);
+        }
     }
 }
