@@ -8,6 +8,8 @@ namespace MobX.Utilities.Types
     {
         [SerializeField] private float value;
 
+        public TimeSpan TimeSpan => this;
+
         public Seconds(float seconds)
         {
             value = seconds;
@@ -25,7 +27,6 @@ namespace MobX.Utilities.Types
 
         public float Value => value;
 
-        // Implicit conversion to float
         public static implicit operator float(Seconds seconds)
         {
             return seconds.value;
@@ -83,12 +84,12 @@ namespace MobX.Utilities.Types
 
         public int CompareTo(object obj)
         {
-            if (obj == null || !(obj is Seconds))
+            if (obj is not Seconds seconds)
             {
                 throw new ArgumentException("Object is not a Seconds");
             }
 
-            return CompareTo((Seconds) obj);
+            return CompareTo(seconds);
         }
 
         public override int GetHashCode()
