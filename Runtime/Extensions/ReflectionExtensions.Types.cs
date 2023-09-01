@@ -16,7 +16,7 @@ namespace MobX.Utilities
          *  Number Sets
          */
 
-        private static readonly HashSet<Type> numericTypes = new HashSet<Type>
+        private static readonly HashSet<Type> numericTypes = new()
         {
             typeof(byte),
             typeof(sbyte),
@@ -28,10 +28,10 @@ namespace MobX.Utilities
             typeof(ulong),
             typeof(float),
             typeof(double),
-            typeof(decimal),
+            typeof(decimal)
         };
 
-        private static readonly HashSet<Type> integerTypes = new HashSet<Type>
+        private static readonly HashSet<Type> integerTypes = new()
         {
             typeof(byte),
             typeof(sbyte),
@@ -40,14 +40,14 @@ namespace MobX.Utilities
             typeof(int),
             typeof(uint),
             typeof(long),
-            typeof(ulong),
+            typeof(ulong)
         };
 
-        private static readonly HashSet<Type> decimalTypes = new HashSet<Type>
+        private static readonly HashSet<Type> decimalTypes = new()
         {
             typeof(float),
             typeof(double),
-            typeof(decimal),
+            typeof(decimal)
         };
 
         #endregion
@@ -223,7 +223,7 @@ namespace MobX.Utilities
 
             if (genericArguments.Length == 2)
             {
-                return typeof(KeyValuePair<,>).MakeGenericType(new[] {genericArguments[0], genericArguments[1]});
+                return typeof(KeyValuePair<,>).MakeGenericType(genericArguments[0], genericArguments[1]);
             }
 
             var result = type.GetElementType();
@@ -285,7 +285,7 @@ namespace MobX.Utilities
         }
 
         /// <summary>
-        /// Returns ture if the type and all of its declaring types are public.
+        ///     Returns ture if the type and all of its declaring types are public.
         /// </summary>
         public static bool IsAccessible(this Type type)
         {
@@ -337,19 +337,19 @@ namespace MobX.Utilities
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsVector(this Type type)
         {
-            return (type == typeof(Vector2) || type == typeof(Vector3) || type == typeof(Vector4));
+            return type == typeof(Vector2) || type == typeof(Vector3) || type == typeof(Vector4);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsVectorInt(this Type type)
         {
-            return (type == typeof(Vector2Int) || type == typeof(Vector3Int));
+            return type == typeof(Vector2Int) || type == typeof(Vector3Int);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsColor(this Type type)
         {
-            return (type == typeof(Color) || type == typeof(Color32));
+            return type == typeof(Color) || type == typeof(Color32);
         }
 
         /*
@@ -425,7 +425,8 @@ namespace MobX.Utilities
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool IsSubclassOfRawGeneric(this Type toCheck, Type generic, bool includeSelf, int maxDepth = 7)
+        public static bool IsSubclassOfRawGeneric(this Type toCheck, Type generic, bool includeSelf = false,
+            int maxDepth = 7)
         {
             if (!includeSelf && toCheck == generic)
             {

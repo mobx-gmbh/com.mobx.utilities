@@ -16,7 +16,7 @@ namespace MobX.Utilities.Singleton
         public static bool IsLoaded => singleton != null;
 
 #pragma warning disable 414
-        private bool _enableEditing;
+        [NonSerialized] private bool _enableEditing;
 #pragma warning restore
 
         [ConditionalShow(nameof(_enableEditing), ReadOnly = true)]
@@ -59,15 +59,6 @@ namespace MobX.Utilities.Singleton
         private static void RegisterInternal<T>(T instance) where T : Object
         {
 #if UNITY_EDITOR
-            static async Task WaitWhile(Func<bool> condition)
-            {
-                while (condition())
-                {
-                    await Task.Delay(25);
-                }
-            }
-
-            static bool IsImport() => UnityEditor.EditorApplication.isCompiling || UnityEditor.EditorApplication.isUpdating;
 
             if (IsImport())
             {
@@ -85,7 +76,7 @@ namespace MobX.Utilities.Singleton
 #endif
             if (IsLoaded is false)
             {
-                Debug.LogError("Singleton", $"Singleton Registry is not loaded yet! Cannot register instance for {typeof(T)}", instance);
+                Debug.LogError("Singleton", $"Registry is not loaded yet! Cannot register instance for {typeof(T)}", instance);
                 return;
             }
 
@@ -105,6 +96,23 @@ namespace MobX.Utilities.Singleton
             Singleton.registry.Add(instance);
 #if UNITY_EDITOR
             UnityEditor.EditorUtility.SetDirty(Singleton);
+#endif
+
+            return;
+
+#if UNITY_EDITOR
+            static async Task WaitWhile(Func<bool> condition)
+            {
+                while (condition())
+                {
+                    await Task.Delay(25);
+                }
+            }
+
+            static bool IsImport()
+            {
+                return UnityEditor.EditorApplication.isCompiling || UnityEditor.EditorApplication.isUpdating;
+            }
 #endif
         }
 
@@ -202,6 +210,7 @@ namespace MobX.Utilities.Singleton
         public void OnAfterDeserialize()
         {
             singleton = this;
+            Validate();
         }
 
         public void OnBeforeSerialize()
@@ -216,9 +225,24 @@ namespace MobX.Utilities.Singleton
         [Button]
         [SpaceBefore]
         [Tooltip("Remove null objects from the registry")]
-        private void ClearInvalid()
+        private void Validate()
         {
+            if (_enableEditing)
+            {
+                return;
+            }
+
             registry.RemoveNull();
+            registry.RemoveDuplicates();
+
+            for (var index = registry.Count - 1; index >= 0; index--)
+            {
+                var item = registry[index];
+                if (item.GetType().IsSubclassOfRawGeneric(typeof(SingletonAsset<>)) is false)
+                {
+                    registry.Remove(item);
+                }
+            }
         }
 
         [Button]
@@ -233,6 +257,7 @@ namespace MobX.Utilities.Singleton
         private void DisableEdit()
         {
             _enableEditing = false;
+            Validate();
         }
 
         #endregion

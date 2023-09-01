@@ -17,7 +17,6 @@ namespace MobX.Utilities.Registry
     {
         #region Inspector & Properties
 
-        [Annotation("Don't modify this map manually!")]
         [Preserve]
         [SerializeField] private Map<string, Object> registry = new();
         [Preserve]
@@ -37,10 +36,7 @@ namespace MobX.Utilities.Registry
         public static void Register<T>(T asset) where T : Object, IUniqueAsset
         {
 #if UNITY_EDITOR
-            UnityEditor.EditorApplication.delayCall += () =>
-            {
-                Singleton.registry.Update(asset.GUID.Value, asset);
-            };
+            UnityEditor.EditorApplication.delayCall += () => { Singleton.registry.Update(asset.GUID.Value, asset); };
 #endif
         }
 
@@ -103,12 +99,21 @@ namespace MobX.Utilities.Registry
 #if UNITY_EDITOR
 
         [Button]
-        public bool Contains(Object obj)
+        [Foldout("Validation", false)]
+        public bool ContainsRuntimeAsset(Object obj)
         {
             return runtimeAssetRegistry.Contains(obj);
         }
 
         [Button]
+        [Foldout("Validation", false)]
+        public bool ContainsAsset(Object obj)
+        {
+            return registry.ContainsValue(obj);
+        }
+
+        [Button]
+        [Foldout("Validation", false)]
         public void Validate()
         {
             var assets = registry.ToArray();
@@ -124,7 +129,7 @@ namespace MobX.Utilities.Registry
             var runtimeAssets = runtimeAssetRegistry.ToArray();
             foreach (var runtimeAsset in runtimeAssets)
             {
-                if (runtimeAsset == null || runtimeAsset is not IUniqueAsset)
+                if (runtimeAsset == null)
                 {
                     Debug.Log("Asset Registry", "Removing invalid runtime asset registry entry!");
                     runtimeAssetRegistry.Remove(runtimeAsset);
