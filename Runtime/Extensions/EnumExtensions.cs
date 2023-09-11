@@ -30,7 +30,7 @@ namespace MobX.Utilities
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool Equals<T>(ref T lhs, ref T rhs) where T : unmanaged, Enum
+        private static bool Equals<T>(ref T lhs, ref T rhs) where T : unmanaged, Enum
             => UnsafeUtility.EnumEquals(lhs, rhs);
 
         /*
