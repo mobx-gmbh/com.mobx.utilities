@@ -109,10 +109,7 @@ namespace MobX.Utilities.Singleton
                 }
             }
 
-            static bool IsImport()
-            {
-                return UnityEditor.EditorApplication.isCompiling || UnityEditor.EditorApplication.isUpdating;
-            }
+            static bool IsImport() => UnityEditor.EditorApplication.isCompiling || UnityEditor.EditorApplication.isUpdating;
 #endif
         }
 
@@ -234,15 +231,6 @@ namespace MobX.Utilities.Singleton
 
             registry.RemoveNull();
             registry.RemoveDuplicates();
-
-            for (var index = registry.Count - 1; index >= 0; index--)
-            {
-                var item = registry[index];
-                if (item.GetType().IsSubclassOfRawGeneric(typeof(SingletonAsset<>)) is false)
-                {
-                    registry.Remove(item);
-                }
-            }
         }
 
         [Button]
