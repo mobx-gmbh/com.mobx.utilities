@@ -139,7 +139,7 @@ namespace MobX.Utilities.Registry
 
         static AssetRegistry()
         {
-            EngineCallbacks.BeforeDeleteAsset += OnBeforeDeleteAsset;
+            Gameloop.BeforeDeleteAsset += OnBeforeDeleteAsset;
         }
 
         private static void OnBeforeDeleteAsset(string assetPath, Object asset)

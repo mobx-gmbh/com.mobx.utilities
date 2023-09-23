@@ -34,14 +34,14 @@ namespace MobX.Utilities.Editor.Inspector.InspectorFields
 
         protected override void DrawGUI()
         {
-            if (EngineCallbacks.EngineState == 3)
+            if (Gameloop.EditorState == 3)
             {
                 return;
             }
 
             _serializedObject.Update();
             var enabled = GUI.enabled;
-            if (_readonly || _runtimeReadonly && Application.isPlaying)
+            if (_readonly || (_runtimeReadonly && Application.isPlaying))
             {
                 GUI.enabled = false;
             }

@@ -1,6 +1,7 @@
 #if UNITY_EDITOR
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using Object = UnityEngine.Object;
 
 namespace MobX.Utilities.Callbacks
@@ -26,39 +27,9 @@ namespace MobX.Utilities.Callbacks
                 Debug.LogException(exception);
             }
 
-            if (asset is not ICallbackInterface)
+            if (asset is ICallbackInterface)
             {
-                return UnityEditor.AssetDeleteResult.DidNotDelete;
-            }
-
-            // ReSharper disable once SuspiciousTypeConversion.Global
-            if (asset is IOnExitPlayMode exitPlayModeCallback)
-            {
-                exitPlayModeListener.Remove(exitPlayModeCallback);
-            }
-
-            // ReSharper disable once SuspiciousTypeConversion.Global
-            if (asset is IOnEnterPlayMode enterPlayModeCallback)
-            {
-                enterPlayModeListener.Remove(enterPlayModeCallback);
-            }
-
-            // ReSharper disable once SuspiciousTypeConversion.Global
-            if (asset is IOnExitEditMode exitEditModeCallback)
-            {
-                exitEditModeListener.Remove(exitEditModeCallback);
-            }
-
-            // ReSharper disable once SuspiciousTypeConversion.Global
-            if (asset is IOnEnterEditMode enterEditModeCallback)
-            {
-                enterEditModeListener.Remove(enterEditModeCallback);
-            }
-
-            // ReSharper disable once SuspiciousTypeConversion.Global
-            if (asset is IOnAfterFirstSceneLoad afterLoadCallback)
-            {
-                afterFirstSceneLoadListener.Remove(afterLoadCallback);
+                RemoveCallbacks(asset);
             }
 
             return UnityEditor.AssetDeleteResult.DidNotDelete;
@@ -155,6 +126,7 @@ namespace MobX.Utilities.Callbacks
             }
         }
 
+        [Conditional("ENABLE_LEGACY_INPUT_MANAGER")]
         private static void OnExitPlayMode()
         {
             for (var i = 0; i < exitPlayModeListener.Count; i++)
@@ -176,6 +148,7 @@ namespace MobX.Utilities.Callbacks
             }
         }
 
+        [Conditional("ENABLE_LEGACY_INPUT_MANAGER")]
         private static void OnEnterPlayMode()
         {
             for (var i = 0; i < enterPlayModeListener.Count; i++)
@@ -197,6 +170,7 @@ namespace MobX.Utilities.Callbacks
             }
         }
 
+        [Conditional("ENABLE_LEGACY_INPUT_MANAGER")]
         private static void OnExitEditMode()
         {
             for (var i = 0; i < exitEditModeListener.Count; i++)
@@ -218,6 +192,7 @@ namespace MobX.Utilities.Callbacks
             }
         }
 
+        [Conditional("ENABLE_LEGACY_INPUT_MANAGER")]
         private static void OnEnterEditMode()
         {
             for (var i = 0; i < enterEditModeListener.Count; i++)

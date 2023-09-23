@@ -11,7 +11,9 @@ namespace MobX.Utilities.Singleton
 
         protected virtual void OnEnable()
         {
+            Gameloop.Register(this);
             EngineCallbacks.AddCallbacks(this);
+
             if (Singletons.Exists<T>() is false)
             {
                 Singletons.Register(this);
@@ -20,6 +22,7 @@ namespace MobX.Utilities.Singleton
 
         private void OnDisable()
         {
+            Gameloop.Unregister(this);
             EngineCallbacks.RemoveCallbacks(this);
         }
 

@@ -22,16 +22,19 @@ namespace MobX.Utilities.Callbacks
         private static readonly List<LateUpdateDelegate> lateUpdateDelegates = new(DefaultCapacity);
         private static readonly List<FixedUpdateDelegate> fixedUpdateDelegates = new(DefaultCapacity);
 
-        private static readonly List<IOnBeforeFirstSceneLoad> beforeSceneLoadListener = new(DefaultCapacity);
+        private static readonly List<IOnBeforeFirstSceneLoad> beforeFirstSceneLoadListener = new(DefaultCapacity);
+        private static readonly List<IOnAfterFirstSceneLoad> afterFirstSceneLoadListener = new(DefaultCapacity);
         private static readonly List<IOnQuit> quitListener = new(DefaultCapacity);
         private static readonly List<IOnApplicationFocusChanged> focusListener = new(DefaultCapacity);
         private static readonly List<IOnApplicationPause> pauseListener = new(DefaultCapacity);
-        private static readonly List<IOnAfterFirstSceneLoad> afterFirstSceneLoadListener = new();
-        private static readonly List<IOnInitializationCompleted> initializationCompletedListener = new();
-        private static readonly List<Action> beforeSceneLoadDelegates = new(DefaultCapacity);
+        private static readonly List<IOnInitializationCompleted> initializationCompletedListener = new(DefaultCapacity);
+
+        private static readonly List<Action> beforeFirstSceneLoadDelegates = new(DefaultCapacity);
+        private static readonly List<Action> afterFirstSceneLoadDelegates = new(DefaultCapacity);
         private static readonly List<Action> quitDelegates = new(DefaultCapacity);
         private static readonly List<Action<bool>> focusDelegates = new(DefaultCapacity);
         private static readonly List<Action<bool>> pauseDelegates = new(DefaultCapacity);
+        private static readonly List<Action> initializationCompletedDelegates = new(DefaultCapacity);
 
         private static bool beforeSceneLoadCompleted;
         private static bool afterSceneLoadCompleted;
@@ -40,14 +43,16 @@ namespace MobX.Utilities.Callbacks
         private static void SetupUpdateCallbacks()
         {
             IsQuitting = false;
-            RuntimeHook.Create(OnUpdate, OnLateUpdate, OnFixedUpdate, OnQuit, OnApplicationFocus, OnApplicationPause);
+#if ENABLE_LEGACY_ENGINE_CALLBACKS
+            RuntimeMonoBehaviourEvents.Create(OnUpdate, OnLateUpdate, OnFixedUpdate, OnQuit, OnApplicationFocus, OnApplicationPause);
+#endif
         }
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void OnBeforeSceneLoad()
         {
 #if DEBUG
-            foreach (var listener in beforeSceneLoadListener)
+            foreach (var listener in beforeFirstSceneLoadListener)
             {
                 try
                 {
@@ -59,7 +64,7 @@ namespace MobX.Utilities.Callbacks
                 }
             }
 
-            foreach (var listener in beforeSceneLoadDelegates)
+            foreach (var listener in beforeFirstSceneLoadDelegates)
             {
                 try
                 {
@@ -99,10 +104,27 @@ namespace MobX.Utilities.Callbacks
                     Debug.LogException(exception);
                 }
             }
+
+            foreach (var afterFirstSceneLoadDelegate in afterFirstSceneLoadDelegates)
+            {
+                try
+                {
+                    afterFirstSceneLoadDelegate();
+                }
+                catch (Exception exception)
+                {
+                    Debug.LogException(exception);
+                }
+            }
 #else
             foreach (var listener in afterFirstSceneLoadListener)
             {
                 listener.OnAfterFirstSceneLoad();
+            }
+
+            foreach (var afterFirstSceneLoadDelegate in afterFirstSceneLoadDelegates)
+            {
+                afterFirstSceneLoadDelegate();
             }
 #endif
             afterSceneLoadCompleted = true;
@@ -113,6 +135,7 @@ namespace MobX.Utilities.Callbacks
             IsQuitting = true;
             beforeSceneLoadCompleted = false;
             afterSceneLoadCompleted = false;
+
 #if DEBUG
             for (var index = quitListener.Count - 1; index >= 0; index--)
             {

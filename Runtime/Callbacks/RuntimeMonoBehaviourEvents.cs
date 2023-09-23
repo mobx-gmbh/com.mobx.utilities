@@ -4,7 +4,7 @@ using UnityEngine;
 namespace MobX.Utilities.Callbacks
 {
     [DisallowMultipleComponent]
-    internal sealed class RuntimeHook : MonoBehaviour
+    internal sealed class RuntimeMonoBehaviourEvents : MonoBehaviour
     {
         private Action _onFixedUpdate;
         private Action _onLateUpdate;
@@ -43,10 +43,11 @@ namespace MobX.Utilities.Callbacks
             _onPause(pauseStatus);
         }
 
-        internal static void Create(Action onUpdate, Action onLateUpdate, Action onFixedUpdate, Action onQuit, Action<bool> onFocus, Action<bool> onPause)
+        internal static void Create(Action onUpdate, Action onLateUpdate, Action onFixedUpdate, Action onQuit,
+            Action<bool> onFocus, Action<bool> onPause)
         {
-            var gameObject = new GameObject(nameof(RuntimeHook));
-            var instance = gameObject.AddComponent<RuntimeHook>();
+            var gameObject = new GameObject(nameof(RuntimeMonoBehaviourEvents));
+            var instance = gameObject.AddComponent<RuntimeMonoBehaviourEvents>();
             gameObject.DontDestroyOnLoad();
             gameObject.hideFlags |= HideFlags.HideInHierarchy;
 

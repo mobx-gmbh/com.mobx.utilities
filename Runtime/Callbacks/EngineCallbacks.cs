@@ -3,6 +3,8 @@ using System;
 using System.Diagnostics;
 using UnityEngine;
 
+// ReSharper disable RedundantAssignment
+
 namespace MobX.Utilities.Callbacks
 {
 #if UNITY_EDITOR
@@ -26,6 +28,7 @@ namespace MobX.Utilities.Callbacks
 
         #region Callbacks
 
+        [Conditional("ENABLE_LEGACY_ENGINE_CALLBACKS")]
         public static void AddCallbacks<T>(T listener) where T : class
         {
             if (listener is not ICallbackInterface)
@@ -86,6 +89,7 @@ namespace MobX.Utilities.Callbacks
 #endif
         }
 
+        [Conditional("ENABLE_LEGACY_ENGINE_CALLBACKS")]
         public static void RemoveCallbacks<T>(T listener) where T : class
         {
             if (listener is not ICallbackInterface)
@@ -152,6 +156,7 @@ namespace MobX.Utilities.Callbacks
         #region Before First Scene Loaded
 
         [PublicAPI]
+        [Conditional("ENABLE_LEGACY_ENGINE_CALLBACKS")]
         public static void AddBeforeFirstSceneLoadListener<T>(T listener) where T : class, IOnBeforeFirstSceneLoad
         {
             if (beforeSceneLoadCompleted)
@@ -159,13 +164,14 @@ namespace MobX.Utilities.Callbacks
                 listener.OnBeforeFirstSceneLoad();
             }
 
-            beforeSceneLoadListener.AddUnique(listener, true);
+            beforeFirstSceneLoadListener.AddUnique(listener, true);
         }
 
         [PublicAPI]
+        [Conditional("ENABLE_LEGACY_ENGINE_CALLBACKS")]
         public static void RemoveBeforeFirstSceneLoadListener<T>(T listener) where T : class, IOnBeforeFirstSceneLoad
         {
-            beforeSceneLoadListener.Remove(listener);
+            beforeFirstSceneLoadListener.Remove(listener);
         }
 
         #endregion
@@ -174,6 +180,7 @@ namespace MobX.Utilities.Callbacks
         #region After First Scene Loaded
 
         [PublicAPI]
+        [Conditional("ENABLE_LEGACY_ENGINE_CALLBACKS")]
         public static void AddAfterFirstSceneLoadListener<T>(T listener) where T : class, IOnAfterFirstSceneLoad
         {
             if (afterSceneLoadCompleted)
@@ -184,6 +191,7 @@ namespace MobX.Utilities.Callbacks
         }
 
         [PublicAPI]
+        [Conditional("ENABLE_LEGACY_ENGINE_CALLBACKS")]
         public static void RemoveAfterFirstSceneLoadListener<T>(T listener) where T : class, IOnAfterFirstSceneLoad
         {
             afterFirstSceneLoadListener.Remove(listener);
@@ -195,12 +203,14 @@ namespace MobX.Utilities.Callbacks
         #region On Quit
 
         [PublicAPI]
+        [Conditional("ENABLE_LEGACY_ENGINE_CALLBACKS")]
         public static void AddOnQuitListener<T>(T listener) where T : class, IOnQuit
         {
             quitListener.AddUnique(listener, true);
         }
 
         [PublicAPI]
+        [Conditional("ENABLE_LEGACY_ENGINE_CALLBACKS")]
         public static void RemoveQuitListener<T>(T listener) where T : class, IOnQuit
         {
             quitListener.Remove(listener);
@@ -211,6 +221,7 @@ namespace MobX.Utilities.Callbacks
 
         #region After Initialization
 
+        [Conditional("ENABLE_LEGACY_ENGINE_CALLBACKS")]
         public static void NotifyInitializationCompleted()
         {
             if (ManualInitializationCompleted)
@@ -232,9 +243,22 @@ namespace MobX.Utilities.Callbacks
                     Debug.LogException(exception);
                 }
             }
+
+            foreach (var initializationCompletedDelegate in initializationCompletedDelegates)
+            {
+                try
+                {
+                    initializationCompletedDelegate();
+                }
+                catch (Exception exception)
+                {
+                    Debug.LogException(exception);
+                }
+            }
         }
 
         [PublicAPI]
+        [Conditional("ENABLE_LEGACY_ENGINE_CALLBACKS")]
         public static void AddInitializationCompletedListener<T>(T listener) where T : class, IOnInitializationCompleted
         {
             if (ManualInitializationCompleted)
@@ -245,6 +269,7 @@ namespace MobX.Utilities.Callbacks
         }
 
         [PublicAPI]
+        [Conditional("ENABLE_LEGACY_ENGINE_CALLBACKS")]
         public static void RemoveInitializationCompletedListener<T>(T listener)
             where T : class, IOnInitializationCompleted
         {
@@ -252,6 +277,7 @@ namespace MobX.Utilities.Callbacks
         }
 
         [PublicAPI]
+        [Conditional("ENABLE_LEGACY_ENGINE_CALLBACKS")]
         public static void AddApplicationFocusChangedListener<T>(T listener)
             where T : class, IOnApplicationFocusChanged
         {
@@ -259,6 +285,7 @@ namespace MobX.Utilities.Callbacks
         }
 
         [PublicAPI]
+        [Conditional("ENABLE_LEGACY_ENGINE_CALLBACKS")]
         public static void RemoveApplicationFocusChangedListener<T>(T listener)
             where T : class, IOnApplicationFocusChanged
         {
@@ -266,6 +293,7 @@ namespace MobX.Utilities.Callbacks
         }
 
         [PublicAPI]
+        [Conditional("ENABLE_LEGACY_ENGINE_CALLBACKS")]
         public static void AddApplicationPauseChangedListener<T>(T listener)
             where T : class, IOnApplicationPause
         {
@@ -273,6 +301,7 @@ namespace MobX.Utilities.Callbacks
         }
 
         [PublicAPI]
+        [Conditional("ENABLE_LEGACY_ENGINE_CALLBACKS")]
         public static void RemoveApplicationPauseChangedListener<T>(T listener)
             where T : class, IOnApplicationPause
         {
@@ -284,31 +313,37 @@ namespace MobX.Utilities.Callbacks
 
         #region Update Callbacks
 
+        [Conditional("ENABLE_LEGACY_ENGINE_CALLBACKS")]
         public static void AddUpdateListener<T>(T listener) where T : class, IOnUpdate
         {
             updateListener.AddUnique(listener, true);
         }
 
+        [Conditional("ENABLE_LEGACY_ENGINE_CALLBACKS")]
         public static void AddLateUpdateListener<T>(T listener) where T : class, IOnLateUpdate
         {
             lateUpdateListener.AddUnique(listener, true);
         }
 
+        [Conditional("ENABLE_LEGACY_ENGINE_CALLBACKS")]
         public static void AddFixedUpdateListener<T>(T listener) where T : class, IOnFixedUpdate
         {
             fixedUpdateListener.AddUnique(listener, true);
         }
 
+        [Conditional("ENABLE_LEGACY_ENGINE_CALLBACKS")]
         public static void RemoveUpdateListener<T>(T listener) where T : class, IOnUpdate
         {
             updateListener.Remove(listener);
         }
 
+        [Conditional("ENABLE_LEGACY_ENGINE_CALLBACKS")]
         public static void RemoveLateUpdateListener<T>(T listener) where T : class, IOnLateUpdate
         {
             lateUpdateListener.Remove(listener);
         }
 
+        [Conditional("ENABLE_LEGACY_ENGINE_CALLBACKS")]
         public static void RemoveFixedUpdateListener<T>(T listener) where T : class, IOnFixedUpdate
         {
             fixedUpdateListener.Remove(listener);
@@ -319,7 +354,7 @@ namespace MobX.Utilities.Callbacks
 
         #region Add State Callbacks
 
-        [Conditional("UNITY_EDITOR")]
+        [Conditional("ENABLE_LEGACY_ENGINE_CALLBACKS")]
         public static void AddExitPlayModeListener<T>(T listener) where T : class, IOnExitPlayMode
         {
 #if UNITY_EDITOR
@@ -327,7 +362,7 @@ namespace MobX.Utilities.Callbacks
 #endif
         }
 
-        [Conditional("UNITY_EDITOR")]
+        [Conditional("ENABLE_LEGACY_ENGINE_CALLBACKS")]
         public static void AddEnterPlayModeListener<T>(T listener) where T : class, IOnEnterPlayMode
         {
 #if UNITY_EDITOR
@@ -335,7 +370,7 @@ namespace MobX.Utilities.Callbacks
 #endif
         }
 
-        [Conditional("UNITY_EDITOR")]
+        [Conditional("ENABLE_LEGACY_ENGINE_CALLBACKS")]
         public static void AddExitEditModeListener<T>(T listener) where T : class, IOnExitEditMode
         {
 #if UNITY_EDITOR
@@ -343,7 +378,7 @@ namespace MobX.Utilities.Callbacks
 #endif
         }
 
-        [Conditional("UNITY_EDITOR")]
+        [Conditional("ENABLE_LEGACY_ENGINE_CALLBACKS")]
         public static void AddEnterEditModeListener<T>(T listener) where T : class, IOnEnterEditMode
         {
 #if UNITY_EDITOR
@@ -351,7 +386,7 @@ namespace MobX.Utilities.Callbacks
 #endif
         }
 
-        [Conditional("UNITY_EDITOR")]
+        [Conditional("ENABLE_LEGACY_ENGINE_CALLBACKS")]
         public static void RemoveExitPlaymodeListener<T>(T listener) where T : class, IOnExitPlayMode
         {
 #if UNITY_EDITOR
@@ -359,7 +394,7 @@ namespace MobX.Utilities.Callbacks
 #endif
         }
 
-        [Conditional("UNITY_EDITOR")]
+        [Conditional("ENABLE_LEGACY_ENGINE_CALLBACKS")]
         public static void RemoveEnterPlaymodeListener<T>(T listener) where T : class, IOnEnterPlayMode
         {
 #if UNITY_EDITOR
@@ -367,7 +402,7 @@ namespace MobX.Utilities.Callbacks
 #endif
         }
 
-        [Conditional("UNITY_EDITOR")]
+        [Conditional("ENABLE_LEGACY_ENGINE_CALLBACKS")]
         public static void RemoveExitEditModeListener<T>(T listener) where T : class, IOnExitEditMode
         {
 #if UNITY_EDITOR
@@ -375,7 +410,7 @@ namespace MobX.Utilities.Callbacks
 #endif
         }
 
-        [Conditional("UNITY_EDITOR")]
+        [Conditional("ENABLE_LEGACY_ENGINE_CALLBACKS")]
         public static void RemoveEnterEditModeListener<T>(T listener) where T : class, IOnEnterEditMode
         {
 #if UNITY_EDITOR

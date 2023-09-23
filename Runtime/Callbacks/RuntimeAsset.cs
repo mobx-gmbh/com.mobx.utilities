@@ -17,6 +17,7 @@ namespace MobX.Utilities.Callbacks
 
         protected virtual void OnEnable()
         {
+            Gameloop.Register(this);
             EngineCallbacks.AddCallbacks(this);
 
 #if UNITY_EDITOR
@@ -26,11 +27,28 @@ namespace MobX.Utilities.Callbacks
 
         protected virtual void OnDisable()
         {
+            Gameloop.Unregister(this);
             EngineCallbacks.RemoveCallbacks(this);
+            GC.SuppressFinalize(this);
         }
 
         public virtual void Dispose()
         {
+            Gameloop.Unregister(this);
+            EngineCallbacks.RemoveCallbacks(this);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void OnDestroy()
+        {
+            Gameloop.Unregister(this);
+            EngineCallbacks.RemoveCallbacks(this);
+            GC.SuppressFinalize(this);
+        }
+
+        ~RuntimeAsset()
+        {
+            Gameloop.Unregister(this);
             EngineCallbacks.RemoveCallbacks(this);
         }
     }

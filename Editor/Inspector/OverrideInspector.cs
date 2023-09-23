@@ -299,7 +299,7 @@ namespace MobX.Utilities.Editor.Inspector
         {
             var enabled = GUI.enabled;
             GUI.enabled = false;
-            if (_script != null && EngineCallbacks.EngineState != 3)
+            if (_script != null && Gameloop.EditorState != 3)
             {
                 UnityEditor.EditorGUILayout.PropertyField(_script);
             }

@@ -5,16 +5,17 @@ using UnityEngine;
 
 namespace MobX.Utilities.Tools
 {
-    public class Installer : RuntimeAsset, IOnBeforeFirstSceneLoad, IOnQuit
+    public class Installer : RuntimeAsset
     {
         [SerializeField] private bool autoInstall;
         [SerializeField] private Optional<GameObject>[] systems;
 
         [NonSerialized] private bool _installed;
 
-        public void Install()
+        [CallbackOnInitialization]
+        private void Install()
         {
-            if (_installed)
+            if (_installed || autoInstall is false)
             {
                 return;
             }
@@ -29,15 +30,8 @@ namespace MobX.Utilities.Tools
             }
         }
 
-        public void OnBeforeFirstSceneLoad()
-        {
-            if (autoInstall)
-            {
-                Install();
-            }
-        }
-
-        public void OnQuit()
+        [CallbackOnApplicationQuit]
+        private void OnQuit()
         {
             _installed = false;
         }

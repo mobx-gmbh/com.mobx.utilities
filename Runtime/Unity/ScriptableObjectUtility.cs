@@ -23,7 +23,11 @@ namespace MobX.Utilities.Unity
             {
                 var template = ScriptableObject.CreateInstance(type);
                 json = JsonUtility.ToJson(template);
+#if GAMELOOP_CALLBACKS
+                Gameloop.Unregister(template);
+#else
                 EngineCallbacks.RemoveCallbacks(template);
+#endif
                 Object.DestroyImmediate(template);
             }
             if (cache)
@@ -40,7 +44,8 @@ namespace MobX.Utilities.Unity
         public static RuntimeGUID GetRuntimeGUID<T>(this T scriptableObject) where T : ScriptableObject
         {
 #if UNITY_EDITOR
-            var assetGuid = UnityEditor.AssetDatabase.AssetPathToGUID(UnityEditor.AssetDatabase.GetAssetPath(scriptableObject));
+            var assetGuid =
+                UnityEditor.AssetDatabase.AssetPathToGUID(UnityEditor.AssetDatabase.GetAssetPath(scriptableObject));
             return new RuntimeGUID(assetGuid);
 #endif
 #pragma warning disable

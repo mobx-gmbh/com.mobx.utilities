@@ -6,13 +6,19 @@ namespace MobX.Utilities.Callbacks
     {
         #region Runtime Events
 
-        public static event Action BeginPlay
+        public static event Action BeforeFirstSceneLoad
         {
-            add => beforeSceneLoadDelegates.AddNullChecked(value);
-            remove => beforeSceneLoadDelegates.Remove(value);
+            add => beforeFirstSceneLoadDelegates.AddNullChecked(value);
+            remove => beforeFirstSceneLoadDelegates.Remove(value);
         }
 
-        public static event Action EndPlay
+        public static event Action AfterFirstSceneLoad
+        {
+            add => afterFirstSceneLoadDelegates.AddNullChecked(value);
+            remove => afterFirstSceneLoadDelegates.Remove(value);
+        }
+
+        public static event Action Quit
         {
             add => quitDelegates.AddNullChecked(value);
             remove => quitDelegates.Remove(value);
@@ -28,6 +34,12 @@ namespace MobX.Utilities.Callbacks
         {
             add => pauseDelegates.AddNullChecked(value);
             remove => pauseDelegates.Remove(value);
+        }
+
+        public static event Action InitializationCompleted
+        {
+            add => initializationCompletedDelegates.AddNullChecked(value);
+            remove => initializationCompletedDelegates.Remove(value);
         }
 
         #endregion

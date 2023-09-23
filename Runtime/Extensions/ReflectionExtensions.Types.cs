@@ -310,6 +310,12 @@ namespace MobX.Utilities
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool HasParameters(this MethodInfo methodInfo)
+        {
+            return methodInfo.GetParameters().Length > 0;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool HasReturnValueOrOutParameter(this MethodInfo methodInfo)
         {
             var parameter = methodInfo.GetParameters();
