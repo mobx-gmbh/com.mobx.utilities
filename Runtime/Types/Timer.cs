@@ -38,6 +38,6 @@ namespace MobX.Utilities.Types
             return $"{nameof(Timer)}: {_targetTime}";
         }
 
-        public static Timer None => new Timer();
+        public static Timer None => new();
     }
 }
