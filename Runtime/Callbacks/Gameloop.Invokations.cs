@@ -19,8 +19,9 @@ namespace MobX.Utilities.Callbacks
         }
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
-        private static void SetupUpdateCallbacks()
+        private static void OnBeforeFirstSceneLoaded()
         {
+            Segment = Segment.BeforeFirstSceneLoad;
             IsQuitting = false;
 #if ENABLE_GAMELOOP_CALLBACKS
             RuntimeMonoBehaviourEvents.Create(
@@ -31,12 +32,6 @@ namespace MobX.Utilities.Callbacks
                 OnApplicationFocus,
                 OnApplicationPause);
 #endif
-        }
-
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
-        private static void OnBeforeFirstSceneLoaded()
-        {
-            Segment = Segment.BeforeFirstSceneLoad;
             for (var index = beforeFirstSceneLoadCallbacks.Count - 1; index >= 0; index--)
             {
                 beforeFirstSceneLoadCallbacks[index]();
