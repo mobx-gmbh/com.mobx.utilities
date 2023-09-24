@@ -59,8 +59,9 @@ namespace MobX.Utilities.Callbacks
         {
 #if ENABLE_GAMELOOP_CALLBACKS
             return ShutdownAsyncInternal();
-#endif
+#else
             return Task.CompletedTask;
+#endif
         }
 
         #endregion
