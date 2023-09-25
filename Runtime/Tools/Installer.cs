@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace MobX.Utilities.Tools
 {
-    public class Installer : RuntimeAsset
+    public class Installer : ScriptableAsset
     {
         [SerializeField] private bool autoInstall;
         [SerializeField] private Optional<GameObject>[] systems;

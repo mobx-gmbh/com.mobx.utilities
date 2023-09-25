@@ -104,6 +104,11 @@ namespace MobX.Utilities.Callbacks
         /// </summary>
         public static int FrameCount { get; private set; }
 
+        /// <summary>
+        ///     Get the current physics update count.
+        /// </summary>
+        public static int FixedUpdateCount { get; private set; }
+
         #endregion
 
 

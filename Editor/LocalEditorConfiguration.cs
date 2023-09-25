@@ -6,7 +6,7 @@ namespace MobX.Utilities.Editor
     /// <summary>
     ///     Base type for developer specific configuration files.
     /// </summary>
-    public abstract class LocalEditorConfiguration<T> : RuntimeAsset where T : LocalEditorConfiguration<T>
+    public abstract class LocalEditorConfiguration<T> : ScriptableAsset where T : LocalEditorConfiguration<T>
     {
         private static T local;
 

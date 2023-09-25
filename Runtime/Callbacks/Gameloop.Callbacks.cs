@@ -16,6 +16,7 @@ namespace MobX.Utilities.Callbacks
         private const int Capacity32 = 32;
         private const int Capacity64 = 64;
         private const int Capacity128 = 128;
+        private static readonly LogCategory logCategory = nameof(Gameloop);
 
         private static readonly HashSet<Object> registeredObjects = new(256);
         private static readonly Dictionary<Type, CallbackMethodInfo> callbackMethodInfoCache = new(Capacity128);
@@ -47,6 +48,15 @@ namespace MobX.Utilities.Callbacks
 
         private static void UnregisterInternal(Object target)
         {
+            Profiler.BeginSample("Gameloop.UnregisterInternal");
+
+            var wasRemoved = registeredObjects.Remove(target);
+            if (wasRemoved is false)
+            {
+                Profiler.EndSample();
+                return;
+            }
+
             RemoveCallbacksFromList(updateCallbacks, target);
             RemoveCallbacksFromList(lateUpdateCallbacks, target);
             RemoveCallbacksFromList(fixedUpdateCallbacks, target);
@@ -69,15 +79,18 @@ namespace MobX.Utilities.Callbacks
             RemoveCallbacksFromList(enterPlayModeDelegate, target);
             RemoveCallbacksFromList(exitPlayModeDelegate, target);
 #endif
-            registeredObjects.Remove(target);
+
+            Profiler.EndSample();
         }
 
         private static void RegisterInternal(Object target)
         {
-            Profiler.BeginSample("Gameloop.Registration");
+            Profiler.BeginSample("Gameloop.RegisterInternal");
 
-            if (registeredObjects.Add(target) is false)
+            var wasAdded = registeredObjects.Add(target);
+            if (wasAdded is false)
             {
+                Profiler.EndSample();
                 return;
             }
 
@@ -86,6 +99,7 @@ namespace MobX.Utilities.Callbacks
 
             if (callbackMethodInfo.HasMethods is false)
             {
+                Profiler.EndSample();
                 return;
             }
 
@@ -112,6 +126,7 @@ namespace MobX.Utilities.Callbacks
                     Debug.LogException(exception);
                 }
             }
+
             Profiler.EndSample();
         }
 

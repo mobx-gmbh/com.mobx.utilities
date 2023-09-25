@@ -19,11 +19,8 @@ namespace MobX.Utilities.Registry
 
         [Preserve]
         [SerializeField] private Map<string, Object> registry = new();
-        [Preserve]
-        [SerializeField] private List<RuntimeAsset> runtimeAssetRegistry = new();
 
         public static IReadOnlyDictionary<string, Object> Registry => Singleton.registry;
-        public static IReadOnlyList<RuntimeAsset> RuntimeAssets => Singleton.runtimeAssetRegistry;
 
         #endregion
 
@@ -74,36 +71,9 @@ namespace MobX.Utilities.Registry
         #endregion
 
 
-        #region Runtime Assets
-
-        /// <summary>
-        ///     Method registers runtime assets to its own unique list to ensure that runtime assets are loaded properly in a
-        ///     build.
-        /// </summary>
-        /// <param name="runtimeAsset"></param>
-        internal static void RegisterRuntimeAsset(RuntimeAsset runtimeAsset)
-        {
-#if UNITY_EDITOR
-            UnityEditor.EditorApplication.delayCall += () =>
-            {
-                Singleton.runtimeAssetRegistry.AddUnique(runtimeAsset);
-            };
-#endif
-        }
-
-        #endregion
-
-
         #region Editor
 
 #if UNITY_EDITOR
-
-        [Button]
-        [Foldout("Validation", false)]
-        public bool ContainsRuntimeAsset(Object obj)
-        {
-            return runtimeAssetRegistry.Contains(obj);
-        }
 
         [Button]
         [Foldout("Validation", false)]
@@ -125,16 +95,6 @@ namespace MobX.Utilities.Registry
                     registry.Remove(key);
                 }
             }
-
-            var runtimeAssets = runtimeAssetRegistry.ToArray();
-            foreach (var runtimeAsset in runtimeAssets)
-            {
-                if (runtimeAsset == null)
-                {
-                    Debug.Log("Asset Registry", "Removing invalid runtime asset registry entry!");
-                    runtimeAssetRegistry.Remove(runtimeAsset);
-                }
-            }
         }
 
         static AssetRegistry()
@@ -146,10 +106,6 @@ namespace MobX.Utilities.Registry
         {
             var guid = UnityEditor.AssetDatabase.AssetPathToGUID(assetPath);
             Singleton.registry.TryRemove(guid);
-            if (asset is RuntimeAsset runtimeAsset)
-            {
-                Singleton.runtimeAssetRegistry.Remove(runtimeAsset);
-            }
         }
 
 #endif

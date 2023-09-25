@@ -51,25 +51,25 @@ namespace MobX.Utilities
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsNullOrEmpty<T>(this T[] array)
         {
-            return array is not { Length: > 0 };
+            return array is not {Length: > 0};
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsNotNullOrEmpty<T>(this T[] array)
         {
-            return array is { Length: > 0 };
+            return array is {Length: > 0};
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsNullOrEmpty<T>(this IList<T> list)
         {
-            return list is not { Count: > 0 };
+            return list is not {Count: > 0};
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsNotNullOrEmpty<T>(this IReadOnlyList<T> list)
         {
-            return list is { Count: > 0 };
+            return list is {Count: > 0};
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -117,7 +117,7 @@ namespace MobX.Utilities
         {
             for (var i = list.Count - 1; i >= 0; i--)
             {
-                if (list[i].IsNull())
+                if (list[i] == null)
                 {
                     list.RemoveAt(i);
                 }
@@ -466,7 +466,8 @@ namespace MobX.Utilities
             return false;
         }
 
-        public static void PopulateBufferWithUniqueRandomIndices(this List<int> resultBuffer, int maxIndex, int indicesToSelect)
+        public static void PopulateBufferWithUniqueRandomIndices(this List<int> resultBuffer, int maxIndex,
+            int indicesToSelect)
         {
             // Check for valid inputs
             if (maxIndex <= 0 || resultBuffer == null || indicesToSelect > maxIndex)

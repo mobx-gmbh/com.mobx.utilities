@@ -7,7 +7,7 @@ namespace MobX.Utilities.Singleton
     /// <summary>
     ///     Base type for developer specific configuration files.
     /// </summary>
-    public abstract class LocalConfiguration<T> : RuntimeAsset where T : LocalConfiguration<T>
+    public abstract class LocalConfiguration<T> : ScriptableAsset where T : LocalConfiguration<T>
     {
         private static T local;
 

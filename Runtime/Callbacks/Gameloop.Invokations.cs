@@ -53,58 +53,142 @@ namespace MobX.Utilities.Callbacks
         private static void OnUpdate()
         {
             Segment = Segment.Update;
+#if DEBUG
+            for (var index = updateCallbacks.Count - 1; index >= 0; index--)
+            {
+                try
+                {
+                    updateCallbacks[index]();
+                }
+                catch (Exception exception)
+                {
+                    Debug.LogException(logCategory, exception);
+                }
+            }
+#else
             for (var index = updateCallbacks.Count - 1; index >= 0; index--)
             {
                 updateCallbacks[index]();
             }
+#endif
         }
 
         private static void OnLateUpdate()
         {
             Segment = Segment.LateUpdate;
+#if DEBUG
+            for (var index = lateUpdateCallbacks.Count - 1; index >= 0; index--)
+            {
+                try
+                {
+                    lateUpdateCallbacks[index]();
+                }
+                catch (Exception exception)
+                {
+                    Debug.LogException(logCategory, exception);
+                }
+            }
+#else
             for (var index = lateUpdateCallbacks.Count - 1; index >= 0; index--)
             {
                 lateUpdateCallbacks[index]();
             }
-
+#endif
             FrameCount++;
         }
 
         private static void OnFixedUpdate()
         {
             Segment = Segment.FixedUpdate;
+#if DEBUG
+            for (var index = fixedUpdateCallbacks.Count - 1; index >= 0; index--)
+            {
+                try
+                {
+                    fixedUpdateCallbacks[index]();
+                }
+                catch (Exception exception)
+                {
+                    Debug.LogException(logCategory, exception);
+                }
+            }
+#else
             for (var index = fixedUpdateCallbacks.Count - 1; index >= 0; index--)
             {
                 fixedUpdateCallbacks[index]();
             }
+#endif
+            FixedUpdateCount++;
         }
 
         private static void OnQuit()
         {
             Segment = Segment.ApplicationQuit;
             IsQuitting = true;
+#if DEBUG
+            for (var index = applicationQuitCallbacks.Count - 1; index >= 0; index--)
+            {
+                try
+                {
+                    applicationQuitCallbacks[index]();
+                }
+                catch (Exception exception)
+                {
+                    Debug.LogException(logCategory, exception);
+                }
+            }
+#else
             for (var index = applicationQuitCallbacks.Count - 1; index >= 0; index--)
             {
                 applicationQuitCallbacks[index]();
             }
+#endif
         }
 
         private static void OnApplicationFocus(bool hasFocus)
         {
             Segment = Segment.ApplicationFocus;
+#if DEBUG
+            for (var index = applicationFocusCallbacks.Count - 1; index >= 0; index--)
+            {
+                try
+                {
+                    applicationFocusCallbacks[index](hasFocus);
+                }
+                catch (Exception exception)
+                {
+                    Debug.LogException(logCategory, exception);
+                }
+            }
+#else
             for (var index = applicationFocusCallbacks.Count - 1; index >= 0; index--)
             {
                 applicationFocusCallbacks[index](hasFocus);
             }
+#endif
         }
 
         private static void OnApplicationPause(bool pauseState)
         {
             Segment = Segment.ApplicationPause;
+#if DEBUG
+            for (var index = applicationPauseCallbacks.Count - 1; index >= 0; index--)
+            {
+                try
+                {
+                    applicationPauseCallbacks[index](pauseState);
+                }
+                catch (Exception exception)
+                {
+                    Debug.LogException(logCategory, exception);
+                }
+            }
+#else
             for (var index = applicationPauseCallbacks.Count - 1; index >= 0; index--)
             {
                 applicationPauseCallbacks[index](pauseState);
             }
+#endif
         }
 
         private static void RaiseInitializationCompletedInternal()
@@ -112,29 +196,58 @@ namespace MobX.Utilities.Callbacks
             Segment = Segment.InitializationCompleted;
             if (InitializationCompletedState)
             {
-                Debug.LogWarning("Gameloop", $"{nameof(RaiseInitializationCompleted)} has already been invoked!");
+                Debug.LogWarning(logCategory, $"{nameof(RaiseInitializationCompleted)} has already been invoked!");
                 return;
             }
 
             InitializationCompletedState = true;
 
+#if DEBUG
+            for (var index = initializationCompletedCallbacks.Count - 1; index >= 0; index--)
+            {
+                try
+                {
+                    initializationCompletedCallbacks[index]();
+                }
+                catch (Exception exception)
+                {
+                    Debug.LogException(logCategory, exception);
+                }
+            }
+#else
             for (var index = initializationCompletedCallbacks.Count - 1; index >= 0; index--)
             {
                 initializationCompletedCallbacks[index]();
             }
+#endif
 
-            Debug.Log("Gameloop", "Initialization Completed");
+            Debug.Log(logCategory, "Initialization Completed");
         }
 
         private static void RaiseCallbackInternal(string callbackName)
         {
-            if (customCallbacks.TryGetValue(callbackName, out var callbacks))
+            if (!customCallbacks.TryGetValue(callbackName, out var callbacks))
             {
-                for (var index = callbacks.Count - 1; index >= 0; index--)
+                return;
+            }
+#if DEBUG
+            for (var index = callbacks.Count - 1; index >= 0; index--)
+            {
+                try
                 {
                     callbacks[index]();
                 }
+                catch (Exception exception)
+                {
+                    Debug.LogException(logCategory, exception);
+                }
             }
+#else
+            for (var index = callbacks.Count - 1; index >= 0; index--)
+            {
+                callbacks[index]();
+            }
+#endif
         }
 
 #if UNITY_EDITOR
@@ -142,10 +255,24 @@ namespace MobX.Utilities.Callbacks
         private static void OnEditorUpdate()
         {
             Segment = Segment.EditorUpdate;
+#if DEBUG
+            for (var index = editorUpdateCallbacks.Count - 1; index >= 0; index--)
+            {
+                try
+                {
+                    editorUpdateCallbacks[index]();
+                }
+                catch (Exception exception)
+                {
+                    Debug.LogException(logCategory, exception);
+                }
+            }
+#else
             for (var index = editorUpdateCallbacks.Count - 1; index >= 0; index--)
             {
                 editorUpdateCallbacks[index]();
             }
+#endif
         }
 
         private static void EditorApplicationOnplayModeStateChanged(UnityEditor.PlayModeStateChange state)
@@ -156,17 +283,19 @@ namespace MobX.Utilities.Callbacks
                 case UnityEditor.PlayModeStateChange.EnteredEditMode:
                     OnEnterEditMode();
                     break;
+
                 case UnityEditor.PlayModeStateChange.ExitingEditMode:
                     OnExitEditMode();
-
                     break;
+
                 case UnityEditor.PlayModeStateChange.EnteredPlayMode:
                     OnEnterPlayMode();
-
                     break;
+
                 case UnityEditor.PlayModeStateChange.ExitingPlayMode:
                     OnExitPlayMode();
                     break;
+
                 default:
                     throw new ArgumentOutOfRangeException(nameof(state), state, null);
             }
@@ -180,7 +309,14 @@ namespace MobX.Utilities.Callbacks
                 {
                     continue;
                 }
-                exitPlayModeDelegate[i]();
+                try
+                {
+                    exitPlayModeDelegate[i]();
+                }
+                catch (Exception exception)
+                {
+                    Debug.LogException(exception);
+                }
             }
         }
 
@@ -192,7 +328,14 @@ namespace MobX.Utilities.Callbacks
                 {
                     continue;
                 }
-                enterPlayModeDelegate[i]();
+                try
+                {
+                    enterPlayModeDelegate[i]();
+                }
+                catch (Exception exception)
+                {
+                    Debug.LogException(exception);
+                }
             }
         }
 
@@ -204,10 +347,18 @@ namespace MobX.Utilities.Callbacks
                 {
                     continue;
                 }
-                exitEditModeDelegate[i]();
+                try
+                {
+                    exitEditModeDelegate[i]();
+                }
+                catch (Exception exception)
+                {
+                    Debug.LogException(exception);
+                }
             }
 
             FrameCount = 0;
+            FixedUpdateCount = 0;
         }
 
         private static void OnEnterEditMode()
@@ -223,10 +374,18 @@ namespace MobX.Utilities.Callbacks
                 {
                     continue;
                 }
-                enterEditModeDelegate[i]();
+                try
+                {
+                    enterEditModeDelegate[i]();
+                }
+                catch (Exception exception)
+                {
+                    Debug.LogException(exception);
+                }
             }
 
             FrameCount = 0;
+            FixedUpdateCount = 0;
         }
 
 #endif

@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace MobX.Utilities.Registry
 {
-    public class RegisteredAsset : RuntimeAsset, IUniqueAsset
+    public class RegisteredAsset : ScriptableAsset, IUniqueAsset
     {
         [SerializeField] private RuntimeGUID guid;
         public RuntimeGUID GUID => guid;
