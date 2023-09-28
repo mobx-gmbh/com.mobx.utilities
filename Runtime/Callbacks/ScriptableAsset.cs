@@ -36,7 +36,10 @@ namespace MobX.Utilities.Callbacks
             EngineCallbacks.RemoveCallbacks(this);
         }
 
-        public void ResetObject()
+        /// <summary>
+        ///     Reset the asset to its default values.
+        /// </summary>
+        public void ResetAsset()
         {
             ScriptableObjectUtility.ResetObject(this);
         }

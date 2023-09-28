@@ -5,6 +5,9 @@ using UnityEngine;
 
 namespace MobX.Utilities.Registry
 {
+    /// <summary>
+    ///     Registered assets can be resolved during runtime, using their GUID. They are also loaded with the application.
+    /// </summary>
     public class RegisteredAsset : ScriptableAsset, IUniqueAsset
     {
         [SerializeField] private RuntimeGUID guid;

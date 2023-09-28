@@ -76,12 +76,12 @@ namespace MobX.Utilities.Callbacks
                 }
             }
 #else
-            foreach (var listener in beforeSceneLoadListener)
+            foreach (var listener in beforeFirstSceneLoadListener)
             {
                 listener.OnBeforeFirstSceneLoad();
             }
 
-            foreach (var listener in beforeSceneLoadDelegates)
+            foreach (var listener in beforeFirstSceneLoadDelegates)
             {
                 listener();
             }

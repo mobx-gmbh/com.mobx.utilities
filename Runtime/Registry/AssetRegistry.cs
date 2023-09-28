@@ -97,6 +97,12 @@ namespace MobX.Utilities.Registry
             }
         }
 
+        [Button]
+        private void ClearAll()
+        {
+            registry.Clear();
+        }
+
         static AssetRegistry()
         {
             Gameloop.BeforeDeleteAsset += OnBeforeDeleteAsset;

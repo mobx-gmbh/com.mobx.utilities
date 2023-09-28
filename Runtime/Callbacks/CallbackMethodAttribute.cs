@@ -38,12 +38,12 @@ namespace MobX.Utilities.Callbacks
     ///     Method is called when the games subsystems are initialized.
     /// </summary>
     [AttributeUsage(AttributeTargets.Method)]
-    public class CallbackOnInitialization : CallbackMethodAttribute
+    public class CallbackOnInitializationAttribute : CallbackMethodAttribute
     {
         /// <summary>
         ///     Method is called when the games subsystems are initialized.
         /// </summary>
-        public CallbackOnInitialization() : base(Segment.InitializationCompleted)
+        public CallbackOnInitializationAttribute() : base(Segment.InitializationCompleted)
         {
         }
     }
@@ -52,12 +52,12 @@ namespace MobX.Utilities.Callbacks
     ///     Method is called when the application is shutdown.
     /// </summary>
     [AttributeUsage(AttributeTargets.Method)]
-    public class CallbackOnApplicationQuit : CallbackMethodAttribute
+    public class CallbackOnApplicationQuitAttribute : CallbackMethodAttribute
     {
         /// <summary>
         ///     Method is called when the application is shutdown.
         /// </summary>
-        public CallbackOnApplicationQuit() : base(Segment.ApplicationQuit)
+        public CallbackOnApplicationQuitAttribute() : base(Segment.ApplicationQuit)
         {
         }
     }
@@ -66,12 +66,12 @@ namespace MobX.Utilities.Callbacks
     ///     Method is called every frame.
     /// </summary>
     [AttributeUsage(AttributeTargets.Method)]
-    public class CallbackOnUpdate : CallbackMethodAttribute
+    public class CallbackOnUpdateAttribute : CallbackMethodAttribute
     {
         /// <summary>
         ///     Method is called every frame.
         /// </summary>
-        public CallbackOnUpdate() : base(Segment.Update)
+        public CallbackOnUpdateAttribute() : base(Segment.Update)
         {
         }
     }
@@ -80,12 +80,12 @@ namespace MobX.Utilities.Callbacks
     ///     Method is called every frame during late update.
     /// </summary>
     [AttributeUsage(AttributeTargets.Method)]
-    public class CallbackOnLateUpdate : CallbackMethodAttribute
+    public class CallbackOnLateUpdateAttribute : CallbackMethodAttribute
     {
         /// <summary>
         ///     Method is called every frame during late update.
         /// </summary>
-        public CallbackOnLateUpdate() : base(Segment.LateUpdate)
+        public CallbackOnLateUpdateAttribute() : base(Segment.LateUpdate)
         {
         }
     }
@@ -94,12 +94,68 @@ namespace MobX.Utilities.Callbacks
     ///     Method is called every fixed physics update.
     /// </summary>
     [AttributeUsage(AttributeTargets.Method)]
-    public class CallbackOnFixedUpdate : CallbackMethodAttribute
+    public class CallbackOnFixedUpdateAttribute : CallbackMethodAttribute
     {
         /// <summary>
         ///     Method is called every fixed physics update.
         /// </summary>
-        public CallbackOnFixedUpdate() : base(Segment.FixedUpdate)
+        public CallbackOnFixedUpdateAttribute() : base(Segment.FixedUpdate)
+        {
+        }
+    }
+
+    /// <summary>
+    ///     Method is called after the first scene was loaded.
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Method)]
+    public class CallbackOnAfterFirstSceneLoadAttribute : CallbackMethodAttribute
+    {
+        /// <summary>
+        ///     Method is called after the first scene was loaded.
+        /// </summary>
+        public CallbackOnAfterFirstSceneLoadAttribute() : base(Segment.AfterFirstSceneLoad)
+        {
+        }
+    }
+
+    /// <summary>
+    ///     Method is called before the first scene is loaded.
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Method)]
+    public class CallbackOnBeforeFirstSceneLoadAttribute : CallbackMethodAttribute
+    {
+        /// <summary>
+        ///     Method is called before the first scene is loaded.
+        /// </summary>
+        public CallbackOnBeforeFirstSceneLoadAttribute() : base(Segment.BeforeFirstSceneLoad)
+        {
+        }
+    }
+
+    /// <summary>
+    ///     Method is called when entering edit mode (editor only)
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Method)]
+    public class CallbackOnEnterEditModeAttribute : CallbackMethodAttribute
+    {
+        /// <summary>
+        ///     Method is called when entering edit mode (editor only)
+        /// </summary>
+        public CallbackOnEnterEditModeAttribute() : base(Segment.EnteredEditMode)
+        {
+        }
+    }
+
+    /// <summary>
+    ///     Method is called when exiting edit mode (editor only)
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Method)]
+    public class CallbackOnExitEditModeAttribute : CallbackMethodAttribute
+    {
+        /// <summary>
+        ///     Method is called when exiting edit mode (editor only)
+        /// </summary>
+        public CallbackOnExitEditModeAttribute() : base(Segment.ExitingEditMode)
         {
         }
     }

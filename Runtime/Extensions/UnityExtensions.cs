@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using UnityEngine;
@@ -89,6 +90,25 @@ namespace MobX.Utilities
         public static void SetScale(this Transform transform, Vector3 scale)
         {
             transform.localScale = scale;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void SetVirtualParent(this Transform transform, MonoBehaviour parent, float duration)
+        {
+            var parentTransform = parent.transform;
+            parent.StartCoroutine(VirtualParentCoroutine());
+            return;
+
+            IEnumerator VirtualParentCoroutine()
+            {
+                var timer = 0f;
+                while (timer < duration)
+                {
+                    yield return null;
+                    timer += Time.deltaTime;
+                    transform.SetPositionAndRotation(parentTransform);
+                }
+            }
         }
 
         #endregion

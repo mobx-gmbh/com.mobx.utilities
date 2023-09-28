@@ -250,8 +250,6 @@ namespace MobX.Utilities.Callbacks
             {
                 if (ReferenceEquals(list[index].Target, target))
                 {
-                    Debug.Log("Gameloop",
-                        $"Removing callback {list[index].Method.Name} in {list[index].Method.DeclaringType?.Name}");
                     list.RemoveAt(index);
                 }
             }

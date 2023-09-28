@@ -10,19 +10,36 @@ namespace MobX.Utilities.Fusion
     public class NetworkAssetRegistry : SingletonAsset<NetworkAssetRegistry>
     {
         [ReadonlyInspector]
-        [SerializeField] private List<ScriptableObject> networkAssets;
+        [SerializeField] private List<Object> networkAssets;
 
-        public static T Resolve<T>(int networkAssetId) where T : ScriptableObject, INetworkAsset
+        public static T Resolve<T>(int networkAssetId) where T : Object, INetworkAsset
         {
-            if (Singleton.networkAssets.TryGetElementAt(networkAssetId, out var scriptableObject))
+            if (Singleton.networkAssets.TryGetElementAt(networkAssetId, out var asset))
             {
-                var asset = scriptableObject as T;
-                Assert.IsNotNull(asset);
-                Assert.IsTrue(asset.NetworkAssetID == networkAssetId);
-                return asset;
+                var networkAsset = asset as T;
+                Assert.IsNotNull(networkAsset);
+                Assert.IsTrue(networkAsset.NetworkAssetID == networkAssetId);
+                return networkAsset;
             }
             Debug.LogError(nameof(NetworkAssetRegistry), $"Network Asset for id: [{networkAssetId}] was not found!");
             return null;
+        }
+
+        public static bool IsNull(int networkAssetId)
+        {
+            return !Singleton.networkAssets.TryGetElementAt(networkAssetId, out var asset) || asset == null;
+        }
+
+        public static string GetStringRepresentation(int networkAssetId)
+        {
+            return $"ID: ({networkAssetId}) Asset: ({(Singleton.networkAssets.TryGetElementAt(networkAssetId, out var asset) ? asset.name : "null")})";
+        }
+
+        public static void Register<T>(T asset) where T : Object, INetworkAsset
+        {
+            Singleton.networkAssets.AddUnique(asset);
+            var networkAssetID = Singleton.networkAssets.IndexOf(asset);
+            asset.NetworkAssetID = networkAssetID;
         }
 
 
@@ -30,25 +47,18 @@ namespace MobX.Utilities.Fusion
 
 #if UNITY_EDITOR
 
-        internal static void Register<T>(T asset) where T : ScriptableObject, INetworkAsset
-        {
-            Singleton.networkAssets.AddUnique(asset);
-            var networkAssetID = Singleton.networkAssets.IndexOf(asset);
-            asset.NetworkAssetID = networkAssetID;
-        }
-
         static NetworkAssetRegistry()
         {
             Gameloop.BeforeDeleteAsset += OnBeforeDeleteAsset;
         }
 
-        private static void OnBeforeDeleteAsset(string assetPath, Object asset)
+        private static void OnBeforeDeleteAsset(string assetPath, Object element)
         {
-            if (asset is not INetworkAsset networkAsset)
+            if (element is not INetworkAsset networkAsset)
             {
                 return;
             }
-            Singleton.networkAssets.Remove((ScriptableObject) networkAsset);
+            Singleton.networkAssets.Remove((Object) networkAsset);
             UpdateAssetIndex();
             UnityEditor.EditorUtility.SetDirty(Singleton);
             UnityEditor.AssetDatabase.Refresh();
