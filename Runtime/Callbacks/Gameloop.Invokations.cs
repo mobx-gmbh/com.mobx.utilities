@@ -220,8 +220,6 @@ namespace MobX.Utilities.Callbacks
                 initializationCompletedCallbacks[index]();
             }
 #endif
-
-            Debug.Log(logCategory, "Initialization Completed");
         }
 
         private static void RaiseCallbackInternal(string callbackName)

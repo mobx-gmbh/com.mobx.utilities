@@ -53,6 +53,12 @@ namespace MobX.Utilities
             return new Vector3(Float(-1, 1), Float(-1, 1), Float(-1, 1)).normalized;
         }
 
+        public static T FromSelection<T>(T[] selection)
+        {
+            var index = Int(0, selection.Length);
+            return selection[index];
+        }
+
         #endregion
 
 
@@ -92,7 +98,8 @@ namespace MobX.Utilities
         public static T[] RandomItems<T>(this IList<T> source, int count)
         {
             Assert.IsNotNull(source);
-            Assert.IsTrue(source.Count >= count, $"Cannot select {count} random items from a collection with {source.Count} items!");
+            Assert.IsTrue(source.Count >= count,
+                $"Cannot select {count} random items from a collection with {source.Count} items!");
 
             var buffer = HashSetPool<T>.Get();
 
@@ -111,7 +118,8 @@ namespace MobX.Utilities
         {
             Assert.IsNotNull(source);
             Assert.IsNotNull(results);
-            Assert.IsTrue(source.Count >= count, $"Cannot select {count} random items from a collection with {source.Count} items!");
+            Assert.IsTrue(source.Count >= count,
+                $"Cannot select {count} random items from a collection with {source.Count} items!");
 
             results.Clear();
 
@@ -126,7 +134,8 @@ namespace MobX.Utilities
         {
             Assert.IsNotNull(source);
             Assert.IsNotNull(results);
-            Assert.IsTrue(source.Count >= count, $"Cannot select {count} random items from a collection with {source.Count} items!");
+            Assert.IsTrue(source.Count >= count,
+                $"Cannot select {count} random items from a collection with {source.Count} items!");
 
             results.Clear();
             var buffer = ListPool<T>.Get();
