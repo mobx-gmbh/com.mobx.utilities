@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using UnityEngine;
 using Object = UnityEngine.Object;
 
 namespace MobX.Utilities.Callbacks
@@ -231,6 +233,29 @@ namespace MobX.Utilities.Callbacks
         public static void ClearTimeScaleModifier()
         {
             timeScaleModifier.Clear();
+        }
+
+        #endregion
+
+
+        #region Coroutines
+
+        public static Coroutine StartCoroutine(IEnumerator enumerator)
+        {
+            if (monoBehaviour == null)
+            {
+                return null;
+            }
+            return monoBehaviour.StartCoroutine(enumerator);
+        }
+
+        public static void StopCoroutine(Coroutine coroutine)
+        {
+            if (monoBehaviour == null)
+            {
+                return;
+            }
+            monoBehaviour.StopCoroutine(coroutine);
         }
 
         #endregion

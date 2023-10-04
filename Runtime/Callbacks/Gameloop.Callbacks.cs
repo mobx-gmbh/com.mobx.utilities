@@ -32,6 +32,7 @@ namespace MobX.Utilities.Callbacks
         private static readonly List<Action<bool>> applicationPauseCallbacks = new(Capacity16);
         private static readonly List<Func<Task>> asyncShutdownCallbacks = new(Capacity16);
         private static readonly Dictionary<string, List<Action>> customCallbacks = new();
+        private static MonoBehaviour monoBehaviour;
 
 #if UNITY_EDITOR
         private static readonly List<Action> editorUpdateCallbacks = new(Capacity32);

@@ -10,12 +10,12 @@ namespace MobX.Utilities.Inspector
     public class RequiredAttribute : PropertyAttribute
     {
         /// <summary>
-        /// Custom message that will be displayed if the target is null
+        ///     Custom message that will be displayed if the target is null
         /// </summary>
         public string Message { get; set; }
 
         /// <summary>
-        /// The message type of the displayed message
+        ///     The message type of the displayed message
         /// </summary>
         public MessageLevel MessageLevel { get; set; }
 

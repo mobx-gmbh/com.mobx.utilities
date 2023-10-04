@@ -24,7 +24,7 @@ namespace MobX.Utilities.Callbacks
             Segment = Segment.BeforeFirstSceneLoad;
             IsQuitting = false;
 #if ENABLE_GAMELOOP_CALLBACKS
-            RuntimeMonoBehaviourEvents.Create(
+            monoBehaviour = RuntimeMonoBehaviourEvents.Create(
                 OnUpdate,
                 OnLateUpdate,
                 OnFixedUpdate,
@@ -196,7 +196,6 @@ namespace MobX.Utilities.Callbacks
             Segment = Segment.InitializationCompleted;
             if (InitializationCompletedState)
             {
-                Debug.LogWarning(logCategory, $"{nameof(RaiseInitializationCompleted)} has already been invoked!");
                 return;
             }
 

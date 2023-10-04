@@ -105,6 +105,14 @@ namespace MobX.Utilities.Editor.Inspector.InspectorFields
 
                     list.Add(inspector);
                 }
+
+                if (propertyInfo.TryGetCustomAttribute<TexturePreviewAttribute>(out var previewAttribute))
+                {
+                    InspectorMember inspector =
+                        new TexturePropertyInspector(propertyInfo, previewAttribute, target.targetObject);
+
+                    list.Add(inspector);
+                }
             }
             catch (Exception exception)
             {

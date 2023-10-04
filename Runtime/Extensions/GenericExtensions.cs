@@ -102,7 +102,8 @@ namespace MobX.Utilities
         public static bool EqualsAll<T>(this T target, T otherA, T otherB, T otherC)
         {
             var comparer = EqualityComparer<T>.Default;
-            return comparer.Equals(target, otherA) && comparer.Equals(target, otherB) && comparer.Equals(target, otherC);
+            return comparer.Equals(target, otherA) && comparer.Equals(target, otherB) &&
+                   comparer.Equals(target, otherC);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -236,7 +237,7 @@ namespace MobX.Utilities
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static string ToNullString<T>(this T target) where T : class
         {
-            return target.IsNull() ? "null" : target.ToString();
+            return target == null ? "null" : target.ToString();
         }
 
         #endregion

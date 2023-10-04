@@ -8,7 +8,7 @@ namespace MobX.Utilities.Inspector
     {
         Default = 0,
         Center = 1,
-        Right = 2,
+        Right = 2
     }
 
     [MeansImplicitUse]
@@ -20,6 +20,7 @@ namespace MobX.Utilities.Inspector
         public ButtonType ButtonType { get; } = ButtonType.Default;
         public bool ShowResult { get; set; } = true;
         public bool ShowArguments { get; set; } = true;
+        public bool RuntimeOnly { get; set; }
 
         public ButtonAttribute()
         {

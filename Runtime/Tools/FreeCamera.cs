@@ -2,6 +2,7 @@ using MobX.Utilities.Inspector;
 using MobX.Utilities.Types;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Serialization;
 
 namespace MobX.Utilities.Tools
 {
@@ -23,7 +24,8 @@ namespace MobX.Utilities.Tools
 
         [Header("Input Maps")]
         [SerializeField] private bool enableOnLoad;
-        [SerializeField] private ActionMapName actionMap;
+        [FormerlySerializedAs("actionMap")] [SerializeField]
+        private InputActionMapName inputActionMap;
         [SerializeField] [Required] private InputActionAsset inputActionAsset;
         [Header("Input")]
         [SerializeField] [Required] private InputActionReference movementInput;
@@ -51,13 +53,13 @@ namespace MobX.Utilities.Tools
         public void Activate()
         {
             inputActionAsset.Enable();
-            inputActionAsset.FindActionMap(actionMap).Enable();
+            inputActionAsset.FindActionMap(inputActionMap).Enable();
         }
 
         public void Deactivate()
         {
             inputActionAsset.Disable();
-            inputActionAsset.FindActionMap(actionMap).Disable();
+            inputActionAsset.FindActionMap(inputActionMap).Disable();
         }
 
         #endregion

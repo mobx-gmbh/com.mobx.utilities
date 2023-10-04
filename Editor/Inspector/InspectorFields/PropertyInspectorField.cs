@@ -24,10 +24,12 @@ namespace MobX.Utilities.Editor.Inspector.InspectorFields
 
             _inline = propertyInfo.HasAttribute<InlineInspectorAttribute>();
 
-            var label = propertyInfo.TryGetCustomAttribute<LabelAttribute>(out LabelAttribute labelAttribute)
+            var label = propertyInfo.TryGetCustomAttribute(out LabelAttribute labelAttribute)
                 ? labelAttribute.Label
                 : _propertyInfo.Name.Humanize(Prefixes);
-            var tooltip = propertyInfo.TryGetCustomAttribute<TooltipAttribute>(out TooltipAttribute tooltipAttribute) ? tooltipAttribute.tooltip : null;
+            var tooltip = propertyInfo.TryGetCustomAttribute(out TooltipAttribute tooltipAttribute)
+                ? tooltipAttribute.tooltip
+                : null;
 
             Label = new GUIContent(label, tooltip);
 
@@ -90,10 +92,12 @@ namespace MobX.Utilities.Editor.Inspector.InspectorFields
 
             _inline = propertyInfo.HasAttribute<InlineInspectorAttribute>();
 
-            var label = propertyInfo.TryGetCustomAttribute<LabelAttribute>(out LabelAttribute labelAttribute)
+            var label = propertyInfo.TryGetCustomAttribute(out LabelAttribute labelAttribute)
                 ? labelAttribute.Label
                 : _propertyInfo.Name.Humanize(Prefixes);
-            var tooltip = propertyInfo.TryGetCustomAttribute<TooltipAttribute>(out TooltipAttribute tooltipAttribute) ? tooltipAttribute.tooltip : null;
+            var tooltip = propertyInfo.TryGetCustomAttribute(out TooltipAttribute tooltipAttribute)
+                ? tooltipAttribute.tooltip
+                : null;
 
             Label = new GUIContent(label, tooltip);
 
@@ -133,6 +137,38 @@ namespace MobX.Utilities.Editor.Inspector.InspectorFields
             _editor ??= UnityEditor.Editor.CreateEditor(targetObject);
             _editor.OnInspectorGUI();
             _editor.serializedObject.ApplyModifiedProperties();
+        }
+    }
+
+    public class TexturePropertyInspector : InspectorMember
+    {
+        private readonly PropertyInfo _propertyInfo;
+        private readonly object _target;
+        private readonly UnityEditor.MessageType _messageType;
+        private UnityEditor.Editor _editor;
+        private readonly int _scale;
+
+        public TexturePropertyInspector(PropertyInfo propertyInfo, TexturePreviewAttribute attribute, object target) :
+            base(propertyInfo, target)
+        {
+            _propertyInfo = propertyInfo;
+            _target = target;
+            _scale = attribute.PreviewFieldHeight;
+
+            var label = propertyInfo.TryGetCustomAttribute(out LabelAttribute labelAttribute)
+                ? labelAttribute.Label
+                : _propertyInfo.Name.Humanize(Prefixes);
+            var tooltip = propertyInfo.TryGetCustomAttribute(out TooltipAttribute tooltipAttribute)
+                ? tooltipAttribute.tooltip
+                : null;
+
+            Label = new GUIContent(label, tooltip);
+        }
+
+        protected override void DrawGUI()
+        {
+            var texture = (Texture2D) _propertyInfo.GetValue(_target);
+            GUIHelper.DrawTexture(texture, _scale);
         }
     }
 }

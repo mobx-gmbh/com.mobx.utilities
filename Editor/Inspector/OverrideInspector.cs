@@ -1,4 +1,3 @@
-using MobX.Utilities.Callbacks;
 using MobX.Utilities.Editor.Helper;
 using MobX.Utilities.Editor.Inspector.InspectorFields;
 using MobX.Utilities.Inspector;
@@ -16,7 +15,6 @@ namespace MobX.Utilities.Editor.Inspector
     {
         #region Fields
 
-        private UnityEditor.SerializedProperty _script;
         private string _filterString;
         private bool _useDefaultInspector;
         private bool _hideMonoScript;
@@ -53,7 +51,6 @@ namespace MobX.Utilities.Editor.Inspector
 
             base.OnEnable();
 
-            _script = serializedObject.FindProperty("m_Script");
             _hideMonoScript = targetType.HasAttribute<HideMonoScriptAttribute>(true);
 
             if (targetType.TryGetCustomAttribute(out DescriptionAttribute descriptionAttribute))
@@ -293,17 +290,6 @@ namespace MobX.Utilities.Editor.Inspector
             }
 
             serializedObject.ApplyModifiedProperties();
-        }
-
-        private void DrawScriptField()
-        {
-            var enabled = GUI.enabled;
-            GUI.enabled = false;
-            if (_script != null && Gameloop.EditorState != 3)
-            {
-                UnityEditor.EditorGUILayout.PropertyField(_script);
-            }
-            GUI.enabled = enabled;
         }
 
         private void DrawDescription()

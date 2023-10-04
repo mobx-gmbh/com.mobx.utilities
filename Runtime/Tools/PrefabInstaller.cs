@@ -1,31 +1,32 @@
 using MobX.Utilities.Callbacks;
+using MobX.Utilities.Singleton;
 using MobX.Utilities.Types;
-using System;
 using UnityEngine;
 
 namespace MobX.Utilities.Tools
 {
-    public class Installer : ScriptableAsset
+    public class PrefabInstaller : SingletonAsset<PrefabInstaller>
     {
         [SerializeField] private bool autoInstall;
         [SerializeField] private Optional<GameObject>[] systems;
 
-        [NonSerialized] private bool _installed;
+        private static bool installed;
 
         [CallbackOnInitialization]
         private void Install()
         {
-            if (_installed || autoInstall is false)
+            if (installed || autoInstall is false)
             {
                 return;
             }
-            _installed = true;
+            installed = true;
             foreach (var system in systems)
             {
                 if (system.TryGetValue(out var prefab))
                 {
                     var instance = Instantiate(prefab);
                     instance.DontDestroyOnLoad();
+                    instance.name = $"[{prefab.name}]";
                 }
             }
         }
@@ -33,7 +34,7 @@ namespace MobX.Utilities.Tools
         [CallbackOnApplicationQuit]
         private void OnQuit()
         {
-            _installed = false;
+            installed = false;
         }
     }
 }

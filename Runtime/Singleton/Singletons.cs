@@ -1,4 +1,5 @@
 using MobX.Utilities.Inspector;
+using MobX.Utilities.Reflection;
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
@@ -9,6 +10,7 @@ using Object = UnityEngine.Object;
 namespace MobX.Utilities.Singleton
 {
     [CreateAssetMenu]
+    [AddressablesGroup("Singletons")]
     public sealed class Singletons : ScriptableObject, ISerializationCallbackReceiver
     {
         #region Data
@@ -76,7 +78,8 @@ namespace MobX.Utilities.Singleton
 #endif
             if (IsLoaded is false)
             {
-                Debug.LogError("Singleton", $"Registry is not loaded yet! Cannot register instance for {typeof(T)}", instance);
+                Debug.LogError("Singleton", $"Registry is not loaded yet! Cannot register instance for {typeof(T)}",
+                    instance);
                 return;
             }
 
@@ -109,7 +112,10 @@ namespace MobX.Utilities.Singleton
                 }
             }
 
-            static bool IsImport() => UnityEditor.EditorApplication.isCompiling || UnityEditor.EditorApplication.isUpdating;
+            static bool IsImport()
+            {
+                return UnityEditor.EditorApplication.isCompiling || UnityEditor.EditorApplication.isUpdating;
+            }
 #endif
         }
 
@@ -190,6 +196,7 @@ namespace MobX.Utilities.Singleton
                         "Singleton Registry is null! Please create a new Singleton Registry (ScriptableObject)");
                 }
 #endif
+
                 return singleton;
             }
         }

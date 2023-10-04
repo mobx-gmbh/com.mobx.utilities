@@ -10,6 +10,9 @@ namespace MobX.Utilities.Callbacks
     /// </summary>
     public abstract class ScriptableAsset : ScriptableObject
     {
+        [Tooltip("When enabled, this asset can receive custom callback methods")]
+        [SerializeField] private bool receiveCallbacks = true;
+
         [Conditional("UNITY_EDITOR")]
         public void Repaint()
         {
@@ -20,8 +23,11 @@ namespace MobX.Utilities.Callbacks
 
         protected virtual void OnEnable()
         {
-            Gameloop.Register(this);
-            EngineCallbacks.AddCallbacks(this);
+            if (receiveCallbacks)
+            {
+                Gameloop.Register(this);
+                EngineCallbacks.AddCallbacks(this);
+            }
         }
 
         protected virtual void OnDisable()

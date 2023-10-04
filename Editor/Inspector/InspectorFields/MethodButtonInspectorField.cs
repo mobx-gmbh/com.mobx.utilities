@@ -10,12 +10,18 @@ namespace MobX.Utilities.Editor.Inspector.InspectorFields
     {
         private readonly ButtonType _buttonType;
         private readonly Action _drawGUI;
+        private readonly bool _runtimeOnly;
 
-        public MethodButtonInspectorMember(MethodInfo methodInfo, ButtonAttribute attribute, object target) : base(methodInfo, target)
+        public MethodButtonInspectorMember(MethodInfo methodInfo, ButtonAttribute attribute, object target) : base(
+            methodInfo, target)
         {
             var label = attribute.Label ?? methodInfo.Name.Humanize();
-            var tooltip = methodInfo.TryGetCustomAttribute(out TooltipAttribute tooltipAttribute) ? tooltipAttribute.tooltip : null;
+            var tooltip = methodInfo.TryGetCustomAttribute(out TooltipAttribute tooltipAttribute)
+                ? tooltipAttribute.tooltip
+                : null;
             Label = new GUIContent(label, tooltip);
+
+            _runtimeOnly = attribute.RuntimeOnly;
 
             var parameterInfos = methodInfo.GetParameters();
             var showResult = attribute.ShowResult;
@@ -79,9 +85,9 @@ namespace MobX.Utilities.Editor.Inspector.InspectorFields
             {
                 _drawGUI += GUIHelper.BeginBox;
 
-                var methodCall = methodInfo.IsStatic ?
-                    methodInfo.CreateMatchingDelegate() :
-                    methodInfo.CreateMatchingDelegate(target);
+                var methodCall = methodInfo.IsStatic
+                    ? methodInfo.CreateMatchingDelegate()
+                    : methodInfo.CreateMatchingDelegate(target);
 
                 var returnValue = default(object);
                 var hasReturnValue = methodInfo.HasReturnValue();
@@ -92,13 +98,11 @@ namespace MobX.Utilities.Editor.Inspector.InspectorFields
                     {
                         var parameterInfo = parameterInfos[index];
 
-                        var elementEditor = GUIHelper.CreateEditor(new GUIContent(parameterInfo.Name), parameterInfo.ParameterType);
+                        var elementEditor = GUIHelper.CreateEditor(new GUIContent(parameterInfo.Name),
+                            parameterInfo.ParameterType);
                         var capturedIndex = index;
 
-                        _drawGUI += () =>
-                        {
-                            arguments[capturedIndex] = elementEditor(arguments[capturedIndex]);
-                        };
+                        _drawGUI += () => { arguments[capturedIndex] = elementEditor(arguments[capturedIndex]); };
                     }
                 }
 
@@ -116,7 +120,8 @@ namespace MobX.Utilities.Editor.Inspector.InspectorFields
                     _drawGUI += () =>
                     {
                         GUIHelper.BeginEnabledOverride(false);
-                        UnityEditor.EditorGUILayout.LabelField("Result", wasCalled ? returnValue.ToNullString() : string.Empty);
+                        UnityEditor.EditorGUILayout.LabelField("Result",
+                            wasCalled ? returnValue.ToNullString() : string.Empty);
                         GUIHelper.EndEnabledOverride();
                     };
                 }
@@ -127,7 +132,17 @@ namespace MobX.Utilities.Editor.Inspector.InspectorFields
 
         protected override void DrawGUI()
         {
+            if (_runtimeOnly && Application.isPlaying is false)
+            {
+                GUIHelper.BeginEnabledOverride(false);
+            }
+
             _drawGUI();
+
+            if (_runtimeOnly && Application.isPlaying is false)
+            {
+                GUIHelper.EndEnabledOverride();
+            }
         }
     }
 }

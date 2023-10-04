@@ -1,9 +1,11 @@
 using MobX.Utilities.Callbacks;
+using MobX.Utilities.Reflection;
 using System.Diagnostics;
 using UnityEngine;
 
 namespace MobX.Utilities.Singleton
 {
+    [AddressablesGroup("Singletons")]
     public abstract class SingletonAsset<T> : ScriptableObject where T : SingletonAsset<T>
     {
         public static T Singleton => singleton ??= Singletons.Resolve<T>();
@@ -11,6 +13,7 @@ namespace MobX.Utilities.Singleton
 
         protected virtual void OnEnable()
         {
+            singleton = (T) this;
             Gameloop.Register(this);
             EngineCallbacks.AddCallbacks(this);
 
@@ -22,6 +25,10 @@ namespace MobX.Utilities.Singleton
 
         private void OnDisable()
         {
+            if (singleton == this)
+            {
+                singleton = null;
+            }
             Gameloop.Unregister(this);
             EngineCallbacks.RemoveCallbacks(this);
         }
@@ -32,6 +39,14 @@ namespace MobX.Utilities.Singleton
         protected void Repaint()
         {
 #if UNITY_EDITOR
+            if (Gameloop.IsQuitting)
+            {
+                return;
+            }
+            if (this == null)
+            {
+                return;
+            }
             UnityEditor.EditorUtility.SetDirty(this);
 #endif
         }

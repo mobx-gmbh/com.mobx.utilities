@@ -6,22 +6,22 @@ using UnityEngine.InputSystem;
 namespace MobX.Utilities.Types
 {
     [Serializable]
-    public struct ActionMapName
+    public struct InputActionMapName
     {
         [SerializeField]
         private string actionMapName;
 
-        public static implicit operator string(ActionMapName actionMap)
+        public static implicit operator string(InputActionMapName inputActionMap)
         {
-            return actionMap.actionMapName;
+            return inputActionMap.actionMapName;
         }
 
-        public static implicit operator ActionMapName(string name)
+        public static implicit operator InputActionMapName(string name)
         {
-            return new ActionMapName(name);
+            return new InputActionMapName(name);
         }
 
-        public ActionMapName(string name)
+        public InputActionMapName(string name)
         {
             actionMapName = name;
         }
@@ -33,7 +33,7 @@ namespace MobX.Utilities.Types
     }
 
 #if UNITY_EDITOR
-    [UnityEditor.CustomPropertyDrawer(typeof(ActionMapName))]
+    [UnityEditor.CustomPropertyDrawer(typeof(InputActionMapName))]
     public class ActionMapNamePropertyDrawer : UnityEditor.PropertyDrawer
     {
         private List<string> _actionMapNames;

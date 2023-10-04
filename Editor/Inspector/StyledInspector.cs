@@ -1,5 +1,7 @@
+using MobX.Utilities.Callbacks;
 using System;
 using System.Reflection;
+using UnityEngine;
 using Object = UnityEngine.Object;
 
 namespace MobX.Utilities.Editor.Inspector
@@ -26,6 +28,7 @@ namespace MobX.Utilities.Editor.Inspector
          */
 
         private string _editorPrefsKey;
+        private UnityEditor.SerializedProperty _script;
 
         #endregion
 
@@ -65,6 +68,7 @@ namespace MobX.Utilities.Editor.Inspector
         {
             Target = target as T;
             Targets = targets.ConvertTo<T>();
+            _script = serializedObject.FindProperty("m_Script");
 
             if (Target == null)
             {
@@ -95,6 +99,17 @@ namespace MobX.Utilities.Editor.Inspector
                 return;
             }
             Foldout?.SaveState();
+        }
+
+        protected void DrawScriptField()
+        {
+            var enabled = GUI.enabled;
+            GUI.enabled = false;
+            if (_script != null && Gameloop.EditorState != 3)
+            {
+                UnityEditor.EditorGUILayout.PropertyField(_script);
+            }
+            GUI.enabled = enabled;
         }
     }
 }

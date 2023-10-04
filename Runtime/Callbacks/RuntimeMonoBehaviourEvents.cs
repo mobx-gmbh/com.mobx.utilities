@@ -43,7 +43,7 @@ namespace MobX.Utilities.Callbacks
             _onPause(pauseStatus);
         }
 
-        internal static void Create(Action onUpdate, Action onLateUpdate, Action onFixedUpdate, Action onQuit,
+        internal static MonoBehaviour Create(Action onUpdate, Action onLateUpdate, Action onFixedUpdate, Action onQuit,
             Action<bool> onFocus, Action<bool> onPause)
         {
             var gameObject = new GameObject(nameof(RuntimeMonoBehaviourEvents));
@@ -57,6 +57,7 @@ namespace MobX.Utilities.Callbacks
             instance._onQuit = onQuit;
             instance._onFocus = onFocus;
             instance._onPause = onPause;
+            return instance;
         }
     }
 }

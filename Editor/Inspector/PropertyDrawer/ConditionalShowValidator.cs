@@ -8,7 +8,7 @@ namespace MobX.Utilities.Editor.Inspector.PropertyDrawer
         {
             var convertedRhs = TryConvert(getRhs(), lhs);
 
-            Type valueType = getRhs().GetType();
+            var valueType = getRhs().GetType();
 
             return valueType.IsFlagsEnum()
                 ? negationCondition
