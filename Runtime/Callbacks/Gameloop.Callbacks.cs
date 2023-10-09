@@ -334,5 +334,25 @@ namespace MobX.Utilities.Callbacks
         }
 
         #endregion
+
+
+        #region Validations
+
+        public static bool IsDelegateSubscribedToUpdate(Action update)
+        {
+            return updateCallbacks.Contains(update);
+        }
+
+        public static bool IsDelegateSubscribedToLateUpdate(Action update)
+        {
+            return lateUpdateCallbacks.Contains(update);
+        }
+
+        public static bool IsDelegateSubscribedToFixedUpdate(Action update)
+        {
+            return fixedUpdateCallbacks.Contains(update);
+        }
+
+        #endregion
     }
 }

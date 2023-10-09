@@ -10,6 +10,54 @@ namespace MobX.Utilities
         #region Math
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool IsPositive(this int value)
+        {
+            return value > 0;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool IsNegative(this int value)
+        {
+            return value < 0;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool IsPositive(this float value)
+        {
+            return value > 0;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool IsNegative(this float value)
+        {
+            return value < 0;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool IsZero(this int value)
+        {
+            return value == 0;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool IsZero(this float value)
+        {
+            return value == 0;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool IsNotZero(this float value)
+        {
+            return value != 0;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool IsNotZero(this int value)
+        {
+            return value != 0;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int RoundToInt(this float origin)
         {
             return Mathf.RoundToInt(origin);
@@ -48,13 +96,13 @@ namespace MobX.Utilities
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsBinarySequenceExcludeZero(this int n)
         {
-            return n > 0 && (n & n - 1) == 0;
+            return n > 0 && (n & (n - 1)) == 0;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsBinarySequence(this int n)
         {
-            return (n & n - 1) == 0;
+            return (n & (n - 1)) == 0;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
