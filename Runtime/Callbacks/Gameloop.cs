@@ -191,6 +191,15 @@ namespace MobX.Utilities.Callbacks
         }
 
         /// <summary>
+        ///     Called once every second.
+        /// </summary>
+        public static event Action SecondUpdate
+        {
+            add => secondUpdateCallbacks.AddNullChecked(value);
+            remove => secondUpdateCallbacks.Remove(value);
+        }
+
+        /// <summary>
         ///     Called when asynchronous initialization has completed.
         ///     Requires <see cref="RaiseInitializationCompleted" /> to be called.
         ///     This event is called retroactively.

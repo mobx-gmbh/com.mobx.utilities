@@ -67,7 +67,14 @@ namespace MobX.Utilities.Fusion
         [Button]
         private static void UpdateAssetIndex()
         {
-            Singleton.networkAssets.RemoveNull();
+            for (var index = Singleton.networkAssets.Count - 1; index >= 0; index--)
+            {
+                var item = Singleton.networkAssets[index];
+                if (item == null || item is not INetworkAsset)
+                {
+                    Singleton.networkAssets.RemoveAt(index);
+                }
+            }
 
             for (var index = 0; index < Singleton.networkAssets.Count; index++)
             {

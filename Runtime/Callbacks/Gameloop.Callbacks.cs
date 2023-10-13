@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MobX.Utilities.Types;
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -27,12 +28,15 @@ namespace MobX.Utilities.Callbacks
         private static readonly List<Action> updateCallbacks = new(Capacity32);
         private static readonly List<Action> lateUpdateCallbacks = new(Capacity32);
         private static readonly List<Action> fixedUpdateCallbacks = new(Capacity32);
+        private static readonly List<Action> secondUpdateCallbacks = new(Capacity32);
         private static readonly List<Action> applicationQuitCallbacks = new(Capacity32);
         private static readonly List<Action<bool>> applicationFocusCallbacks = new(Capacity16);
         private static readonly List<Action<bool>> applicationPauseCallbacks = new(Capacity16);
         private static readonly List<Func<Task>> asyncShutdownCallbacks = new(Capacity16);
         private static readonly Dictionary<string, List<Action>> customCallbacks = new();
         private static MonoBehaviour monoBehaviour;
+
+        private static Timer OneSecondTimer { get; set; } = Timer.None;
 
 #if UNITY_EDITOR
         private static readonly List<Action> editorUpdateCallbacks = new(Capacity32);

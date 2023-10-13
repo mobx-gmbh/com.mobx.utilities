@@ -1,4 +1,4 @@
-﻿namespace MobX.Utilities
+﻿namespace MobX.Utilities.Libraries
 {
     public interface IWeighted
     {

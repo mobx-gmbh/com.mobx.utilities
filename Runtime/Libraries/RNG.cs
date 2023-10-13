@@ -7,7 +7,7 @@ using UnityEngine.Assertions;
 using UnityEngine.Pool;
 using static UnityEngine.Random;
 
-namespace MobX.Utilities
+namespace MobX.Utilities.Libraries
 {
     public static class RNG
     {

@@ -96,13 +96,13 @@ namespace MobX.Utilities
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsBinarySequenceExcludeZero(this int n)
         {
-            return n > 0 && (n & (n - 1)) == 0;
+            return n > 0 && (n & n - 1) == 0;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsBinarySequence(this int n)
         {
-            return (n & (n - 1)) == 0;
+            return (n & n - 1) == 0;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -253,6 +253,16 @@ namespace MobX.Utilities
         public static float3 ToFloat3(this Vector3 vector3)
         {
             return new float3(vector3.x, vector3.y, vector3.z);
+        }
+
+        public static float GetPercentage(this float value, float percentage)
+        {
+            return value * (percentage * .01f);
+        }
+
+        public static float GetPercentage(this int value, float percentage)
+        {
+            return value * (percentage * .01f);
         }
 
         #endregion

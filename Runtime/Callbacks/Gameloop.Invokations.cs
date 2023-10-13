@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MobX.Utilities.Types;
+using System;
 using UnityEngine;
 
 namespace MobX.Utilities.Callbacks
@@ -69,6 +70,35 @@ namespace MobX.Utilities.Callbacks
             for (var index = updateCallbacks.Count - 1; index >= 0; index--)
             {
                 updateCallbacks[index]();
+            }
+#endif
+            OnSecondUpdate();
+        }
+
+        private static void OnSecondUpdate()
+        {
+            if (OneSecondTimer.IsRunning)
+            {
+                return;
+            }
+
+            OneSecondTimer = new Timer(1);
+#if DEBUG
+            for (var index = secondUpdateCallbacks.Count - 1; index >= 0; index--)
+            {
+                try
+                {
+                    secondUpdateCallbacks[index]();
+                }
+                catch (Exception exception)
+                {
+                    Debug.LogException(logCategory, exception);
+                }
+            }
+#else
+            for (var index = secondUpdateCallbacks.Count - 1; index >= 0; index--)
+            {
+                secondUpdateCallbacks[index]();
             }
 #endif
         }

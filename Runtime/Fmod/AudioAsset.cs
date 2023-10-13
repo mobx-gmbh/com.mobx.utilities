@@ -55,5 +55,10 @@ namespace MobX.Utilities.Fmod
                 audioInstance.setVolume(volume.Value);
             }
         }
+
+        public void StopInstance(ref EventInstance instance)
+        {
+            instance.StopAndRelease();
+        }
     }
 }

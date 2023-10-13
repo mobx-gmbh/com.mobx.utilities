@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace MobX.Utilities
+namespace MobX.Utilities.Libraries
 {
     /// <summary>
     ///     Class containing the vector equivalent operations of <see cref="Mathf" />
@@ -117,7 +117,7 @@ namespace MobX.Utilities
         /// <returns>The clamped rotation</returns>
         public static Quaternion ClampAngles(Quaternion val, Vector3 minAngles, Vector3 maxAngles)
         {
-            Vector3 eulers = val.eulerAngles;
+            var eulers = val.eulerAngles;
             for (var i = 0; i < 3; i++)
             {
                 if (eulers[i] > 180f)
@@ -131,7 +131,7 @@ namespace MobX.Utilities
         public static Vector3 GetClosestPointOnLineSegment(Vector3 point, Vector3 lineStart, Vector3 lineEnd)
         {
             // calculate coordinates of the point on the line segment
-            Vector3 dir = lineEnd - lineStart;
+            var dir = lineEnd - lineStart;
             var t = Vector3.Dot(point - lineStart, dir) / dir.sqrMagnitude;
             // clamp to segment
             t = Mathf.Clamp01(t);
