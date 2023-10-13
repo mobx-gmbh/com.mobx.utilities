@@ -11,24 +11,24 @@ namespace MobX.Utilities
          *  Color Presets
          */
 
-        public static Color SoftWhite { get; } = new Color(0.92f, 0.92f, 0.95f);
+        public static Color SoftWhite { get; } = new(0.92f, 0.92f, 0.95f);
 
-        public static Color HotPink { get; } = new Color(1f, 0.41f, 0.71f);
-        public static Color DeepPink { get; } = new Color(1f, 0.08f, 0.58f);
-        public static Color MediumVioletRed { get; } = new Color(0.78f, 0.08f, 0.52f);
-        public static Color MediumSlateBlue { get; } = new Color(0.48f, 0.41f, 0.93f);
-        public static Color TypeMagenta { get; } = new Color(0.76f, 0.57f, 1f);
-        public static Color LightSkyBlue { get; } = new Color(0.64f, 0.81f, 0.98f);
-        public static Color SteelBlue { get; } = new Color(0.27f, 0.51f, 0.71f);
-        public static Color CornflowerBlue { get; } = new Color(0.39f, 0.58f, 0.93f);
-        public static Color DarkSlateBlue { get; } = new Color(0.28f, 0.24f, 0.55f);
-        public static Color VarBlue { get; } = new Color(0.52f, 0.56f, 0.91f);
-        public static Color DarkGrey { get; } = new Color(0.29f, 0.29f, 0.29f);
-        public static Color Gold { get; } = new Color(1f, 0.92f, 0.62f);
-        public static Color Coral { get; } = new Color(1f, 0.5f, 0.31f);
-        public static Color Tomato { get; } = new Color(1f, 0.39f, 0.28f);
-        public static Color OrangeRed { get; } = new Color(1f, 0.27f, 0f);
-        public static Color SoftLime { get; } = new Color(0.53f, 1f, 0.71f);
+        public static Color HotPink { get; } = new(1f, 0.41f, 0.71f);
+        public static Color DeepPink { get; } = new(1f, 0.08f, 0.58f);
+        public static Color MediumVioletRed { get; } = new(0.78f, 0.08f, 0.52f);
+        public static Color MediumSlateBlue { get; } = new(0.48f, 0.41f, 0.93f);
+        public static Color TypeMagenta { get; } = new(0.76f, 0.57f, 1f);
+        public static Color LightSkyBlue { get; } = new(0.64f, 0.81f, 0.98f);
+        public static Color SteelBlue { get; } = new(0.27f, 0.51f, 0.71f);
+        public static Color CornflowerBlue { get; } = new(0.39f, 0.58f, 0.93f);
+        public static Color DarkSlateBlue { get; } = new(0.28f, 0.24f, 0.55f);
+        public static Color VarBlue { get; } = new(0.52f, 0.56f, 0.91f);
+        public static Color DarkGrey { get; } = new(0.29f, 0.29f, 0.29f);
+        public static Color Gold { get; } = new(1f, 0.92f, 0.62f);
+        public static Color Coral { get; } = new(1f, 0.5f, 0.31f);
+        public static Color Tomato { get; } = new(1f, 0.39f, 0.28f);
+        public static Color OrangeRed { get; } = new(1f, 0.27f, 0f);
+        public static Color SoftLime { get; } = new(0.53f, 1f, 0.71f);
 
         /*
          *  RichTextExtensions operations
@@ -37,19 +37,13 @@ namespace MobX.Utilities
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static string Colorize(this string content)
         {
-            return content.Colorize(VarBlue);
+            return Debug.Colorize(content, VarBlue);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static string Colorize(this string content, Color color)
         {
-            var stringBuilder = ConcurrentStringBuilderPool.Get();
-            stringBuilder.Append("<color=#");
-            stringBuilder.Append(ColorUtility.ToHtmlStringRGBA(color));
-            stringBuilder.Append('>');
-            stringBuilder.Append(content);
-            stringBuilder.Append("</color>");
-            return ConcurrentStringBuilderPool.Release(stringBuilder);
+            return Debug.Colorize(content, color);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -208,7 +202,7 @@ namespace MobX.Utilities
         {
             return logType switch
             {
-                LogType.Log => RichTextExtensions.SoftWhite,
+                LogType.Log => SoftWhite,
                 LogType.Error => Color.red,
                 LogType.Exception => Color.red,
                 LogType.Assert => Color.red,
