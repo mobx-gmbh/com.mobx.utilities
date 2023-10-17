@@ -310,7 +310,10 @@ namespace MobX.Utilities.Callbacks
 
         private static void OnEditorUpdate()
         {
-            Segment = Segment.EditorUpdate;
+            if (Application.isPlaying is false)
+            {
+                Segment = Segment.EditorUpdate;
+            }
 #if DEBUG
             for (var index = editorUpdateCallbacks.Count - 1; index >= 0; index--)
             {

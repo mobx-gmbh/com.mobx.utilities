@@ -346,16 +346,19 @@ namespace MobX.Utilities.Callbacks
 
         #region Validations
 
+        // ReSharper disable Unity.PerformanceAnalysis
         public static bool IsDelegateSubscribedToUpdate(Action update)
         {
             return updateCallbacks.Contains(update);
         }
 
+        // ReSharper disable Unity.PerformanceAnalysis
         public static bool IsDelegateSubscribedToLateUpdate(Action update)
         {
             return lateUpdateCallbacks.Contains(update);
         }
 
+        // ReSharper disable Unity.PerformanceAnalysis
         public static bool IsDelegateSubscribedToFixedUpdate(Action update)
         {
             return fixedUpdateCallbacks.Contains(update);

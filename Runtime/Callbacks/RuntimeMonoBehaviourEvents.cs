@@ -1,9 +1,11 @@
-﻿using System;
+﻿using MobX.Utilities.Reflection;
+using System;
 using UnityEngine;
 
 namespace MobX.Utilities.Callbacks
 {
     [DisallowMultipleComponent]
+    [ExecutionOrder(0)]
     internal sealed class RuntimeMonoBehaviourEvents : MonoBehaviour
     {
         private Action _onFixedUpdate;
