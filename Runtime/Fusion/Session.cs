@@ -1,4 +1,5 @@
 ﻿using Fusion;
+using System;
 using UnityEngine;
 
 namespace MobX.Utilities.Fusion
@@ -22,6 +23,28 @@ namespace MobX.Utilities.Fusion
         /// </summary>
         public static float SmoothSharedTime => IsInitialized ? Singleton.NetworkedSmoothSharedTime : 0;
 
+        /// <summary>
+        ///     Called when the session is initialized. Will trigger retroactively.
+        ///     You don't have to unsubscribe from this event.
+        /// </summary>
+        public static event Action Initialized
+        {
+            add
+            {
+                if (IsInitialized)
+                {
+                    value();
+                }
+                else
+                {
+                    onInitialized += value;
+                }
+            }
+            remove => onInitialized -= value;
+        }
+
+        private static Action onInitialized;
+
         #endregion
 
 
@@ -42,6 +65,8 @@ namespace MobX.Utilities.Fusion
         {
             base.Spawned();
             IsInitialized = true;
+            onInitialized?.Invoke();
+            onInitialized = null;
         }
 
         public override void Despawned(NetworkRunner runner, bool hasState)

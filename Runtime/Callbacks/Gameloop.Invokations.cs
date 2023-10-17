@@ -73,6 +73,7 @@ namespace MobX.Utilities.Callbacks
             }
 #endif
             OnSecondUpdate();
+            OnTickUpdate();
         }
 
         private static void OnSecondUpdate()
@@ -99,6 +100,34 @@ namespace MobX.Utilities.Callbacks
             for (var index = secondUpdateCallbacks.Count - 1; index >= 0; index--)
             {
                 secondUpdateCallbacks[index]();
+            }
+#endif
+        }
+
+        private static void OnTickUpdate()
+        {
+            if (TickTimer.IsRunning)
+            {
+                return;
+            }
+
+            TickTimer = new Timer(.1f);
+#if DEBUG
+            for (var index = tickUpdateCallbacks.Count - 1; index >= 0; index--)
+            {
+                try
+                {
+                    tickUpdateCallbacks[index]();
+                }
+                catch (Exception exception)
+                {
+                    Debug.LogException(logCategory, exception);
+                }
+            }
+#else
+            for (var index = tickUpdateCallbacks.Count - 1; index >= 0; index--)
+            {
+                tickUpdateCallbacks[index]();
             }
 #endif
         }

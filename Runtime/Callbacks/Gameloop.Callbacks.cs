@@ -9,6 +9,8 @@ using Object = UnityEngine.Object;
 
 namespace MobX.Utilities.Callbacks
 {
+    // TODO: Expose gameloop settings (Tick rate etc.)
+
     public partial class Gameloop
     {
         #region Fields
@@ -29,6 +31,7 @@ namespace MobX.Utilities.Callbacks
         private static readonly List<Action> lateUpdateCallbacks = new(Capacity32);
         private static readonly List<Action> fixedUpdateCallbacks = new(Capacity32);
         private static readonly List<Action> secondUpdateCallbacks = new(Capacity32);
+        private static readonly List<Action> tickUpdateCallbacks = new(Capacity32);
         private static readonly List<Action> applicationQuitCallbacks = new(Capacity32);
         private static readonly List<Action<bool>> applicationFocusCallbacks = new(Capacity16);
         private static readonly List<Action<bool>> applicationPauseCallbacks = new(Capacity16);
@@ -37,6 +40,7 @@ namespace MobX.Utilities.Callbacks
         private static MonoBehaviour monoBehaviour;
 
         private static Timer OneSecondTimer { get; set; } = Timer.None;
+        private static Timer TickTimer { get; set; }
 
 #if UNITY_EDITOR
         private static readonly List<Action> editorUpdateCallbacks = new(Capacity32);

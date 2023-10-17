@@ -200,6 +200,15 @@ namespace MobX.Utilities.Callbacks
         }
 
         /// <summary>
+        ///     Called 10 times per second.
+        /// </summary>
+        public static event Action Tick
+        {
+            add => tickUpdateCallbacks.AddNullChecked(value);
+            remove => tickUpdateCallbacks.Remove(value);
+        }
+
+        /// <summary>
         ///     Called when asynchronous initialization has completed.
         ///     Requires <see cref="RaiseInitializationCompleted" /> to be called.
         ///     This event is called retroactively.
