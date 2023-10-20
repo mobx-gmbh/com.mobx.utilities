@@ -111,6 +111,12 @@ namespace MobX.Utilities
             return $"<color=#{ColorUtility.ToHtmlStringRGBA(color)}>";
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static string ToHexCode(this Color color)
+        {
+            return ColorUtility.ToHtmlStringRGBA(color);
+        }
+
         /*
          *  RichTextExtensions removal
          */

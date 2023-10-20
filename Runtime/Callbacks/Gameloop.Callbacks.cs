@@ -30,7 +30,7 @@ namespace MobX.Utilities.Callbacks
         private static readonly List<Action> updateCallbacks = new(Capacity32);
         private static readonly List<Action> lateUpdateCallbacks = new(Capacity32);
         private static readonly List<Action> fixedUpdateCallbacks = new(Capacity32);
-        private static readonly List<Action> secondUpdateCallbacks = new(Capacity32);
+        private static readonly List<Action> slowTickUpdateCallbacks = new(Capacity32);
         private static readonly List<Action> tickUpdateCallbacks = new(Capacity32);
         private static readonly List<Action> applicationQuitCallbacks = new(Capacity32);
         private static readonly List<Action<bool>> applicationFocusCallbacks = new(Capacity16);

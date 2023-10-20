@@ -72,11 +72,11 @@ namespace MobX.Utilities.Callbacks
                 updateCallbacks[index]();
             }
 #endif
-            OnSecondUpdate();
+            OnSlowTickUpdate();
             OnTickUpdate();
         }
 
-        private static void OnSecondUpdate()
+        private static void OnSlowTickUpdate()
         {
             if (OneSecondTimer.IsRunning)
             {
@@ -85,11 +85,11 @@ namespace MobX.Utilities.Callbacks
 
             OneSecondTimer = new Timer(1);
 #if DEBUG
-            for (var index = secondUpdateCallbacks.Count - 1; index >= 0; index--)
+            for (var index = slowTickUpdateCallbacks.Count - 1; index >= 0; index--)
             {
                 try
                 {
-                    secondUpdateCallbacks[index]();
+                    slowTickUpdateCallbacks[index]();
                 }
                 catch (Exception exception)
                 {

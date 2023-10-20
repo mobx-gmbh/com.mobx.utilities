@@ -193,10 +193,10 @@ namespace MobX.Utilities.Callbacks
         /// <summary>
         ///     Called once every second.
         /// </summary>
-        public static event Action SecondUpdate
+        public static event Action SlowTick
         {
-            add => secondUpdateCallbacks.AddNullChecked(value);
-            remove => secondUpdateCallbacks.Remove(value);
+            add => slowTickUpdateCallbacks.AddNullChecked(value);
+            remove => slowTickUpdateCallbacks.Remove(value);
         }
 
         /// <summary>
