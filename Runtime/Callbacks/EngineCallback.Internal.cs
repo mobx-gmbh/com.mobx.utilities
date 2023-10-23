@@ -44,8 +44,12 @@ namespace MobX.Utilities.Callbacks
         {
             IsQuitting = false;
 #if ENABLE_LEGACY_ENGINE_CALLBACKS
-            RuntimeMonoBehaviourEvents.Create(OnUpdate, OnLateUpdate, OnFixedUpdate, OnQuit, OnApplicationFocus, OnApplicationPause);
+            RuntimeMonoBehaviourEvents.Create(OnStart, OnUpdate, OnLateUpdate, OnFixedUpdate, OnQuit, OnApplicationFocus, OnApplicationPause);
 #endif
+        }
+
+        private static void OnStart()
+        {
         }
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]

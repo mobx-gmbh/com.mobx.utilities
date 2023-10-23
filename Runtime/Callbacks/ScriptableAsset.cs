@@ -62,10 +62,6 @@ namespace MobX.Utilities.Callbacks
 
         protected virtual void OnEnable()
         {
-            assetOptions = annotation.IsNotNullOrWhitespace()
-                ? Options.ReceiveCallbacks | Options.Annotation
-                : Options.ReceiveCallbacks;
-
             if (assetOptions.HasFlagUnsafe(Options.ReceiveCallbacks))
             {
                 Gameloop.Register(this);
