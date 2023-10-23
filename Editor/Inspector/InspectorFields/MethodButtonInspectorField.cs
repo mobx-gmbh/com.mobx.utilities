@@ -11,6 +11,7 @@ namespace MobX.Utilities.Editor.Inspector.InspectorFields
         private readonly ButtonType _buttonType;
         private readonly Action _drawGUI;
         private readonly bool _runtimeOnly;
+        private readonly bool _editorOnly;
 
         public MethodButtonInspectorMember(MethodInfo methodInfo, ButtonAttribute attribute, object target) : base(
             methodInfo, target)
@@ -22,6 +23,9 @@ namespace MobX.Utilities.Editor.Inspector.InspectorFields
             Label = new GUIContent(label, tooltip);
 
             _runtimeOnly = attribute.RuntimeOnly;
+            _editorOnly = attribute.EditorOnly;
+            var confirmationRequired = attribute.ConfirmationText != null;
+            var confirmationText = attribute.ConfirmationText;
 
             var parameterInfos = methodInfo.GetParameters();
             var showResult = attribute.ShowResult;
@@ -53,12 +57,25 @@ namespace MobX.Utilities.Editor.Inspector.InspectorFields
                 {
                     ButtonType.Default => () =>
                     {
-                        if (!GUILayout.Button(Label))
+                        if (GUILayout.Button(Label))
                         {
-                            return;
+                            if (confirmationRequired)
+                            {
+                                var result = UnityEditor.EditorUtility.DisplayDialog(
+                                    "Confirm",
+                                    confirmationText,
+                                    "Confirm",
+                                    "Cancel");
+
+                                if (result == false)
+                                {
+                                    return;
+                                }
+                            }
+
+                            methodCall?.DynamicInvoke(arguments);
+                            wasCalled = true;
                         }
-                        methodCall?.DynamicInvoke(arguments);
-                        wasCalled = true;
                     },
                     ButtonType.Center => () =>
                     {
@@ -110,6 +127,19 @@ namespace MobX.Utilities.Editor.Inspector.InspectorFields
                 {
                     if (GUILayout.Button(Label))
                     {
+                        if (confirmationRequired)
+                        {
+                            var result = UnityEditor.EditorUtility.DisplayDialog(
+                                "Confirm",
+                                confirmationText,
+                                "Confirm",
+                                "Cancel");
+
+                            if (result == false)
+                            {
+                                return;
+                            }
+                        }
                         returnValue = methodCall?.DynamicInvoke(arguments);
                         wasCalled = true;
                     }
@@ -132,14 +162,15 @@ namespace MobX.Utilities.Editor.Inspector.InspectorFields
 
         protected override void DrawGUI()
         {
-            if (_runtimeOnly && Application.isPlaying is false)
+            var disable = (_runtimeOnly && Application.isPlaying is false) || (_editorOnly && Application.isPlaying);
+            if (disable)
             {
                 GUIHelper.BeginEnabledOverride(false);
             }
 
             _drawGUI();
 
-            if (_runtimeOnly && Application.isPlaying is false)
+            if (disable)
             {
                 GUIHelper.EndEnabledOverride();
             }

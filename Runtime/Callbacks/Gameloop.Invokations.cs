@@ -9,8 +9,18 @@ namespace MobX.Utilities.Callbacks
 #endif
     public partial class Gameloop
     {
+        private static bool EnableApplicationQuit { get; set; }
+
         static Gameloop()
         {
+            Application.wantsToQuit += () =>
+            {
+                if (EnableApplicationQuit is false)
+                {
+                    ShutdownAsync();
+                }
+                return EnableApplicationQuit;
+            };
             Application.quitting += () => IsQuitting = true;
 #if UNITY_EDITOR
             UnityEditor.EditorApplication.playModeStateChanged -= EditorApplicationOnplayModeStateChanged;
@@ -26,6 +36,7 @@ namespace MobX.Utilities.Callbacks
             IsQuitting = false;
 #if ENABLE_GAMELOOP_CALLBACKS
             monoBehaviour = RuntimeMonoBehaviourEvents.Create(
+                OnStart,
                 OnUpdate,
                 OnLateUpdate,
                 OnFixedUpdate,
@@ -49,6 +60,28 @@ namespace MobX.Utilities.Callbacks
                 afterFirstSceneLoadCallbacks[index]();
             }
             AfterSceneLoadCompleted = true;
+        }
+
+        private static void OnStart()
+        {
+#if DEBUG
+            for (var index = firstUpdateCallbacks.Count - 1; index >= 0; index--)
+            {
+                try
+                {
+                    firstUpdateCallbacks[index]();
+                }
+                catch (Exception exception)
+                {
+                    Debug.LogException(logCategory, exception);
+                }
+            }
+#else
+            for (var index = firstUpdateCallbacks.Count - 1; index >= 0; index--)
+            {
+                firstUpdateCallbacks[index]();
+            }
+#endif
         }
 
         private static void OnUpdate()
@@ -97,9 +130,9 @@ namespace MobX.Utilities.Callbacks
                 }
             }
 #else
-            for (var index = secondUpdateCallbacks.Count - 1; index >= 0; index--)
+            for (var index = slowTickUpdateCallbacks.Count - 1; index >= 0; index--)
             {
-                secondUpdateCallbacks[index]();
+                slowTickUpdateCallbacks[index]();
             }
 #endif
         }

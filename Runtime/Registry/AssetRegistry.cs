@@ -30,10 +30,13 @@ namespace MobX.Utilities.Registry
         /// <summary>
         ///     Register a unique asset. Registered assets can be resolved using their <see cref="RuntimeGUID" />
         /// </summary>
-        public static void Register<T>(T asset) where T : Object, IUniqueAsset
+        public static void Register<T>(T asset) where T : Object, IAssetGUID
         {
 #if UNITY_EDITOR
-            UnityEditor.EditorApplication.delayCall += () => { Singleton.registry.Update(asset.GUID.Value, asset); };
+            UnityEditor.EditorApplication.delayCall += () =>
+            {
+                Singleton.registry.AddOrUpdate(asset.GUID.Value, asset);
+            };
 #endif
         }
 
@@ -89,7 +92,7 @@ namespace MobX.Utilities.Registry
             var assets = registry.ToArray();
             foreach (var (key, value) in assets)
             {
-                if (value == null || value is not IUniqueAsset)
+                if (value == null || value is not IAssetGUID)
                 {
                     Debug.Log("Asset Registry", "Removing invalid unique asset registry entry!");
                     registry.Remove(key);

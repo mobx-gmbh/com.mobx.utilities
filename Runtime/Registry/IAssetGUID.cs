@@ -2,7 +2,7 @@
 
 namespace MobX.Utilities.Registry
 {
-    public interface IUniqueAsset
+    public interface IAssetGUID
     {
         public RuntimeGUID GUID { get; }
     }

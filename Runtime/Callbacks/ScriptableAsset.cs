@@ -1,6 +1,10 @@
-﻿using MobX.Utilities.Unity;
+﻿using JetBrains.Annotations;
+using MobX.Utilities.Inspector;
+using MobX.Utilities.Unity;
+using System;
 using System.Diagnostics;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace MobX.Utilities.Callbacks
 {
@@ -10,8 +14,43 @@ namespace MobX.Utilities.Callbacks
     /// </summary>
     public abstract class ScriptableAsset : ScriptableObject
     {
-        [Tooltip("When enabled, this asset can receive custom callback methods")]
-        [SerializeField] private bool receiveCallbacks = true;
+        [Flags]
+        private enum Options
+        {
+            None = 0,
+
+            /// <summary>
+            ///     When enabled, the asset will receive custom runtime and editor callbacks.
+            /// </summary>
+            ReceiveCallbacks = 1,
+
+            /// <summary>
+            ///     When enabled, a developer annotation field is displayed.
+            /// </summary>
+            Annotation = 2,
+
+            /// <summary>
+            ///     When enabled, changes to this asset during runtime are reset when entering edit mode.
+            /// </summary>
+            ResetRuntimeChanges = 4
+        }
+
+        [Tooltip(AssetOptionsTooltip)]
+        [SerializeField] private Options assetOptions = Options.ReceiveCallbacks;
+
+#pragma warning disable
+        [FormerlySerializedAs("description")]
+        [TextArea(0, 6)]
+        [DrawLineAfter]
+        [UsedImplicitly]
+        [ConditionalShow(nameof(assetOptions), Options.Annotation)]
+        [SerializeField] private string annotation;
+#pragma warning restore
+
+        private const string AssetOptionsTooltip =
+            "Receive Callbacks: When enabled, the asset will receive custom runtime and editor callbacks." +
+            "Annotation: When enabled, a developer annotation field is displayed." +
+            "ResetRuntimeChanges: When enabled, changes to this asset during runtime are reset when entering edit mode.";
 
         [Conditional("UNITY_EDITOR")]
         public void Repaint()
@@ -23,7 +62,11 @@ namespace MobX.Utilities.Callbacks
 
         protected virtual void OnEnable()
         {
-            if (receiveCallbacks)
+            assetOptions = annotation.IsNotNullOrWhitespace()
+                ? Options.ReceiveCallbacks | Options.Annotation
+                : Options.ReceiveCallbacks;
+
+            if (assetOptions.HasFlagUnsafe(Options.ReceiveCallbacks))
             {
                 Gameloop.Register(this);
                 EngineCallbacks.AddCallbacks(this);
@@ -49,5 +92,34 @@ namespace MobX.Utilities.Callbacks
         {
             ScriptableObjectUtility.ResetObject(this);
         }
+
+
+        #region Editor
+
+#if UNITY_EDITOR
+
+        [NonSerialized] private string _json;
+
+        [CallbackOnEnterPlayMode]
+        private void OnEnterPlayMode()
+        {
+            if (assetOptions.HasFlagUnsafe(Options.ResetRuntimeChanges))
+            {
+                _json = ScriptableObjectUtility.GetAssetJSon(this);
+            }
+        }
+
+        [CallbackOnExitPlayMode]
+        private void OnExitPlayMode()
+        {
+            if (assetOptions.HasFlagUnsafe(Options.ResetRuntimeChanges))
+            {
+                ScriptableObjectUtility.SetAssetJSon(this, _json);
+            }
+        }
+
+#endif
+
+        #endregion
     }
 }

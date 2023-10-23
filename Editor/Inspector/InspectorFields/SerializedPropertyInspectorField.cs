@@ -40,6 +40,7 @@ namespace MobX.Utilities.Editor.Inspector.InspectorFields
             }
 
             _serializedObject.Update();
+
             var enabled = GUI.enabled;
             if (_readonly || (_runtimeReadonly && Application.isPlaying))
             {

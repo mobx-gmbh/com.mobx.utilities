@@ -159,4 +159,32 @@ namespace MobX.Utilities.Callbacks
         {
         }
     }
+
+    /// <summary>
+    ///     Method is called when entering play mode (editor only)
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Method)]
+    public class CallbackOnEnterPlayModeAttribute : CallbackMethodAttribute
+    {
+        /// <summary>
+        ///     Method is called when entering play mode (editor only)
+        /// </summary>
+        public CallbackOnEnterPlayModeAttribute() : base(Segment.EnteredPlayMode)
+        {
+        }
+    }
+
+    /// <summary>
+    ///     Method is called when exiting play mode (editor only)
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Method)]
+    public class CallbackOnExitPlayModeAttribute : CallbackMethodAttribute
+    {
+        /// <summary>
+        ///     Method is called when exiting play mode (editor only)
+        /// </summary>
+        public CallbackOnExitPlayModeAttribute() : base(Segment.ExitingPlayMode)
+        {
+        }
+    }
 }

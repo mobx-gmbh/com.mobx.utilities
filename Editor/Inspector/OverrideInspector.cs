@@ -2,12 +2,14 @@ using MobX.Utilities.Editor.Helper;
 using MobX.Utilities.Editor.Inspector.InspectorFields;
 using MobX.Utilities.Inspector;
 using MobX.Utilities.Reflection;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityEngine.Pool;
+using Object = UnityEngine.Object;
 
 namespace MobX.Utilities.Editor.Inspector
 {
@@ -152,7 +154,15 @@ namespace MobX.Utilities.Editor.Inspector
                 GUIHelper.Space();
             }
 
-            DrawMember();
+            try
+            {
+                // TODO: instead of try catch, check if members serialized objects and targets are valid.
+                DrawMember();
+            }
+            catch (ArgumentNullException)
+            {
+                return;
+            }
 
             if (GUI.changed)
             {
@@ -288,7 +298,6 @@ namespace MobX.Utilities.Editor.Inspector
                     GUIHelper.Space();
                 }
             }
-
             serializedObject.ApplyModifiedProperties();
         }
 

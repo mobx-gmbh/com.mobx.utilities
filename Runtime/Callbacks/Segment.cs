@@ -14,6 +14,7 @@
         BeforeFirstSceneLoad = 9,
         AfterFirstSceneLoad = 10,
         AsyncShutdown = 11,
+        FirstUpdate = 12,
 
         EnteredEditMode = 101,
         ExitingEditMode = 102,

@@ -21,6 +21,8 @@ namespace MobX.Utilities.Inspector
         public bool ShowResult { get; set; } = true;
         public bool ShowArguments { get; set; } = true;
         public bool RuntimeOnly { get; set; }
+        public bool EditorOnly { get; set; }
+        public string ConfirmationText { get; set; }
 
         public ButtonAttribute()
         {

@@ -8,39 +8,51 @@ namespace MobX.Utilities.Editor.Inspector.PropertyDrawer
     public class RuntimeGUIDPropertyDrawer : UnityEditor.PropertyDrawer
     {
         private UnityEditor.SerializedProperty _stringProperty;
-        private bool _isGuidSet;
+        private const int ToggleButtonWidth = 40;
+        private const int UpdateButtonWidth = 60;
+        private bool _enableEdit;
 
         public override void OnGUI(Rect position, UnityEditor.SerializedProperty property, GUIContent label)
         {
             _stringProperty ??= property.FindPropertyRelative("value");
-            GUIHelper.BeginEnabledOverride(false);
-            label.text = "GUID";
-            UnityEditor.EditorGUI.TextField(position, label, _stringProperty.stringValue);
+            GUIHelper.BeginEnabledOverride(_enableEdit);
+            const int CombinedWidth = ToggleButtonWidth + UpdateButtonWidth;
+            var textPos = new Rect(position.x, position.y, position.width - CombinedWidth, position.height);
+            UnityEditor.EditorGUI.PropertyField(textPos, _stringProperty, label);
             GUIHelper.EndEnabledOverride();
 
-            if (_isGuidSet)
+            var updateButtonPosition = new Rect(position.x + position.width - UpdateButtonWidth, position.y,
+                UpdateButtonWidth,
+                position.height);
+            var toggleButtonPosition = new Rect(position.x + position.width - CombinedWidth, position.y,
+                ToggleButtonWidth,
+                position.height);
+            if (GUI.Button(toggleButtonPosition, _enableEdit ? "Lock" : "Edit"))
             {
-                return;
+                _enableEdit = !_enableEdit;
             }
-            UpdateGuid(property);
+            if (GUI.Button(updateButtonPosition, "Update"))
+            {
+                UpdateGuid(property);
+            }
         }
 
         private void UpdateGuid(UnityEditor.SerializedProperty property)
         {
             if (UnityEditor.PrefabUtility.IsPartOfAnyPrefab(property.serializedObject.targetObject))
             {
-                var prefabPath = UnityEditor.PrefabUtility.GetPrefabAssetPathOfNearestInstanceRoot(property.serializedObject.targetObject);
+                var prefabPath =
+                    UnityEditor.PrefabUtility.GetPrefabAssetPathOfNearestInstanceRoot(property.serializedObject
+                        .targetObject);
                 var prefabGuid = UnityEditor.AssetDatabase.AssetPathToGUID(prefabPath);
                 _stringProperty.serializedObject.Update();
                 _stringProperty.stringValue = prefabGuid;
                 _stringProperty.serializedObject.ApplyModifiedProperties();
-                _isGuidSet = true;
                 return;
             }
             var path = UnityEditor.AssetDatabase.GetAssetPath(property.serializedObject.targetObject);
             var guid = UnityEditor.AssetDatabase.AssetPathToGUID(path);
             _stringProperty.stringValue = guid;
-            _isGuidSet = true;
         }
     }
 }

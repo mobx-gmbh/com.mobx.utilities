@@ -15,13 +15,15 @@ namespace MobX.Utilities.Callbacks
     {
         #region Fields
 
+        private const int Capacity8 = 8;
         private const int Capacity16 = 16;
         private const int Capacity32 = 32;
         private const int Capacity64 = 64;
         private const int Capacity128 = 128;
+        private const int Capacity256 = 256;
         private static readonly LogCategory logCategory = nameof(Gameloop);
 
-        private static readonly HashSet<Object> registeredObjects = new(256);
+        private static readonly HashSet<Object> registeredObjects = new(Capacity256);
         private static readonly Dictionary<Type, CallbackMethodInfo> callbackMethodInfoCache = new(Capacity128);
 
         private static readonly List<Action> initializationCompletedCallbacks = new(Capacity64);
@@ -33,6 +35,7 @@ namespace MobX.Utilities.Callbacks
         private static readonly List<Action> slowTickUpdateCallbacks = new(Capacity32);
         private static readonly List<Action> tickUpdateCallbacks = new(Capacity32);
         private static readonly List<Action> applicationQuitCallbacks = new(Capacity32);
+        private static readonly List<Action> firstUpdateCallbacks = new(Capacity8);
         private static readonly List<Action<bool>> applicationFocusCallbacks = new(Capacity16);
         private static readonly List<Action<bool>> applicationPauseCallbacks = new(Capacity16);
         private static readonly List<Func<Task>> asyncShutdownCallbacks = new(Capacity16);
@@ -197,6 +200,11 @@ namespace MobX.Utilities.Callbacks
                     asyncShutdownCallbacks.Add(asyncShutdownCallback);
                     break;
 
+                case Segment.FirstUpdate:
+                    var firstUpdateCallback = (Action) methodInfo.CreateDelegate(typeof(Action), target);
+                    firstUpdateCallbacks.Add(firstUpdateCallback);
+                    break;
+
                 case Segment.InitializationCompleted:
                     var initializationCompletedCallback = (Action) methodInfo.CreateDelegate(typeof(Action), target);
                     initializationCompletedCallbacks.Add(initializationCompletedCallback);
@@ -335,33 +343,12 @@ namespace MobX.Utilities.Callbacks
 
             await Task.WhenAll(buffer);
 
+            Debug.Log("Gameloop", "Quitting Application");
+            EnableApplicationQuit = true;
             Application.Quit();
 #if UNITY_EDITOR
-            UnityEditor.EditorApplication.isPlaying = false;
+            UnityEditor.EditorApplication.ExitPlaymode();
 #endif
-        }
-
-        #endregion
-
-
-        #region Validations
-
-        // ReSharper disable Unity.PerformanceAnalysis
-        public static bool IsDelegateSubscribedToUpdate(Action update)
-        {
-            return updateCallbacks.Contains(update);
-        }
-
-        // ReSharper disable Unity.PerformanceAnalysis
-        public static bool IsDelegateSubscribedToLateUpdate(Action update)
-        {
-            return lateUpdateCallbacks.Contains(update);
-        }
-
-        // ReSharper disable Unity.PerformanceAnalysis
-        public static bool IsDelegateSubscribedToFixedUpdate(Action update)
-        {
-            return fixedUpdateCallbacks.Contains(update);
         }
 
         #endregion

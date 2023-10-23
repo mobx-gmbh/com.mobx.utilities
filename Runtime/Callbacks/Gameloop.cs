@@ -57,6 +57,14 @@ namespace MobX.Utilities.Callbacks
         /// <summary>
         ///     Begin an asynchronous shutdown process.
         /// </summary>
+        public static void Shutdown()
+        {
+            ShutdownAsync();
+        }
+
+        /// <summary>
+        ///     Begin an asynchronous shutdown process.
+        /// </summary>
         public static Task ShutdownAsync()
         {
 #if ENABLE_GAMELOOP_CALLBACKS
@@ -277,5 +285,40 @@ namespace MobX.Utilities.Callbacks
         }
 
         #endregion
+
+
+        #region Validations
+
+        // ReSharper disable Unity.PerformanceAnalysis
+        public static bool IsDelegateSubscribedToUpdate(Action update)
+        {
+            return updateCallbacks.Contains(update);
+        }
+
+        // ReSharper disable Unity.PerformanceAnalysis
+        public static bool IsDelegateSubscribedToLateUpdate(Action update)
+        {
+            return lateUpdateCallbacks.Contains(update);
+        }
+
+        // ReSharper disable Unity.PerformanceAnalysis
+        public static bool IsDelegateSubscribedToFixedUpdate(Action update)
+        {
+            return fixedUpdateCallbacks.Contains(update);
+        }
+
+        #endregion
+
+
+        public static async Task DelayedCallAsync()
+        {
+#if UNITY_EDITOR
+            var completionSource = new TaskCompletionSource<object>();
+            UnityEditor.EditorApplication.delayCall += () => { completionSource.SetResult(null); };
+            await completionSource.Task;
+#else
+            await Task.CompletedTask;
+#endif
+        }
     }
 }

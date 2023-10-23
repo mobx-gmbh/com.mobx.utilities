@@ -12,8 +12,14 @@ namespace MobX.Utilities.Callbacks
         private Action _onLateUpdate;
         private Action _onQuit;
         private Action _onUpdate;
+        private Action _onStart;
         private Action<bool> _onFocus;
         private Action<bool> _onPause;
+
+        private void Start()
+        {
+            _onStart();
+        }
 
         private void Update()
         {
@@ -45,7 +51,8 @@ namespace MobX.Utilities.Callbacks
             _onPause(pauseStatus);
         }
 
-        internal static MonoBehaviour Create(Action onUpdate, Action onLateUpdate, Action onFixedUpdate, Action onQuit,
+        internal static MonoBehaviour Create(Action onStart, Action onUpdate, Action onLateUpdate, Action onFixedUpdate,
+            Action onQuit,
             Action<bool> onFocus, Action<bool> onPause)
         {
             var gameObject = new GameObject(nameof(RuntimeMonoBehaviourEvents));
@@ -53,6 +60,7 @@ namespace MobX.Utilities.Callbacks
             gameObject.DontDestroyOnLoad();
             gameObject.hideFlags |= HideFlags.HideInHierarchy;
 
+            instance._onStart = onStart;
             instance._onUpdate = onUpdate;
             instance._onLateUpdate = onLateUpdate;
             instance._onFixedUpdate = onFixedUpdate;

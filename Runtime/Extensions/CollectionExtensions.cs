@@ -275,7 +275,7 @@ namespace MobX.Utilities
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Update<TKey, TValue>(this IDictionary<TKey, TValue> target, TKey key, TValue value)
+        public static void AddOrUpdate<TKey, TValue>(this IDictionary<TKey, TValue> target, TKey key, TValue value)
         {
             if (target == null)
             {
@@ -292,7 +292,7 @@ namespace MobX.Utilities
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Update<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key,
+        public static void AddOrUpdate<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key,
             Func<TValue, TValue> updateFunc)
         {
             if (dictionary.ContainsKey(key))

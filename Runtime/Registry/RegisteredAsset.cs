@@ -1,25 +1,25 @@
 ﻿using MobX.Utilities.Callbacks;
 using MobX.Utilities.Types;
-using MobX.Utilities.Unity;
 using UnityEngine;
 
 namespace MobX.Utilities.Registry
 {
     /// <summary>
-    ///     Registered assets can be resolved during runtime, using their GUID. They are also loaded with the application.
+    ///     Registered assets are always included in a build and loaded during startup.
+    ///     They can also be resolved during runtime, using their GUID.
     /// </summary>
-    public class RegisteredAsset : ScriptableAsset, IUniqueAsset
+    public class RegisteredAsset : ScriptableAsset, IAssetGUID
     {
         [SerializeField] private RuntimeGUID guid;
         public RuntimeGUID GUID => guid;
 
+#if UNITY_EDITOR
         protected override void OnEnable()
         {
             base.OnEnable();
-#if UNITY_EDITOR
-            guid = this.GetRuntimeGUID();
+            RuntimeGUID.Create(this, ref guid);
             AssetRegistry.Register(this);
-#endif
         }
+#endif
     }
 }

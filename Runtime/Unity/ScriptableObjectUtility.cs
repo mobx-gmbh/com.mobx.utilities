@@ -1,6 +1,4 @@
 using MobX.Utilities.Callbacks;
-using MobX.Utilities.Registry;
-using MobX.Utilities.Types;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -11,6 +9,16 @@ namespace MobX.Utilities.Unity
     public static class ScriptableObjectUtility
     {
         private static readonly Dictionary<Type, string> templateCache = new();
+
+        public static string GetAssetJSon(ScriptableObject scriptableObject)
+        {
+            return JsonUtility.ToJson(scriptableObject);
+        }
+
+        public static void SetAssetJSon(ScriptableObject scriptableObject, string json)
+        {
+            JsonUtility.FromJsonOverwrite(json, scriptableObject);
+        }
 
         /// <summary>
         ///     Reset the passed scriptableObject to its default values
@@ -39,25 +47,6 @@ namespace MobX.Utilities.Unity
 #if UNITY_EDITOR
             UnityEditor.EditorUtility.SetDirty(scriptableObject);
 #endif
-        }
-
-        public static RuntimeGUID GetRuntimeGUID<T>(this T scriptableObject) where T : ScriptableObject
-        {
-#if UNITY_EDITOR
-            var assetGuid =
-                UnityEditor.AssetDatabase.AssetPathToGUID(UnityEditor.AssetDatabase.GetAssetPath(scriptableObject));
-            return new RuntimeGUID(assetGuid);
-#endif
-#pragma warning disable
-            foreach (var (guid, value) in AssetRegistry.Registry)
-            {
-                if (value == scriptableObject)
-                {
-                    return guid;
-                }
-            }
-
-            return default(RuntimeGUID);
         }
     }
 }

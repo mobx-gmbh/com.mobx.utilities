@@ -30,6 +30,8 @@ namespace MobX.Utilities.Editor.Inspector
         private string _editorPrefsKey;
         private UnityEditor.SerializedProperty _script;
 
+        protected const string NativeRedraw = "RedrawFromNative";
+
         #endregion
 
 
@@ -87,14 +89,11 @@ namespace MobX.Utilities.Editor.Inspector
         protected virtual void LoadStateData(string editorPrefsKey)
         {
             Foldout = new FoldoutHandler(editorPrefsKey);
-            if (Environment.StackTrace.Contains("RedrawFromNative"))
-            {
-            }
         }
 
         protected virtual void SaveStateData(string editorPrefsKey)
         {
-            if (Environment.StackTrace.Contains("RedrawFromNative"))
+            if (Environment.StackTrace.Contains(NativeRedraw))
             {
                 return;
             }
