@@ -48,6 +48,21 @@ namespace MobX.Utilities.Libraries
             return new Vector3(Float(-1, 1), Float(-1, 1), Float(-1, 1));
         }
 
+        public static Vector3 Vector(float minX, float maxX, float minY, float maxY, float minZ, float maxZ)
+        {
+            return new Vector3(Float(minX, maxX), Float(minY, maxY), Float(minZ, maxZ));
+        }
+
+        public static Vector3 Vector(float x, float y, float z)
+        {
+            return new Vector3(Float(-x, x), Float(-y, y), Float(-z, z));
+        }
+
+        public static Vector3 Vector(float value)
+        {
+            return new Vector3(Float(-value, value), Float(-value, value), Float(-value, value));
+        }
+
         public static Vector3 VectorNormalized()
         {
             return new Vector3(Float(-1, 1), Float(-1, 1), Float(-1, 1)).normalized;

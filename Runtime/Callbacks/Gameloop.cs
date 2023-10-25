@@ -310,6 +310,8 @@ namespace MobX.Utilities.Callbacks
         #endregion
 
 
+        public static float TickDelta => TickTimer.Delta();
+
         public static async Task DelayedCallAsync()
         {
 #if UNITY_EDITOR
