@@ -2,7 +2,7 @@
 
 namespace MobX.Utilities.Editor.Inspector.PropertyDrawer
 {
-    [UnityEditor.CustomPropertyDrawer(typeof(InlinedAsset), true)]
+    [UnityEditor.CustomPropertyDrawer(typeof(InlinedScriptableObject), true)]
     public class InlinedAssetPropertyDrawer : InlineInspectorDrawer
     {
     }
