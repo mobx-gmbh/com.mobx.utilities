@@ -16,7 +16,8 @@
         ///     Called on the callback receiver every update while the cooldown is running.
         /// </summary>
         /// <param name="remainingTime">seconds remaining</param>
-        public void OnCooldownUpdate(float remainingTime)
+        /// <param name="delta">delta value between the cooldowns start and end time</param>
+        public void OnCooldownUpdate(float remainingTime, float delta)
         {
         }
     }

@@ -1,6 +1,5 @@
 ﻿using MobX.Utilities.Callbacks;
 using MobX.Utilities.Singleton;
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -54,6 +53,14 @@ namespace MobX.Utilities.Cooldown
         /// <summary>
         ///     Instantly complete the cooldown and raise completion callbacks.
         /// </summary>
+        public static float GetRemainingCooldownDelta(ICooldownCallback target)
+        {
+            return Singleton.GetRemainingCooldownDeltaInternal(target);
+        }
+
+        /// <summary>
+        ///     Instantly complete the cooldown and raise completion callbacks.
+        /// </summary>
         public static void CompleteCooldown(ICooldownCallback target)
         {
             Singleton.CompleteCooldownInternal(target);
@@ -82,17 +89,32 @@ namespace MobX.Utilities.Cooldown
 
         #region Internal
 
-        private readonly List<(ICooldownCallback callback, float endTimestamp)> _cooldowns = new();
+        private struct CooldownData
+        {
+            public readonly ICooldownCallback Callback;
+            public readonly float StartTimeStamp;
+            public readonly float EndTimestamp;
+
+            public CooldownData(ICooldownCallback callback, float startTimeStamp, float endTimestamp)
+            {
+                Callback = callback;
+                StartTimeStamp = startTimeStamp;
+                EndTimestamp = endTimestamp;
+            }
+        }
+
+        private readonly List<CooldownData> _cooldowns = new();
 
         private void StartCooldownInternal(ICooldownCallback callbackReceiver, float cooldownDuration)
         {
             callbackReceiver.OnBeginCooldown();
 
-            var newEntry = new ValueTuple<ICooldownCallback, float>(callbackReceiver, Time.time + cooldownDuration);
+            var time = Time.time;
+            var newEntry = new CooldownData(callbackReceiver, time, time + cooldownDuration);
             for (var index = _cooldowns.Count - 1; index >= 0; index--)
             {
                 var entry = _cooldowns[index];
-                if (entry.callback == callbackReceiver)
+                if (entry.Callback == callbackReceiver)
                 {
                     _cooldowns[index] = newEntry;
                     return;
@@ -106,12 +128,13 @@ namespace MobX.Utilities.Cooldown
             for (var index = _cooldowns.Count - 1; index >= 0; index--)
             {
                 var entry = _cooldowns[index];
-                if (entry.callback != callbackReceiver)
+                if (entry.Callback != callbackReceiver)
                 {
                     continue;
                 }
 
-                _cooldowns[index] = new ValueTuple<ICooldownCallback, float>(callbackReceiver, Time.time + cooldownDuration);
+                var time = Time.time;
+                _cooldowns[index] = new CooldownData(callbackReceiver, time, time + cooldownDuration);
                 if (callOnBegin)
                 {
                     callbackReceiver.OnBeginCooldown();
@@ -125,7 +148,7 @@ namespace MobX.Utilities.Cooldown
             for (var index = _cooldowns.Count - 1; index >= 0; index--)
             {
                 var entry = _cooldowns[index];
-                if (entry.callback != callbackReceiver)
+                if (entry.Callback != callbackReceiver)
                 {
                     continue;
                 }
@@ -139,9 +162,22 @@ namespace MobX.Utilities.Cooldown
         {
             foreach (var entry in _cooldowns)
             {
-                if (entry.callback == target)
+                if (entry.Callback == target)
                 {
-                    return (entry.endTimestamp - Time.time).WithMinLimit(0);
+                    return (entry.EndTimestamp - Time.time).WithMinLimit(0);
+                }
+            }
+            return 0;
+        }
+
+        private float GetRemainingCooldownDeltaInternal(ICooldownCallback target)
+        {
+            foreach (var entry in _cooldowns)
+            {
+                if (entry.Callback == target)
+                {
+                    var delta = Mathf.InverseLerp(entry.StartTimeStamp, entry.EndTimestamp, Time.time);
+                    return delta;
                 }
             }
             return 0;
@@ -152,13 +188,13 @@ namespace MobX.Utilities.Cooldown
             for (var index = _cooldowns.Count - 1; index >= 0; index--)
             {
                 var entry = _cooldowns[index];
-                if (entry.callback != callbackReceiver)
+                if (entry.Callback != callbackReceiver)
                 {
                     continue;
                 }
 
                 _cooldowns.RemoveAt(index);
-                entry.callback.OnEndCooldown();
+                entry.Callback.OnEndCooldown();
                 return;
             }
         }
@@ -167,9 +203,10 @@ namespace MobX.Utilities.Cooldown
         {
             for (var index = 0; index < _cooldowns.Count; index++)
             {
-                if (_cooldowns[index].callback == callbackReceiver)
+                if (_cooldowns[index].Callback == callbackReceiver)
                 {
-                    _cooldowns[index] = (callbackReceiver, _cooldowns[index].endTimestamp - reductionInSeconds);
+                    var cooldown = _cooldowns[index];
+                    _cooldowns[index] = new CooldownData(callbackReceiver, cooldown.StartTimeStamp, cooldown.EndTimestamp - reductionInSeconds);
                 }
             }
         }
@@ -179,7 +216,7 @@ namespace MobX.Utilities.Cooldown
             foreach (var entry in _cooldowns)
             {
                 // ReSharper disable once SuspiciousTypeConversion.Global
-                if (entry.callback is IOnCooldownCancelled cancelledCallback)
+                if (entry.Callback is IOnCooldownCancelled cancelledCallback)
                 {
                     cancelledCallback.OnCooldownCancelled();
                 }
@@ -191,7 +228,7 @@ namespace MobX.Utilities.Cooldown
         {
             foreach (var entry in _cooldowns)
             {
-                if (entry.callback == target)
+                if (entry.Callback == target)
                 {
                     return true;
                 }
@@ -213,12 +250,14 @@ namespace MobX.Utilities.Cooldown
             for (var index = _cooldowns.Count - 1; index >= 0; index--)
             {
                 var entry = _cooldowns[index];
-                entry.callback.OnCooldownUpdate(entry.endTimestamp - timeStamp);
+                var remaining = entry.EndTimestamp - timeStamp;
+                var delta = Mathf.InverseLerp(entry.StartTimeStamp, entry.EndTimestamp, timeStamp);
+                entry.Callback.OnCooldownUpdate(remaining, delta);
 
-                if (timeStamp > entry.endTimestamp)
+                if (timeStamp > entry.EndTimestamp)
                 {
                     _cooldowns.RemoveAt(index);
-                    entry.callback.OnEndCooldown();
+                    entry.Callback.OnEndCooldown();
                 }
             }
         }

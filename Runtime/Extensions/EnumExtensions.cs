@@ -26,6 +26,19 @@ namespace MobX.Utilities
             };
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool HasAnyFlagUnsafe<TEnum>(this TEnum lhs, TEnum rhs) where TEnum : unmanaged, Enum
+        {
+            return UnsafeUtility.SizeOf<TEnum>() switch
+            {
+                1 => (UnsafeUtility.As<TEnum, byte>(ref lhs) & UnsafeUtility.As<TEnum, byte>(ref rhs)) != 0,
+                2 => (UnsafeUtility.As<TEnum, ushort>(ref lhs) & UnsafeUtility.As<TEnum, ushort>(ref rhs)) != 0,
+                4 => (UnsafeUtility.As<TEnum, uint>(ref lhs) & UnsafeUtility.As<TEnum, uint>(ref rhs)) != 0,
+                8 => (UnsafeUtility.As<TEnum, ulong>(ref lhs) & UnsafeUtility.As<TEnum, ulong>(ref rhs)) != 0,
+                _ => throw new Exception($"Size of {typeof(TEnum).Name} does not match a known Enum backing type.")
+            };
+        }
+
         public static bool HasFlagInt(this int lhs, int rhs)
         {
             return (lhs & rhs) > 0;

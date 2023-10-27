@@ -84,7 +84,7 @@ namespace MobX.Utilities.Collections
         {
             Clear();
             Assert.IsTrue(keys.Count == values.Count,
-                $"there are {keys.Count.ToString()} keys and {values.Count.ToString()} values after deserialization. Make sure that both key and value types are serializable.");
+                $"there are {keys.Count.ToString()} keys and {values.Count.ToString()} values after deserialization {keys.GetType()}. Make sure that both key and value types are serializable.");
 
             for (var i = 0; i < keys.Count; i++)
             {

@@ -260,6 +260,11 @@ namespace MobX.Utilities
             return value * (percentage * .01f);
         }
 
+        public static float GetPercentage(this byte value, float percentage)
+        {
+            return value * (percentage * .01f);
+        }
+
         public static float GetPercentage(this int value, float percentage)
         {
             return value * (percentage * .01f);
