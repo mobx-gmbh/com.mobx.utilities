@@ -393,6 +393,73 @@ namespace MobX.Utilities.Editor.Windows
             }
         }
 
+        protected void AddOptionalEditorGroup<T>(Func<List<T>> group, string editorTitle, string optionName,
+            string tooltip = null, bool showByDefault = false) where T : Object
+        {
+            (UnityEditor.Editor editor, string name)[] editors = null;
+
+            Action init = () =>
+            {
+                var list = group();
+                editors = new (UnityEditor.Editor editor, string name)[list.Count];
+                for (var i = 0; i < list.Count; i++)
+                {
+                    var editor = UnityEditor.Editor.CreateEditor(list[i]);
+                    _editorCache.Add(editor);
+                    editors[i] = (editor, editor.target.name.Humanize());
+                }
+            };
+
+            var optionKey = $"custom_editor_{optionName}";
+            AddOptions((new GUIContent(optionName, tooltip), optionKey));
+            if (!UnityEditor.EditorPrefs.HasKey(optionKey))
+            {
+                UnityEditor.EditorPrefs.SetBool(optionKey, showByDefault);
+            }
+
+            _instructions.Add(() =>
+            {
+                if (!UnityEditor.EditorPrefs.GetBool(optionKey, showByDefault))
+                {
+                    return;
+                }
+                if (SearchQuery.IsNotNullOrWhitespace() && !editorTitle.ContainsIgnoreCase(SearchQuery))
+                {
+                    return;
+                }
+                var foldoutStyle = FoldoutHandler.Style;
+                FoldoutHandler.Style = FoldoutStyle.Dark;
+                if (Foldout[editorTitle])
+                {
+                    init?.Invoke();
+                    init = null;
+                    UnityEditor.EditorGUIUtility.wideMode = false;
+                    UnityEditor.EditorGUIUtility.labelWidth = UnityEditor.EditorGUIUtility.currentViewWidth * 0.4f;
+                    foreach (var (editor, displayName) in editors)
+                    {
+                        FoldoutHandler.Style = FoldoutStyle.Default;
+                        if (Foldout[displayName])
+                        {
+                            if (editor.serializedObject.targetObject == null)
+                            {
+                                UnityEditor.EditorGUILayout.HelpBox("Target is null!", UnityEditor.MessageType.Error);
+                                return;
+                            }
+                            GUIHelper.Space();
+                            UnityEditor.EditorGUI.indentLevel += 2;
+                            editor.serializedObject.Update();
+                            editor.OnInspectorGUI();
+                            editor.serializedObject.ApplyModifiedProperties();
+                            UnityEditor.EditorGUI.indentLevel -= 2;
+                        }
+                    }
+                    GUIHelper.Space();
+                }
+                FoldoutHandler.Style = foldoutStyle;
+                Foldout.SaveState();
+            });
+        }
+
         protected void __AddEditor<T>(T target, string editorTitle) where T : Object
         {
             if (target == null)
@@ -457,7 +524,8 @@ namespace MobX.Utilities.Editor.Windows
             }
         }
 
-        protected void AddOptionalEditor<T>(Func<T> target, string editorTitle, string optionName, string tooltip = null,
+        protected void AddOptionalEditor<T>(Func<T> target, string editorTitle, string optionName,
+            string tooltip = null,
             bool showByDefault = false) where T : Object
         {
             if (target() == null)
@@ -700,13 +768,13 @@ namespace MobX.Utilities.Editor.Windows
             var key = option.key;
             foreach (var (_, elementKey) in _options)
             {
-                if (key == elementKey)
+                if (string.Equals(key, elementKey, StringComparison.OrdinalIgnoreCase))
                 {
                     return;
                 }
             }
 
-            _options.Add(option);
+            _options.AddUnique(option);
         }
 
         #endregion
