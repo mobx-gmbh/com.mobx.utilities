@@ -39,7 +39,10 @@ namespace MobX.Utilities.Editor.AssetManagement
         }
 
         [Pure]
-        public static List<Object> FindAssetsOfType<T1, T2, T3, T4>() where T1 : Object where T2 : Object where T3 : Object where T4 : Object
+        public static List<Object> FindAssetsOfType<T1, T2, T3, T4>() where T1 : Object
+            where T2 : Object
+            where T3 : Object
+            where T4 : Object
         {
             var list = new List<Object>();
             list.AddRange(FindAssetsOfType<T1>());
@@ -50,7 +53,11 @@ namespace MobX.Utilities.Editor.AssetManagement
         }
 
         [Pure]
-        public static List<Object> FindAssetsOfType<T1, T2, T3, T4, T5>() where T1 : Object where T2 : Object where T3 : Object where T4 : Object where T5 : Object
+        public static List<Object> FindAssetsOfType<T1, T2, T3, T4, T5>() where T1 : Object
+            where T2 : Object
+            where T3 : Object
+            where T4 : Object
+            where T5 : Object
         {
             var list = new List<Object>();
             list.AddRange(FindAssetsOfType<T1>());
@@ -70,19 +77,22 @@ namespace MobX.Utilities.Editor.AssetManagement
         [Pure]
         public static List<T> FindAssetsOfType<T>() where T : Object
         {
-            var assets = new List<T>();
             var guids = UnityEditor.AssetDatabase.FindAssets($"t:{typeof(T)}");
+            var assetList = new List<T>();
             for (var i = 0; i < guids.Length; i++)
             {
                 var assetPath = UnityEditor.AssetDatabase.GUIDToAssetPath(guids[i]);
-                var asset = UnityEditor.AssetDatabase.LoadAssetAtPath<T>(assetPath);
-                if (asset != null)
+                var assets = UnityEditor.AssetDatabase.LoadAllAssetsAtPath(assetPath);
+                foreach (var asset in assets)
                 {
-                    assets.Add(asset);
+                    if (asset is T typedAsset)
+                    {
+                        assetList.Add(typedAsset);
+                    }
                 }
             }
 
-            return assets;
+            return assetList;
         }
 
         [Pure]

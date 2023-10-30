@@ -120,8 +120,8 @@ namespace MobX.Utilities
         #region Set Value
 
         private const BindingFlags InterfaceFlags = BindingFlags.Static | BindingFlags.Public |
-            BindingFlags.NonPublic | BindingFlags.DeclaredOnly |
-            BindingFlags.FlattenHierarchy;
+                                                    BindingFlags.NonPublic | BindingFlags.DeclaredOnly |
+                                                    BindingFlags.FlattenHierarchy;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void SetInterfacePropertyValue(this Type type, string propertyName, object value,
@@ -322,7 +322,7 @@ namespace MobX.Utilities
         #region MemberInfo Casting
 
         private const BindingFlags EventFlags = BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Instance |
-            BindingFlags.Public | BindingFlags.FlattenHierarchy;
+                                                BindingFlags.Public | BindingFlags.FlattenHierarchy;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static FieldInfo AsFieldInfo(this EventInfo eventInfo)
@@ -484,9 +484,9 @@ namespace MobX.Utilities
         private static int GetAutoPropertyBakingFieldMetadataTokenInSetMethodOfInstance(byte[] msilBytes)
         {
             return 8 == msilBytes.Length && 0x02 == msilBytes[0] && 0x03 == msilBytes[1] && 0x7D == msilBytes[2] &&
-                0x2A == msilBytes[7]
-                    ? BitConverter.ToInt32(msilBytes, 3)
-                    : -1;
+                   0x2A == msilBytes[7]
+                ? BitConverter.ToInt32(msilBytes, 3)
+                : -1;
         }
 #endif
 
@@ -543,7 +543,7 @@ namespace MobX.Utilities
         public static bool IsStatic(this PropertyInfo propertyInfo)
         {
             return propertyInfo?.GetMethod?.IsStatic ??
-                propertyInfo?.SetMethod?.IsStatic ?? throw new InvalidProgramException();
+                   propertyInfo?.SetMethod?.IsStatic ?? throw new InvalidProgramException();
         }
 
         public static bool IsStatic(this EventInfo eventInfo)
@@ -1077,7 +1077,7 @@ namespace MobX.Utilities
 
         public static Func<object> CreateGetDelegateForMember(this object target, string memberName,
             BindingFlags flags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance |
-                BindingFlags.Static)
+                                 BindingFlags.Static)
         {
             var type = target.GetType();
             var fieldInfo = type.GetFieldIncludeBaseTypes(memberName, flags);

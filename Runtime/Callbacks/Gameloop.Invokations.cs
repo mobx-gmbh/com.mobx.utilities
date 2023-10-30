@@ -17,11 +17,16 @@ namespace MobX.Utilities.Callbacks
             {
                 if (EnableApplicationQuit is false)
                 {
+                    IsQuitting = true;
                     ShutdownAsync();
                 }
                 return EnableApplicationQuit;
             };
-            Application.quitting += () => IsQuitting = true;
+            Application.quitting += () =>
+            {
+                IsQuitting = true;
+                OnQuit();
+            };
 #if UNITY_EDITOR
             UnityEditor.EditorApplication.playModeStateChanged -= EditorApplicationOnplayModeStateChanged;
             UnityEditor.EditorApplication.playModeStateChanged += EditorApplicationOnplayModeStateChanged;
@@ -40,7 +45,6 @@ namespace MobX.Utilities.Callbacks
                 OnUpdate,
                 OnLateUpdate,
                 OnFixedUpdate,
-                OnQuit,
                 OnApplicationFocus,
                 OnApplicationPause);
 #endif
