@@ -6,7 +6,7 @@ namespace MobX.Utilities.Editor.Inspector
     [UnityEditor.CustomEditor(typeof(ScriptableObject), true)]
     [UnityEditor.CanEditMultipleObjects]
 #endif
-    public class ScriptableObjectFoldoutInspector : OverrideInspector<ScriptableObject>
+    public class ScriptableObjectInspector : OverrideInspector<ScriptableObject>
     {
     }
 }

@@ -35,8 +35,6 @@ namespace MobX.Utilities.Editor.Inspector
         #endregion
 
 
-        //--------------------------------------------------------------------------------------------------------------
-
         protected void SetDefaultFoldoutState(FoldoutData data, bool stateValue)
         {
             Foldout.DefaultFoldoutStates.TryAdd(data.Title, stateValue);

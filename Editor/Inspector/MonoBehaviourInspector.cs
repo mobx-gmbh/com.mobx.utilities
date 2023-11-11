@@ -6,7 +6,7 @@ namespace MobX.Utilities.Editor.Inspector
     [UnityEditor.CustomEditor(typeof(MonoBehaviour), true)]
     [UnityEditor.CanEditMultipleObjects]
 #endif
-    public class MonoBehaviourFoldoutInspector : OverrideInspector<MonoBehaviour>
+    public class MonoBehaviourInspector : OverrideInspector<MonoBehaviour>
     {
     }
 }

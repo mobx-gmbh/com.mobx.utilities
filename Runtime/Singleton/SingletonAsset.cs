@@ -1,30 +1,22 @@
 using JetBrains.Annotations;
 using MobX.Utilities.Callbacks;
 using MobX.Utilities.Reflection;
-using System.Diagnostics;
-using UnityEngine;
 
 namespace MobX.Utilities.Singleton
 {
     [AddressablesGroup("Singletons")]
-    public abstract class SingletonAsset<T> : ScriptableObject where T : SingletonAsset<T>
+    public abstract class SingletonAsset<T> : ScriptableAsset where T : SingletonAsset<T>
     {
-        [Tooltip("When enabled, this asset can receive custom callback methods")]
-        [SerializeField] private bool receiveCallbacks = true;
-
         public static T Singleton => singleton ??= Singletons.Resolve<T>();
         private static T singleton;
 
         [PublicAPI]
         public bool IsSingleton => Singletons.Exists<T>() && Singletons.Resolve<T>() == this;
 
-        protected virtual void OnEnable()
+        protected override void OnEnable()
         {
+            base.OnEnable();
             singleton = (T) this;
-            if (receiveCallbacks)
-            {
-                Gameloop.Register(this);
-            }
 
             if (Singletons.Exists<T>() is false)
             {
@@ -32,29 +24,14 @@ namespace MobX.Utilities.Singleton
             }
         }
 
-        private void OnDisable()
+        protected override void OnDisable()
         {
+            base.OnDisable();
+
             if (singleton == this)
             {
                 singleton = null;
             }
-            Gameloop.Unregister(this);
-        }
-
-        [Conditional("UNITY_EDITOR")]
-        protected void Repaint()
-        {
-#if UNITY_EDITOR
-            if (Gameloop.IsQuitting)
-            {
-                return;
-            }
-            if (this == null)
-            {
-                return;
-            }
-            UnityEditor.EditorUtility.SetDirty(this);
-#endif
         }
     }
 }

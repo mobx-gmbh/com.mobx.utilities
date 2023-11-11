@@ -56,6 +56,11 @@ namespace MobX.Utilities.Callbacks
         public void Repaint()
         {
 #if UNITY_EDITOR
+            if (Gameloop.IsQuitting)
+            {
+                return;
+            }
+
             UnityEditor.EditorUtility.SetDirty(this);
 #endif
         }
