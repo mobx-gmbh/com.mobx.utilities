@@ -19,39 +19,43 @@ namespace MobX.Utilities.Callbacks
         ///     Register an object making it receive custom callbacks.
         /// </summary>
         /// <param name="target">The object to register</param>
-        [Conditional("ENABLE_GAMELOOP_CALLBACKS")]
         public static void Register(Object target)
         {
+#if !DISABLE_GAMELOOP_CALLBACKS
             RegisterInternal(target);
+#endif
         }
 
         /// <summary>
         ///     Unregister an object making it no longer receive custom callbacks.
         /// </summary>
         /// <param name="target">The object to unregister</param>
-        [Conditional("ENABLE_GAMELOOP_CALLBACKS")]
         public static void Unregister(Object target)
         {
+#if !DISABLE_GAMELOOP_CALLBACKS
             UnregisterInternal(target);
+#endif
         }
 
         /// <summary>
         ///     Raise a custom callback method.
         /// </summary>
         /// <param name="callback">The name of the callback method</param>
-        [Conditional("ENABLE_GAMELOOP_CALLBACKS")]
         public static void RaiseCallback(string callback)
         {
+#if !DISABLE_GAMELOOP_CALLBACKS
             RaiseCallbackInternal(callback);
+#endif
         }
 
         /// <summary>
         ///     Raise the initialization completed callback.
         /// </summary>
-        [Conditional("ENABLE_GAMELOOP_CALLBACKS")]
         public static void RaiseInitializationCompleted()
         {
+#if !DISABLE_GAMELOOP_CALLBACKS
             RaiseInitializationCompletedInternal();
+#endif
         }
 
         /// <summary>
@@ -67,7 +71,7 @@ namespace MobX.Utilities.Callbacks
         /// </summary>
         public static Task ShutdownAsync()
         {
-#if ENABLE_GAMELOOP_CALLBACKS
+#if !DISABLE_GAMELOOP_CALLBACKS
             return ShutdownAsyncInternal();
 #else
             return Task.CompletedTask;

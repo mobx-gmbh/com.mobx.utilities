@@ -65,20 +65,17 @@ namespace MobX.Utilities.Callbacks
             if (assetOptions.HasFlagUnsafe(Options.ReceiveCallbacks))
             {
                 Gameloop.Register(this);
-                EngineCallbacks.AddCallbacks(this);
             }
         }
 
         protected virtual void OnDisable()
         {
             Gameloop.Unregister(this);
-            EngineCallbacks.RemoveCallbacks(this);
         }
 
         protected virtual void OnDestroy()
         {
             Gameloop.Unregister(this);
-            EngineCallbacks.RemoveCallbacks(this);
         }
 
         /// <summary>

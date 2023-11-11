@@ -31,11 +31,7 @@ namespace MobX.Utilities.Unity
             {
                 var template = ScriptableObject.CreateInstance(type);
                 json = JsonUtility.ToJson(template);
-#if GAMELOOP_CALLBACKS
                 Gameloop.Unregister(template);
-#else
-                EngineCallbacks.RemoveCallbacks(template);
-#endif
                 Object.DestroyImmediate(template);
             }
             if (cache)

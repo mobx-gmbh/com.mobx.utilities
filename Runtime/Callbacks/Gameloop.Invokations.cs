@@ -39,7 +39,7 @@ namespace MobX.Utilities.Callbacks
         {
             Segment = Segment.BeforeFirstSceneLoad;
             IsQuitting = false;
-#if ENABLE_GAMELOOP_CALLBACKS
+#if !DISABLE_GAMELOOP_CALLBACKS
             monoBehaviour = RuntimeMonoBehaviourEvents.Create(
                 OnStart,
                 OnUpdate,

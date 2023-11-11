@@ -24,7 +24,6 @@ namespace MobX.Utilities.Singleton
             if (receiveCallbacks)
             {
                 Gameloop.Register(this);
-                EngineCallbacks.AddCallbacks(this);
             }
 
             if (Singletons.Exists<T>() is false)
@@ -40,7 +39,6 @@ namespace MobX.Utilities.Singleton
                 singleton = null;
             }
             Gameloop.Unregister(this);
-            EngineCallbacks.RemoveCallbacks(this);
         }
 
         [Conditional("UNITY_EDITOR")]
