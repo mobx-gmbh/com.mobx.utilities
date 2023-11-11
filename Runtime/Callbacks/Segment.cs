@@ -20,6 +20,7 @@
         ExitingEditMode = 102,
         EnteredPlayMode = 103,
         ExitingPlayMode = 104,
-        EditorUpdate = 105
+        EditorUpdate = 105,
+        EditorLoad = 106
     }
 }

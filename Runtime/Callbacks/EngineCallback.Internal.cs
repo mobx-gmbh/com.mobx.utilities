@@ -43,8 +43,10 @@ namespace MobX.Utilities.Callbacks
         private static void SetupUpdateCallbacks()
         {
             IsQuitting = false;
+            Application.quitting -= OnQuit;
+            Application.quitting += OnQuit;
 #if ENABLE_LEGACY_ENGINE_CALLBACKS
-            RuntimeMonoBehaviourEvents.Create(OnStart, OnUpdate, OnLateUpdate, OnFixedUpdate, OnQuit, OnApplicationFocus, OnApplicationPause);
+            RuntimeMonoBehaviourEvents.Create(OnStart, OnUpdate, OnLateUpdate, OnFixedUpdate, OnApplicationFocus, OnApplicationPause);
 #endif
         }
 

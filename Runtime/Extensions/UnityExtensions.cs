@@ -5,6 +5,7 @@ using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityEngine.Pool;
 using Object = UnityEngine.Object;
+using Random = UnityEngine.Random;
 
 namespace MobX.Utilities
 {
@@ -44,6 +45,32 @@ namespace MobX.Utilities
             {
                 Object.Destroy(child.gameObject);
             }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Vector3 SamplePositionInCircle(this Transform transform, float radius, float coneDegree = 80)
+        {
+            var center = transform.position;
+
+            // Flatten the forward vector onto the X-Z plane
+            var forward = transform.forward;
+            var flatForward = new Vector3(forward.x, 0f, forward.z).normalized;
+
+            // Get the angle of the flattened forward vector in radians
+            var forwardAngle = Mathf.Atan2(flatForward.z, flatForward.x);
+
+            // Convert the cone degree to radians and get the half-angle
+            var halfCone = Mathf.Deg2Rad * coneDegree / 2f;
+
+            // Generate random angle in radians within the restricted cone range
+            var angle = Random.Range(forwardAngle - halfCone, forwardAngle + halfCone);
+
+            var x = center.x + radius * Mathf.Cos(angle);
+            var z = center.z + radius * Mathf.Sin(angle);
+
+            var newPos = new Vector3(x, center.y, z);
+
+            return newPos;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

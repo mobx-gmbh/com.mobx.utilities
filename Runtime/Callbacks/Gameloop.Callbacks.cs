@@ -307,20 +307,19 @@ namespace MobX.Utilities.Callbacks
 
                 foreach (var methodInfo in methods)
                 {
-                    if (!methodInfo.TryGetCustomAttribute<CallbackMethodAttribute>(out var attribute, true))
+                    var attributes = methodInfo.GetCustomAttributes<CallbackMethodAttribute>(true);
+                    foreach (var attribute in attributes)
                     {
-                        continue;
-                    }
-
-                    if (attribute.Segment == Segment.Custom)
-                    {
-                        data.HasMethods = true;
-                        data.CustomMethods.Add((attribute.Custom, methodInfo));
-                    }
-                    else
-                    {
-                        data.HasMethods = true;
-                        data.SegmentMethods.Add((attribute.Segment, methodInfo));
+                        if (attribute.Segment == Segment.Custom)
+                        {
+                            data.HasMethods = true;
+                            data.CustomMethods.Add((attribute.Custom, methodInfo));
+                        }
+                        else
+                        {
+                            data.HasMethods = true;
+                            data.SegmentMethods.Add((attribute.Segment, methodInfo));
+                        }
                     }
                 }
 
