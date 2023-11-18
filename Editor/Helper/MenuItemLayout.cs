@@ -1,4 +1,4 @@
-namespace MobX.Utilities.Editor.ScriptOrderEditor
+namespace MobX.Utilities.Editor.Helper
 {
     public static class MenuItemLayout
     {
@@ -18,6 +18,12 @@ namespace MobX.Utilities.Editor.ScriptOrderEditor
         private static void ValidateAllObjectsHideFlags()
         {
             HideFlagsUtility.ValidateAllObjectsHideFlags();
+        }
+
+        [UnityEditor.MenuItem("Edit/Clear All EditorPrefs", priority = 280)]
+        private static void ClearEditorPrefs()
+        {
+            UnityEditor.EditorPrefs.DeleteAll();
         }
     }
 }

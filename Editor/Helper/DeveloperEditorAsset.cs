@@ -1,12 +1,12 @@
 using MobX.Utilities.Callbacks;
 using System;
 
-namespace MobX.Utilities.Editor
+namespace MobX.Utilities.Editor.Helper
 {
     /// <summary>
     ///     Base type for developer specific configuration files.
     /// </summary>
-    public abstract class LocalEditorConfiguration<T> : ScriptableAsset where T : LocalEditorConfiguration<T>
+    public abstract class DeveloperEditorAsset<T> : ScriptableAsset where T : DeveloperEditorAsset<T>
     {
         private static T local;
 

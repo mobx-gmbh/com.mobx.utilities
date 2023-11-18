@@ -1,5 +1,5 @@
-using MobX.Utilities.Editor.FactoryWindow;
 using MobX.Utilities.Editor.Helper;
+using MobX.Utilities.Editor.Inspector;
 using MobX.Utilities.Types;
 using System;
 using System.Collections;
@@ -11,7 +11,7 @@ using UnityEngine;
 using UnityEngine.Pool;
 using Object = UnityEngine.Object;
 
-namespace MobX.Utilities.Editor.Inspector
+namespace MobX.Utilities.Editor.Windows
 {
     public abstract class AssetCollectionWindow : UnityEditor.EditorWindow
     {
@@ -40,7 +40,8 @@ namespace MobX.Utilities.Editor.Inspector
         private System.Action<Object> _onEnter;
 
         private readonly Dictionary<Type, Action<Object>> _footerDrawer = new(8);
-        private readonly List<(string title, ReorderableList orderedList, IList rawList, ValueObject<bool> show)> _assetCollections = new(8);
+        private readonly List<(string title, ReorderableList orderedList, IList rawList, ValueObject<bool> show)>
+            _assetCollections = new(8);
 
         private class ActiveSelection
         {
@@ -74,7 +75,7 @@ namespace MobX.Utilities.Editor.Inspector
                 {
                     var targets = new List<(string name, UnityEditor.Editor editor)>();
                     var foldout = new FoldoutHandler(color: new Color(0f, 0f, 0f, 0.27f));
-                    foreach (Component component in gameObject.GetComponents(typeof(Component)))
+                    foreach (var component in gameObject.GetComponents(typeof(Component)))
                     {
                         targets.Add((component.GetType().Name.Humanize(), UnityEditor.Editor.CreateEditor(component)));
                     }
@@ -105,13 +106,15 @@ namespace MobX.Utilities.Editor.Inspector
 
         #region API
 
-        protected void AddAssetCollection<TObject>(string collectionTitle, List<TObject> list, string emptyCollectionDisplay)
+        protected void AddAssetCollection<TObject>(string collectionTitle, List<TObject> list,
+            string emptyCollectionDisplay)
             where TObject : Object
         {
             AddAssetCollectionInternal<TObject>(collectionTitle, list, null, emptyCollectionDisplay);
         }
 
-        protected void AddAssetCollection<TObject>(string collectionTitle, List<TObject> list, Action<Object> drawFooter = null)
+        protected void AddAssetCollection<TObject>(string collectionTitle, List<TObject> list,
+            Action<Object> drawFooter = null)
             where TObject : Object
         {
             list.RemoveDuplicates();
@@ -172,7 +175,7 @@ namespace MobX.Utilities.Editor.Inspector
             Initialize();
 
             var lastSelected = UnityEditor.EditorPrefs.GetString(_selectionKey);
-            foreach ((var _, ReorderableList reorderableList, IList _, ValueObject<bool> _) in _assetCollections)
+            foreach ((var _, var reorderableList, var _, var _) in _assetCollections)
             {
                 _elementCount += reorderableList.list.Count;
 
@@ -181,7 +184,7 @@ namespace MobX.Utilities.Editor.Inspector
                     if (((Object) reorderableList.list[i]).name == lastSelected)
                     {
                         reorderableList.Select(i);
-                        foreach ((string title, ReorderableList orderedList, IList rawList, ValueObject<bool> show) tuple in _assetCollections)
+                        foreach (var tuple in _assetCollections)
                         {
                             if (tuple.orderedList == reorderableList)
                             {
@@ -198,14 +201,14 @@ namespace MobX.Utilities.Editor.Inspector
                     }
                 }
             }
-            foreach ((var _, ReorderableList reorderableList, IList _, ValueObject<bool> _) in _assetCollections)
+            foreach ((var _, var reorderableList, var _, var _) in _assetCollections)
             {
                 for (var i = 0; i < reorderableList.list.Count; i++)
                 {
                     if (((Object) reorderableList.list[i]).IsNotNull())
                     {
                         reorderableList.Select(i);
-                        foreach ((string title, ReorderableList orderedList, IList rawList, ValueObject<bool> show) tuple in _assetCollections)
+                        foreach (var tuple in _assetCollections)
                         {
                             if (tuple.orderedList == reorderableList)
                             {
@@ -236,7 +239,8 @@ namespace MobX.Utilities.Editor.Inspector
         #region List Setup
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void AddAssetCollectionInternal<T>(string collectionTitle, IList list, Action<Object> drawFooter, string emptyCollectionDisplay = null) where T : Object
+        private void AddAssetCollectionInternal<T>(string collectionTitle, IList list, Action<Object> drawFooter,
+            string emptyCollectionDisplay = null) where T : Object
         {
             _elementCount += list.Count;
             var orderedList = new ReorderableList(list, typeof(T), false, false, false, false)
@@ -265,7 +269,7 @@ namespace MobX.Utilities.Editor.Inspector
 
             orderedList.onSelectCallback += reorderableList =>
             {
-                foreach ((string title, ReorderableList orderedList, IList rawList, ValueObject<bool> show) tuple in _assetCollections)
+                foreach (var tuple in _assetCollections)
                 {
                     if (tuple.orderedList == reorderableList)
                     {
@@ -285,10 +289,7 @@ namespace MobX.Utilities.Editor.Inspector
                 UnityEditor.EditorPrefs.SetString(_selectionKey, target.name);
             };
 
-            orderedList.drawNoneElementCallback += rect =>
-            {
-                GUI.Label(rect, emptyCollectionDisplay);
-            };
+            orderedList.drawNoneElementCallback += rect => { GUI.Label(rect, emptyCollectionDisplay); };
 
             orderedList.drawElementCallback += (rect, index, active, focused) =>
             {
@@ -302,7 +303,9 @@ namespace MobX.Utilities.Editor.Inspector
                 var iconRect = new Rect(rect.x - 2, rect.y + 4, 26, 26);
                 if (element is Component component)
                 {
-                    GUI.Label(iconRect, UnityEditor.EditorGUIUtility.ObjectContent(component.gameObject, component.gameObject.GetType()).image);
+                    GUI.Label(iconRect,
+                        UnityEditor.EditorGUIUtility.ObjectContent(component.gameObject, component.gameObject.GetType())
+                            .image);
                 }
                 else
                 {
@@ -345,7 +348,8 @@ namespace MobX.Utilities.Editor.Inspector
         private void DrawLeftSide()
         {
             UnityEditor.EditorGUILayout.BeginHorizontal();
-            UnityEditor.EditorGUILayout.BeginVertical(GUILayout.Height(position.height - 4), GUILayout.Width(GetMenuWidth()));
+            UnityEditor.EditorGUILayout.BeginVertical(GUILayout.Height(position.height - 4),
+                GUILayout.Width(GetMenuWidth()));
             {
                 GUIHelper.Space(2);
                 UnityEditor.EditorGUILayout.BeginHorizontal();
@@ -385,7 +389,7 @@ namespace MobX.Utilities.Editor.Inspector
 
                     _scrollLeft = UnityEditor.EditorGUILayout.BeginScrollView(_scrollLeft);
 
-                    foreach ((string title, ReorderableList orderedList, IList rawList, ValueObject<bool> show) assetCollection in _assetCollections)
+                    foreach (var assetCollection in _assetCollections)
                     {
                         if (assetCollection.rawList.Count <= 0)
                         {
@@ -394,7 +398,7 @@ namespace MobX.Utilities.Editor.Inspector
 
                         if (_filterString.IsNotNullOrWhitespace())
                         {
-                            List<Object> tempList = ListPool<Object>.Get();
+                            var tempList = ListPool<Object>.Get();
                             foreach (var item in assetCollection.rawList)
                             {
                                 var obj = (Object) item;
@@ -413,7 +417,8 @@ namespace MobX.Utilities.Editor.Inspector
                                     {
                                         return true;
                                     }
-                                    if (obj.GetType().BaseType?.Name.Contains(filter, StringComparison.OrdinalIgnoreCase) ?? false)
+                                    if (obj.GetType().BaseType?.Name
+                                            .Contains(filter, StringComparison.OrdinalIgnoreCase) ?? false)
                                     {
                                         return true;
                                     }
@@ -428,7 +433,8 @@ namespace MobX.Utilities.Editor.Inspector
                         }
                         else
                         {
-                            assetCollection.show.Value = GUIHelper.DynamicFoldout(assetCollection.show, assetCollection.title);
+                            assetCollection.show.Value =
+                                GUIHelper.DynamicFoldout(assetCollection.show, assetCollection.title);
                             if (!assetCollection.show)
                             {
                                 continue;
@@ -489,7 +495,7 @@ namespace MobX.Utilities.Editor.Inspector
                 GUI.enabled = false;
                 UnityEditor.EditorGUILayout.LabelField(_selection.Path);
                 GUI.enabled = true;
-                Rect buttonRect = GUILayoutUtility.GetLastRect();
+                var buttonRect = GUILayoutUtility.GetLastRect();
                 buttonRect.x += buttonRect.width - 60;
                 buttonRect.width = 60;
                 GUIHelper.Space(7);
@@ -506,20 +512,22 @@ namespace MobX.Utilities.Editor.Inspector
 
         private void HandleInput()
         {
-            Event current = Event.current;
+            var current = Event.current;
 
             if (_isRenameMode)
             {
                 if (current.keyCode == KeyCode.Return && current.type == EventType.KeyUp)
                 {
-                    UnityEditor.AssetDatabase.RenameAsset(UnityEditor.AssetDatabase.GetAssetPath(_selection.Target), _elementName);
+                    UnityEditor.AssetDatabase.RenameAsset(UnityEditor.AssetDatabase.GetAssetPath(_selection.Target),
+                        _elementName);
                     Repaint();
                     _isRenameMode = false;
                     return;
                 }
                 if (current.isMouse)
                 {
-                    UnityEditor.AssetDatabase.RenameAsset(UnityEditor.AssetDatabase.GetAssetPath(_selection.Target), _elementName);
+                    UnityEditor.AssetDatabase.RenameAsset(UnityEditor.AssetDatabase.GetAssetPath(_selection.Target),
+                        _elementName);
                     Repaint();
                     _isRenameMode = false;
                     return;
@@ -570,8 +578,8 @@ namespace MobX.Utilities.Editor.Inspector
 
         private Action<Object> GetFooterDrawer(object target)
         {
-            Type type = target.GetType();
-            foreach ((Type key, Action<Object> value) in _footerDrawer)
+            var type = target.GetType();
+            foreach (var (key, value) in _footerDrawer)
             {
                 if (type.IsSubclassOrAssignable(key))
                 {

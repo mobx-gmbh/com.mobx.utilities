@@ -64,7 +64,7 @@ namespace MobX.Utilities.Editor.Inspector
 
             FoldoutData activeHeader = null;
 
-            var inspectorMembers = InspectorFieldUtils.GetInspectorMembers(serializedObject);
+            var inspectorMembers = InspectorFieldUtility.GetInspectorMembers(serializedObject);
             var count = 0;
             for (var i = 0; i < inspectorMembers.Length; i++)
             {

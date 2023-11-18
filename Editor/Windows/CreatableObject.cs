@@ -2,10 +2,10 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using UnityEditor;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
-namespace MobX.Utilities.Editor.FactoryWindow
+namespace MobX.Utilities.Editor.Windows
 {
     internal class CreatableObject
     {
@@ -23,7 +23,9 @@ namespace MobX.Utilities.Editor.FactoryWindow
             if (type.TryGetCustomAttribute<CreateAssetMenuAttribute>(out var createAssetAttribute))
             {
                 CreateAssetPath = createAssetAttribute.menuName;
-                DefaultFileName = createAssetAttribute.fileName.IsNotNullOrWhitespace() ? createAssetAttribute.fileName : Type.Name;
+                DefaultFileName = createAssetAttribute.fileName.IsNotNullOrWhitespace()
+                    ? createAssetAttribute.fileName
+                    : Type.Name;
             }
 
             var sb = ConcurrentStringBuilderPool.Get();
@@ -51,22 +53,25 @@ namespace MobX.Utilities.Editor.FactoryWindow
 
         public bool IsValidForFilter(string filter, SearchOptions searchOptions)
         {
-            if(Type.Name.ContainsIgnoreCase(filter.NoSpace()))
+            if (Type.Name.ContainsIgnoreCase(filter.NoSpace()))
             {
                 return true;
             }
 
-            if(searchOptions.HasFlagUnsafe(SearchOptions.AssemblyName) && AssemblyName.ContainsIgnoreCase(filter.NoSpace()))
+            if (searchOptions.HasFlagUnsafe(SearchOptions.AssemblyName) &&
+                AssemblyName.ContainsIgnoreCase(filter.NoSpace()))
             {
                 return true;
             }
 
-            if(searchOptions.HasFlagUnsafe(SearchOptions.CreateAttributePath) &&  CreateAssetPath.IsNotNullOrWhitespace() && CreateAssetPath.ContainsIgnoreCase(filter.NoSpace()))
+            if (searchOptions.HasFlagUnsafe(SearchOptions.CreateAttributePath) &&
+                CreateAssetPath.IsNotNullOrWhitespace() && CreateAssetPath.ContainsIgnoreCase(filter.NoSpace()))
             {
                 return true;
             }
 
-            if(searchOptions.HasFlagUnsafe(SearchOptions.BaseTypes) &&  BaseTypes.IsNotNullOrWhitespace() && BaseTypes.ContainsIgnoreCase(filter.NoSpace()))
+            if (searchOptions.HasFlagUnsafe(SearchOptions.BaseTypes) && BaseTypes.IsNotNullOrWhitespace() &&
+                BaseTypes.ContainsIgnoreCase(filter.NoSpace()))
             {
                 return true;
             }
@@ -74,29 +79,31 @@ namespace MobX.Utilities.Editor.FactoryWindow
             return false;
         }
 
-        public List<UnityEngine.Object> Create(string filePath, string fileName, int amount)
+        public List<Object> Create(string filePath, string fileName, int amount)
         {
-            var createdObject = new List<UnityEngine.Object>(amount);
+            var createdObject = new List<Object>(amount);
             for (var i = 0; i < amount; i++)
             {
                 var so = CreateInternal(filePath, fileName);
                 createdObject.Add(so);
             }
-            AssetDatabase.Refresh();
+            UnityEditor.AssetDatabase.Refresh();
             return createdObject;
         }
 
-        private UnityEngine.Object CreateInternal(string filePath, string fileName)
+        private Object CreateInternal(string filePath, string fileName)
         {
             var so = ScriptableObject.CreateInstance(Type);
-            var completePath = $"{filePath}/{(fileName.IsNotNullOrWhitespace() ? fileName : Type.Name.Humanize())}.asset";
+            var completePath =
+                $"{filePath}/{(fileName.IsNotNullOrWhitespace() ? fileName : Type.Name.Humanize())}.asset";
             var index = 1;
             while (File.Exists(completePath))
             {
-                completePath = $"{filePath}/{(fileName.IsNotNullOrWhitespace() ? fileName : Type.Name.Humanize())}{index++.ToString()}.asset";
+                completePath =
+                    $"{filePath}/{(fileName.IsNotNullOrWhitespace() ? fileName : Type.Name.Humanize())}{index++.ToString()}.asset";
             }
 
-            AssetDatabase.CreateAsset(so, completePath);
+            UnityEditor.AssetDatabase.CreateAsset(so, completePath);
             return so;
         }
     }

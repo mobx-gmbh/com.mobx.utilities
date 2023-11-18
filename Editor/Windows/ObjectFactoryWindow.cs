@@ -1,6 +1,5 @@
 ﻿using MobX.Utilities.Editor.Helper;
 using MobX.Utilities.Reflection;
-using MobX.Utilities.Tools;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -10,7 +9,7 @@ using UnityEditorInternal;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace MobX.Utilities.Editor.FactoryWindow
+namespace MobX.Utilities.Editor.Windows
 {
     public class ObjectFactoryWindow : UnityEditor.EditorWindow
     {
@@ -138,7 +137,8 @@ namespace MobX.Utilities.Editor.FactoryWindow
 
         private static async ValueTask<List<CreatableObject>> ProfileAssemblies()
         {
-            var assemblies = AssemblyProfiler.GetFilteredAssemblies(null, ObjectFactorySettings.GetIgnoredAssemblyPrefixes());
+            var assemblies =
+                AssemblyProfiler.GetFilteredAssemblies(null, ObjectFactorySettings.GetIgnoredAssemblyPrefixes());
             var ignoreNames = ObjectFactorySettings.GetIgnoredNames();
 
             var result = await Task.Run(() =>

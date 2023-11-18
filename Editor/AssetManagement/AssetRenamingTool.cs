@@ -1,4 +1,5 @@
 using MobX.Utilities.Collections;
+using MobX.Utilities.Editor.Helper;
 using MobX.Utilities.Inspector;
 using MobX.Utilities.Types;
 using System;
@@ -9,7 +10,7 @@ using Object = UnityEngine.Object;
 
 namespace MobX.Utilities.Editor.AssetManagement
 {
-    public class AssetRenamingTool : LocalEditorConfiguration<AssetRenamingTool>
+    public class AssetRenamingTool : DeveloperEditorAsset<AssetRenamingTool>
     {
         #region Type Definitions
 
@@ -63,7 +64,8 @@ namespace MobX.Utilities.Editor.AssetManagement
 
         [ShowInInspector]
         [Foldout("Assets")]
-        public string SelectedGameObjectResult => FormatGameObjectName(GameObjects.FirstOrDefault()?.name ?? gameObjectExampleName, gameObjectStartNumber);
+        public string SelectedGameObjectResult =>
+            FormatGameObjectName(GameObjects.FirstOrDefault()?.name ?? gameObjectExampleName, gameObjectStartNumber);
 
         [Foldout("Assets")]
         [SerializeField] private RenameMode assetRenaming = RenameMode.Dehumanize;
@@ -95,7 +97,8 @@ namespace MobX.Utilities.Editor.AssetManagement
 
         [ShowInInspector]
         [Foldout("Assets")]
-        public string SelectedAssetResult => FormatAssetName(Assets.FirstOrDefault()?.name ?? assetExampleName, gameObjectStartNumber);
+        public string SelectedAssetResult =>
+            FormatAssetName(Assets.FirstOrDefault()?.name ?? assetExampleName, gameObjectStartNumber);
 
         #endregion
 
@@ -165,7 +168,8 @@ namespace MobX.Utilities.Editor.AssetManagement
                 {
                     if (toRemove.TryGetValue(out var value) && value.IsNotNullOrWhitespace())
                     {
-                        elementName = elementName.Replace(value, string.Empty, gameObjectIgnoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal);
+                        elementName = elementName.Replace(value, string.Empty,
+                            gameObjectIgnoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal);
                     }
                 }
 
@@ -182,11 +186,14 @@ namespace MobX.Utilities.Editor.AssetManagement
                 {
                     if (replacement.enabled)
                     {
-                        elementName = elementName.Replace(replacement.oldValue ?? string.Empty, replacement.newValue ?? string.Empty, gameObjectIgnoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal);
+                        elementName = elementName.Replace(replacement.oldValue ?? string.Empty,
+                            replacement.newValue ?? string.Empty,
+                            gameObjectIgnoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal);
                     }
                 }
 
-                elementName = gameObjectPrefix.ValueOrDefault(string.Empty) + elementName + gameObjectSuffix.ValueOrDefault(string.Empty);
+                elementName = gameObjectPrefix.ValueOrDefault(string.Empty) + elementName +
+                              gameObjectSuffix.ValueOrDefault(string.Empty);
 
                 if (numberGameObjects)
                 {
@@ -271,7 +278,9 @@ namespace MobX.Utilities.Editor.AssetManagement
                 {
                     if (toRemove.Enabled)
                     {
-                        elementName = elementName.Replace(toRemove.ValueOrDefault(string.Empty) ?? string.Empty, string.Empty, assetIgnoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal);
+                        elementName = elementName.Replace(toRemove.ValueOrDefault(string.Empty) ?? string.Empty,
+                            string.Empty,
+                            assetIgnoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal);
                     }
                 }
 
@@ -279,11 +288,14 @@ namespace MobX.Utilities.Editor.AssetManagement
                 {
                     if (replacement.enabled)
                     {
-                        elementName = elementName.Replace(replacement.oldValue ?? string.Empty, replacement.newValue ?? string.Empty, assetIgnoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal);
+                        elementName = elementName.Replace(replacement.oldValue ?? string.Empty,
+                            replacement.newValue ?? string.Empty,
+                            assetIgnoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal);
                     }
                 }
 
-                elementName = assetPrefix.ValueOrDefault(string.Empty) + elementName + assetSuffix.ValueOrDefault(string.Empty);
+                elementName = assetPrefix.ValueOrDefault(string.Empty) + elementName +
+                              assetSuffix.ValueOrDefault(string.Empty);
 
                 if (numberAssets)
                 {
@@ -314,11 +326,13 @@ namespace MobX.Utilities.Editor.AssetManagement
 
         [Foldout("Selection")]
         [ShowInInspector]
-        public GameObject[] GameObjects => UnityEditor.Selection.gameObjects.Where(element => element.IsGameObjectInScene()).ToArray();
+        public GameObject[] GameObjects =>
+            UnityEditor.Selection.gameObjects.Where(element => element.IsGameObjectInScene()).ToArray();
 
         [Foldout("Selection")]
         [ShowInInspector]
-        public Object[] Assets => UnityEditor.Selection.objects.Where(element => !element.IsGameObjectInScene()).ToArray();
+        public Object[] Assets =>
+            UnityEditor.Selection.objects.Where(element => !element.IsGameObjectInScene()).ToArray();
 
         #endregion
     }

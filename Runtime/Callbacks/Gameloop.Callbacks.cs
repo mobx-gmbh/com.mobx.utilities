@@ -9,8 +9,6 @@ using Object = UnityEngine.Object;
 
 namespace MobX.Utilities.Callbacks
 {
-    // TODO: Expose gameloop settings (Tick rate etc.)
-
     public partial class Gameloop
     {
         #region Fields

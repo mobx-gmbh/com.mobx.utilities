@@ -2,14 +2,14 @@ using MobX.Utilities.Reflection;
 using System.Reflection;
 using UnityEngine;
 
-namespace MobX.Utilities.Editor.ScriptOrderEditor
+namespace MobX.Utilities.Editor.Helper
 {
     public static class HideFlagsUtility
     {
         public static void ShowAllHiddenObjects()
         {
-            GameObject[] allGameObjects = Object.FindObjectsOfType<GameObject>();
-            foreach (GameObject gameObject in allGameObjects)
+            var allGameObjects = Object.FindObjectsOfType<GameObject>();
+            foreach (var gameObject in allGameObjects)
             {
                 switch (gameObject.hideFlags)
                 {
@@ -28,10 +28,10 @@ namespace MobX.Utilities.Editor.ScriptOrderEditor
 
         public static void ShowAllHiddenInspector()
         {
-            GameObject[] allGameObjects = Object.FindObjectsOfType<GameObject>();
-            foreach (GameObject gameObject in allGameObjects)
+            var allGameObjects = Object.FindObjectsOfType<GameObject>();
+            foreach (var gameObject in allGameObjects)
             {
-                foreach (Component component in gameObject.GetComponents<Component>())
+                foreach (var component in gameObject.GetComponents<Component>())
                 {
                     switch (component.hideFlags)
                     {
@@ -52,13 +52,13 @@ namespace MobX.Utilities.Editor.ScriptOrderEditor
         [UnityEditor.InitializeOnLoadMethodAttribute]
         public static void ValidateAllObjectsHideFlags()
         {
-            MonoBehaviour[] monoBehaviours = Object.FindObjectsOfType<MonoBehaviour>(true);
+            var monoBehaviours = Object.FindObjectsOfType<MonoBehaviour>(true);
 
-            foreach (MonoBehaviour monoBehaviour in monoBehaviours)
+            foreach (var monoBehaviour in monoBehaviours)
             {
                 if (monoBehaviour.GetType().GetCustomAttribute<HideFlagsAttribute>() is { } attribute)
                 {
-                    GameObject gameObject = monoBehaviour.gameObject;
+                    var gameObject = monoBehaviour.gameObject;
 
                     if (attribute.InternalObjectFlags.HasValue)
                     {

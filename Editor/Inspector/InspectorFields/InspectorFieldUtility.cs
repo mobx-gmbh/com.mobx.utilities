@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace MobX.Utilities.Editor.Inspector.InspectorFields
 {
-    public static class InspectorFieldUtils
+    public static class InspectorFieldUtility
     {
         public static InspectorMember[] GetInspectorMembers(UnityEditor.SerializedObject target)
         {

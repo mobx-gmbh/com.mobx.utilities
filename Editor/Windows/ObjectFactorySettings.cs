@@ -4,7 +4,7 @@ using System;
 using System.Linq;
 using UnityEngine;
 
-namespace MobX.Utilities.Editor.FactoryWindow
+namespace MobX.Utilities.Editor.Windows
 {
     [Flags]
     public enum SearchOptions
@@ -43,19 +43,22 @@ namespace MobX.Utilities.Editor.FactoryWindow
 
         internal static string[] GetIgnoredAssemblyPrefixes()
         {
-            var data = UnityEditor.EditorPrefs.GetString($"{nameof(ObjectFactorySettings)}{nameof(ignoredAssemblyPrefixes)}", string.Empty);
+            var data = UnityEditor.EditorPrefs.GetString(
+                $"{nameof(ObjectFactorySettings)}{nameof(ignoredAssemblyPrefixes)}", string.Empty);
             return data.Split("§").Where(x => x.IsNotNullOrWhitespace()).ToArray();
         }
 
         private static void SetIgnoredAssemblyPrefixes(string[] dataArray)
         {
             var data = dataArray.Aggregate(string.Empty, (current, str) => $"{current}§{str}");
-            UnityEditor.EditorPrefs.SetString($"{nameof(ObjectFactorySettings)}{nameof(ignoredAssemblyPrefixes)}", data);
+            UnityEditor.EditorPrefs.SetString($"{nameof(ObjectFactorySettings)}{nameof(ignoredAssemblyPrefixes)}",
+                data);
         }
 
         internal static string[] GetIgnoredNames()
         {
-            var data = UnityEditor.EditorPrefs.GetString($"{nameof(ObjectFactorySettings)}{nameof(ignoredNames)}", string.Empty);
+            var data = UnityEditor.EditorPrefs.GetString($"{nameof(ObjectFactorySettings)}{nameof(ignoredNames)}",
+                string.Empty);
             return data.Split("§").Where(x => x.IsNotNullOrWhitespace()).ToArray();
         }
 
@@ -67,13 +70,17 @@ namespace MobX.Utilities.Editor.FactoryWindow
 
         internal static bool EnableMultiAssetCreation
         {
-            get => UnityEditor.EditorPrefs.GetBool($"{nameof(ObjectFactorySettings)}{nameof(EnableMultiAssetCreation)}", false);
-            set => UnityEditor.EditorPrefs.SetBool($"{nameof(ObjectFactorySettings)}{nameof(EnableMultiAssetCreation)}", value);
+            get => UnityEditor.EditorPrefs.GetBool($"{nameof(ObjectFactorySettings)}{nameof(EnableMultiAssetCreation)}",
+                false);
+            set => UnityEditor.EditorPrefs.SetBool($"{nameof(ObjectFactorySettings)}{nameof(EnableMultiAssetCreation)}",
+                value);
         }
 
         internal static SearchOptions SearchOptions
         {
-            get => (SearchOptions) UnityEditor.EditorPrefs.GetInt($"{nameof(ObjectFactoryWindow)}{nameof(SearchOptions)}", (int) (SearchOptions.AssemblyName | SearchOptions.CreateAttributePath | SearchOptions.BaseTypes));
+            get => (SearchOptions) UnityEditor.EditorPrefs.GetInt(
+                $"{nameof(ObjectFactoryWindow)}{nameof(SearchOptions)}",
+                (int) (SearchOptions.AssemblyName | SearchOptions.CreateAttributePath | SearchOptions.BaseTypes));
             set => UnityEditor.EditorPrefs.SetInt($"{nameof(ObjectFactoryWindow)}{nameof(SearchOptions)}", (int) value);
         }
 
@@ -86,7 +93,7 @@ namespace MobX.Utilities.Editor.FactoryWindow
         {
             if (!isOpen)
             {
-                ObjectFactorySettings window = GetWindow<ObjectFactorySettings>("Settings");
+                var window = GetWindow<ObjectFactorySettings>("Settings");
                 window.Show(false);
             }
         }
@@ -136,7 +143,7 @@ namespace MobX.Utilities.Editor.FactoryWindow
                 UnityEditor.EditorGUI.indentLevel++;
                 UnityEditor.EditorGUI.indentLevel++;
                 GUIHelper.Space();
-                SearchOptions newSearchOptions = GUIHelper.DrawFlagsEnumAsToggle(SearchOptions, true);
+                var newSearchOptions = GUIHelper.DrawFlagsEnumAsToggle(SearchOptions, true);
                 if (newSearchOptions != SearchOptions)
                 {
                     changed = true;

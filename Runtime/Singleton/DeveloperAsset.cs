@@ -7,14 +7,14 @@ namespace MobX.Utilities.Singleton
     /// <summary>
     ///     Base type for developer specific configuration files.
     /// </summary>
-    public abstract class LocalConfiguration<T> : ScriptableAsset where T : LocalConfiguration<T>
+    public abstract class DeveloperAsset<T> : ScriptableAsset where T : DeveloperAsset<T>
     {
         private static T local;
 
         /// <summary>
         ///     The locally saved/applied configuration file.
         /// </summary>
-        public static T Local
+        public static T LocalInstance
         {
             get
             {
@@ -27,7 +27,7 @@ namespace MobX.Utilities.Singleton
                     var path = UnityEditor.AssetDatabase.GUIDToAssetPath(guid);
                     var asset = UnityEditor.AssetDatabase.LoadAssetAtPath<T>(path);
 
-                    Local = asset;
+                    LocalInstance = asset;
                 }
 
                 if (local == null)
@@ -47,12 +47,12 @@ namespace MobX.Utilities.Singleton
                     UnityEditor.AssetDatabase.CreateAsset(asset, assetPath);
                     UnityEditor.AssetDatabase.SaveAssets();
                     Debug.Log("Singleton", $"Creating new {typeof(T).Name} instance at {assetPath}!");
-                    Local = asset;
+                    LocalInstance = asset;
                 }
 
                 if (local == null)
                 {
-                    Local = Singletons.Resolve<T>();
+                    LocalInstance = Singletons.Resolve<T>();
                 }
 
                 return local;
@@ -82,7 +82,7 @@ namespace MobX.Utilities.Singleton
 
         private bool IsLocal()
         {
-            return this == Local;
+            return this == LocalInstance;
         }
 
         private bool IsGlobal()
@@ -95,7 +95,7 @@ namespace MobX.Utilities.Singleton
         [ConditionalShow(nameof(IsLocal), false)]
         public void DeclareAsLocal()
         {
-            Local = (T) this;
+            LocalInstance = (T) this;
         }
 
         [Button]
@@ -105,6 +105,7 @@ namespace MobX.Utilities.Singleton
         {
             Singletons.Register((T) this);
         }
-#endif // UNITY_EDITOR
+
+#endif
     }
 }
