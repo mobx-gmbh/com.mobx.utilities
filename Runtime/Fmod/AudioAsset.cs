@@ -98,8 +98,8 @@ namespace MobX.Utilities.Fmod
         public void StartInstance(out EventInstance audioInstance, GameObject target)
         {
             audioInstance = RuntimeManager.CreateInstance(audioEvent);
-            RuntimeManager.AttachInstanceToGameObject(audioInstance, target.transform);
             audioInstance.start();
+            RuntimeManager.AttachInstanceToGameObject(audioInstance, target.transform);
             if (volume.Enabled)
             {
                 audioInstance.setVolume(volume.Value);
