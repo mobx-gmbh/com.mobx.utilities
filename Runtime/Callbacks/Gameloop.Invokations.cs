@@ -221,7 +221,6 @@ namespace MobX.Utilities.Callbacks
         {
             Segment = Segment.ApplicationQuit;
             IsQuitting = true;
-#if DEBUG
             for (var index = applicationQuitCallbacks.Count - 1; index >= 0; index--)
             {
                 try
@@ -233,12 +232,6 @@ namespace MobX.Utilities.Callbacks
                     Debug.LogException(logCategory, exception);
                 }
             }
-#else
-            for (var index = applicationQuitCallbacks.Count - 1; index >= 0; index--)
-            {
-                applicationQuitCallbacks[index]();
-            }
-#endif
         }
 
         private static void OnApplicationFocus(bool hasFocus)
