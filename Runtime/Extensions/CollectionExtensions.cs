@@ -51,25 +51,43 @@ namespace MobX.Utilities
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsNullOrEmpty<T>(this T[] array)
         {
-            return array is not {Length: > 0};
+            return array is not { Length: > 0 };
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsNotNullOrEmpty<T>(this T[] array)
         {
-            return array is {Length: > 0};
+            return array is { Length: > 0 };
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsNullOrEmpty<T>(this IList<T> list)
         {
-            return list is not {Count: > 0};
+            return list is not { Count: > 0 };
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool IsNullOrHasNullElements<T>(this ICollection<T> list)
+        {
+            if (list == null)
+            {
+                return true;
+            }
+            foreach (var element in list)
+            {
+                if (element == null)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsNotNullOrEmpty<T>(this IReadOnlyList<T> list)
         {
-            return list is {Count: > 0};
+            return list is { Count: > 0 };
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -365,6 +383,31 @@ namespace MobX.Utilities
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static string ToCollectionString<T>(this IEnumerable<T> enumerable, string separator = "\n")
         {
+            if (enumerable == null)
+            {
+                return "null";
+            }
+            var stringBuilder = StringBuilderPool.Get();
+            foreach (var item in enumerable)
+            {
+                var text = item.ToString();
+                stringBuilder.Append(text);
+                stringBuilder.Append(separator);
+            }
+
+            return StringBuilderPool.BuildAndRelease(stringBuilder);
+        }
+
+        /// <summary>
+        ///     Returns a string, appending string representation of every element in the collection.
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static string ToCollectionString<T>(this IEnumerable<T> enumerable, char separator)
+        {
+            if (enumerable == null)
+            {
+                return "null";
+            }
             var stringBuilder = StringBuilderPool.Get();
             foreach (var item in enumerable)
             {
