@@ -1,8 +1,7 @@
-﻿#if UNITY_EDITOR
-// Custom property drawer for Seconds
+﻿using MobX.Utilities.Types;
 using UnityEngine;
 
-namespace MobX.Utilities.Types
+namespace MobX.Utilities.Editor.Inspector.PropertyDrawer
 {
     [UnityEditor.CustomPropertyDrawer(typeof(Seconds))]
     public class SecondsDrawer : UnityEditor.PropertyDrawer
@@ -13,5 +12,3 @@ namespace MobX.Utilities.Types
         }
     }
 }
-
-#endif

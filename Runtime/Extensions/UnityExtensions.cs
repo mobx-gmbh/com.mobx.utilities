@@ -87,7 +87,8 @@ namespace MobX.Utilities
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void SetPositionAndViewDirection(this Transform transform, Vector3 position, Vector3 viewDirection)
+        public static void SetPositionAndViewDirection(this Transform transform, Vector3 position,
+            Vector3 viewDirection)
         {
             if (viewDirection == Vector3.zero)
             {
@@ -100,7 +101,8 @@ namespace MobX.Utilities
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void MoveTowards(this Transform transform, Transform target, float maxDistanceDelta, float maxDegreesDelta)
+        public static void MoveTowards(this Transform transform, Transform target, float maxDistanceDelta,
+            float maxDegreesDelta)
         {
             var position = Vector3.MoveTowards(transform.position, target.position, maxDistanceDelta);
             var rotation = Quaternion.RotateTowards(transform.rotation, target.rotation, maxDegreesDelta);
@@ -144,19 +146,22 @@ namespace MobX.Utilities
         #region Component
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void SetPosition<TComponent>(this TComponent component, Vector3 position) where TComponent : Component
+        public static void SetPosition<TComponent>(this TComponent component, Vector3 position)
+            where TComponent : Component
         {
             component.transform.position = position;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void SetPositionAndRotation<TComponent>(this TComponent component, Vector3 position, Quaternion rotation) where TComponent : Component
+        public static void SetPositionAndRotation<TComponent>(this TComponent component, Vector3 position,
+            Quaternion rotation) where TComponent : Component
         {
             component.transform.SetPositionAndRotation(position, rotation);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void SetPositionAndRotation<TComponent>(this TComponent component, Transform target) where TComponent : Component
+        public static void SetPositionAndRotation<TComponent>(this TComponent component, Transform target)
+            where TComponent : Component
         {
             component.transform.SetPositionAndRotation(target.position, target.rotation);
         }
@@ -231,13 +236,15 @@ namespace MobX.Utilities
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void DestroyGameObject<TComponent>(this TComponent component, float secondsDelay) where TComponent : Component
+        public static void DestroyGameObject<TComponent>(this TComponent component, float secondsDelay)
+            where TComponent : Component
         {
             Object.Destroy(component.gameObject, secondsDelay);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool TryGetComponents<TComponent>(this GameObject gameObject, out TComponent[] components) where TComponent : Component
+        public static bool TryGetComponents<TComponent>(this GameObject gameObject, out TComponent[] components)
+            where TComponent : Component
         {
             components = gameObject.GetComponents<TComponent>();
             return components.IsNotNullOrEmpty();
@@ -251,14 +258,16 @@ namespace MobX.Utilities
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool TryGetComponentInChildren<T>(this Component target, out T component, bool includeInactive = false)
+        public static bool TryGetComponentInChildren<T>(this Component target, out T component,
+            bool includeInactive = false)
         {
             component = target.GetComponentInChildren<T>(includeInactive);
             return component != null;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool TryGetComponentInParent<T>(this Component target, out T component, bool includeInactive = false)
+        public static bool TryGetComponentInParent<T>(this Component target, out T component,
+            bool includeInactive = false)
         {
             component = target.GetComponentInChildren<T>(includeInactive);
             return component != null;
@@ -309,6 +318,34 @@ namespace MobX.Utilities
             return component;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool TrySetActive(this GameObject obj, bool activeState)
+        {
+            if (obj != null)
+            {
+                obj.SetActive(activeState);
+                return true;
+            }
+            return false;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void SetPosition(this GameObject gameObject, Vector3 position)
+        {
+            gameObject.transform.position = position;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool IsPrefab(this Object obj)
+        {
+#if UNITY_EDITOR
+            return UnityEditor.PrefabUtility.GetPrefabInstanceStatus(obj) !=
+                   UnityEditor.PrefabInstanceStatus.NotAPrefab;
+#else
+        return false;
+#endif
+        }
+
         #endregion
 
 
@@ -345,33 +382,6 @@ namespace MobX.Utilities
                     return true;
             }
             return false;
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool TrySetActive(this GameObject obj, bool activeState)
-        {
-            if (obj != null)
-            {
-                obj.SetActive(activeState);
-                return true;
-            }
-            return false;
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void SetPosition(this GameObject gameObject, Vector3 position)
-        {
-            gameObject.transform.position = position;
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool IsPrefab(this Object obj)
-        {
-#if UNITY_EDITOR
-            return UnityEditor.PrefabUtility.GetPrefabInstanceStatus(obj) != UnityEditor.PrefabInstanceStatus.NotAPrefab;
-#else
-        return false;
-#endif
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

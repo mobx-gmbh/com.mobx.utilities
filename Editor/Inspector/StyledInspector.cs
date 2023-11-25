@@ -1,4 +1,3 @@
-using MobX.Utilities.Callbacks;
 using System;
 using System.Reflection;
 using UnityEngine;
@@ -102,7 +101,7 @@ namespace MobX.Utilities.Editor.Inspector
         {
             var enabled = GUI.enabled;
             GUI.enabled = false;
-            if (_script != null && Gameloop.EditorState != 3)
+            if (_script != null && EngineState.Value != 3)
             {
                 UnityEditor.EditorGUILayout.PropertyField(_script);
             }
