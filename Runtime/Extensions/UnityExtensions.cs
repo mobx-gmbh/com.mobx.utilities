@@ -365,6 +365,12 @@ namespace MobX.Utilities
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void SetScale(this GameObject gameObject, float scale)
+        {
+            gameObject.transform.localScale = new Vector3(scale, scale, scale);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsPrefab(this Object obj)
         {
 #if UNITY_EDITOR
