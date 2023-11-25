@@ -1,5 +1,4 @@
-﻿using MobX.Utilities.Callbacks;
-using MobX.Utilities.Inspector;
+﻿using MobX.Utilities.Inspector;
 using System;
 using System.Reflection;
 using UnityEditorInternal;
@@ -34,7 +33,7 @@ namespace MobX.Utilities.Editor.Inspector.InspectorFields
 
         protected override void DrawGUI()
         {
-            if (Gameloop.EditorState == 3)
+            if (EngineState.Value == 3)
             {
                 return;
             }
