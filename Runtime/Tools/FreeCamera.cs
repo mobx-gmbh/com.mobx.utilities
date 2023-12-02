@@ -1,5 +1,5 @@
-using MobX.Utilities.Inspector;
 using MobX.Utilities.Types;
+using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Serialization;

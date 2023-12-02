@@ -1,4 +1,3 @@
-using MobX.Utilities.Editor.Helper;
 using MobX.Utilities.Editor.Inspector;
 using MobX.Utilities.Types;
 using System;
@@ -9,6 +8,7 @@ using System.Runtime.CompilerServices;
 using UnityEditorInternal;
 using UnityEngine;
 using UnityEngine.Pool;
+using GUIUtility = MobX.Utilities.Editor.Helper.GUIUtility;
 using Object = UnityEngine.Object;
 
 namespace MobX.Utilities.Editor.Windows
@@ -55,9 +55,9 @@ namespace MobX.Utilities.Editor.Windows
             public void DrawHeader()
             {
                 UnityEditor.EditorGUIUtility.labelWidth = 0;
-                GUIHelper.BeginIndentOverride(0);
+                GUIUtility.BeginIndentOverride(0);
                 _editor.DrawHeader();
-                GUIHelper.EndIndentOverride();
+                GUIUtility.EndIndentOverride();
             }
 
             public void DrawInspectorGUI()
@@ -81,14 +81,14 @@ namespace MobX.Utilities.Editor.Windows
                     }
                     _drawInspectorGUI = () =>
                     {
-                        GUIHelper.Space();
+                        GUIUtility.Space();
                         for (var i = 0; i < targets.Count; i++)
                         {
                             if (foldout[targets[i].name])
                             {
-                                GUIHelper.Space();
+                                GUIUtility.Space();
                                 targets[i].editor.OnInspectorGUI();
-                                GUIHelper.Space();
+                                GUIUtility.Space();
                             }
                         }
                     };
@@ -175,7 +175,7 @@ namespace MobX.Utilities.Editor.Windows
             Initialize();
 
             var lastSelected = UnityEditor.EditorPrefs.GetString(_selectionKey);
-            foreach ((var _, var reorderableList, var _, var _) in _assetCollections)
+            foreach (var (_, reorderableList, _, _) in _assetCollections)
             {
                 _elementCount += reorderableList.list.Count;
 
@@ -201,7 +201,7 @@ namespace MobX.Utilities.Editor.Windows
                     }
                 }
             }
-            foreach ((var _, var reorderableList, var _, var _) in _assetCollections)
+            foreach (var (_, reorderableList, _, _) in _assetCollections)
             {
                 for (var i = 0; i < reorderableList.list.Count; i++)
                 {
@@ -253,7 +253,7 @@ namespace MobX.Utilities.Editor.Windows
             {
                 var clicked = (Object) reorderableList.list[reorderableList.index];
 
-                if (clicked == _selection.Target && GUIHelper.IsDoubleClick(clicked))
+                if (clicked == _selection.Target && GUIUtility.IsDoubleClick(clicked))
                 {
                     try
                     {
@@ -351,23 +351,23 @@ namespace MobX.Utilities.Editor.Windows
             UnityEditor.EditorGUILayout.BeginVertical(GUILayout.Height(position.height - 4),
                 GUILayout.Width(GetMenuWidth()));
             {
-                GUIHelper.Space(2);
+                GUIUtility.Space(2);
                 UnityEditor.EditorGUILayout.BeginHorizontal();
 
-                if (GUIHelper.OptionsButton())
+                if (GUIUtility.OptionsButton())
                 {
                     _foldout = !_foldout;
                 }
 
                 if (_foldout)
                 {
-                    if (GUIHelper.RefreshButton())
+                    if (GUIUtility.RefreshButton())
                     {
                         InitializeInternal();
                         _filterString = string.Empty;
                     }
 
-                    if (GUIHelper.SelectButton())
+                    if (GUIUtility.SelectButton())
                     {
                         try
                         {
@@ -383,8 +383,8 @@ namespace MobX.Utilities.Editor.Windows
                     UnityEditor.EditorGUILayout.EndHorizontal();
                     if (_elementCount > 5)
                     {
-                        GUIHelper.Space();
-                        _filterString = GUIHelper.SearchBar(_filterString);
+                        GUIUtility.Space();
+                        _filterString = GUIUtility.SearchBar(_filterString);
                     }
 
                     _scrollLeft = UnityEditor.EditorGUILayout.BeginScrollView(_scrollLeft);
@@ -434,7 +434,7 @@ namespace MobX.Utilities.Editor.Windows
                         else
                         {
                             assetCollection.show.Value =
-                                GUIHelper.DynamicFoldout(assetCollection.show, assetCollection.title);
+                                GUIUtility.DynamicFoldout(assetCollection.show, assetCollection.title);
                             if (!assetCollection.show)
                             {
                                 continue;
@@ -446,15 +446,15 @@ namespace MobX.Utilities.Editor.Windows
 
                     UnityEditor.EditorGUILayout.EndScrollView();
 
-                    GUIHelper.DrawLine();
+                    GUIUtility.DrawLine();
                     UnityEditor.EditorGUILayout.BeginHorizontal();
-                    if (GUIHelper.AddButton())
+                    if (GUIUtility.AddButton())
                     {
                         ObjectFactoryWindow.OpenWindow(_createSearchFilter);
                     }
-                    if (GUIHelper.RemoveButton())
+                    if (GUIUtility.RemoveButton())
                     {
-                        if (GUIHelper.DestroyDialogue(_selection.Target))
+                        if (GUIUtility.DestroyDialogue(_selection.Target))
                         {
                             UnityEditor.EditorGUILayout.EndHorizontal();
                             UnityEditor.EditorGUILayout.EndVertical();
@@ -475,7 +475,7 @@ namespace MobX.Utilities.Editor.Windows
         private void DrawRightSide()
         {
             GUILayout.FlexibleSpace();
-            GUIHelper.DrawRect(new Rect(GetMenuWidth() - 1, 0, 1, position.height));
+            GUIUtility.DrawRect(new Rect(GetMenuWidth() - 1, 0, 1, position.height));
             UnityEditor.EditorGUILayout.BeginVertical(GUILayout.Width(position.width - GetMenuWidth()));
 
             if (_selection != null && _selection.Target != null)
@@ -489,8 +489,8 @@ namespace MobX.Utilities.Editor.Windows
                 _selection.SerializedObject.ApplyModifiedProperties();
                 FoldoutHandler.SetDirty();
                 UnityEditor.EditorGUILayout.EndScrollView();
-                GUIHelper.DrawLine();
-                GUIHelper.Space(4);
+                GUIUtility.DrawLine();
+                GUIUtility.Space(4);
                 GetFooterDrawer(_selection.Target)?.Invoke(_selection.Target);
                 GUI.enabled = false;
                 UnityEditor.EditorGUILayout.LabelField(_selection.Path);
@@ -498,7 +498,7 @@ namespace MobX.Utilities.Editor.Windows
                 var buttonRect = GUILayoutUtility.GetLastRect();
                 buttonRect.x += buttonRect.width - 60;
                 buttonRect.width = 60;
-                GUIHelper.Space(7);
+                GUIUtility.Space(7);
             }
             else
             {
@@ -507,7 +507,7 @@ namespace MobX.Utilities.Editor.Windows
 
             UnityEditor.EditorGUILayout.EndVertical();
             UnityEditor.EditorGUILayout.EndHorizontal();
-            GUIHelper.DrawRect(new Rect(0, 0, position.width, 1));
+            GUIUtility.DrawRect(new Rect(0, 0, position.width, 1));
         }
 
         private void HandleInput()
@@ -542,7 +542,7 @@ namespace MobX.Utilities.Editor.Windows
             {
                 if (current.keyCode == KeyCode.Delete && current.type == EventType.KeyUp)
                 {
-                    if (GUIHelper.DestroyDialogue(_selection.Target))
+                    if (GUIUtility.DestroyDialogue(_selection.Target))
                     {
                         InitializeInternal();
                         return;

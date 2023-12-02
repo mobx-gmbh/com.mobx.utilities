@@ -2,7 +2,7 @@
 
 namespace MobX.Utilities.Editor.Helper
 {
-    public static partial class GUIHelper
+    public static partial class GUIUtility
     {
         public static T ObjectField<T>(string label, T obj, bool allowSceneObjects) where T : Object
         {

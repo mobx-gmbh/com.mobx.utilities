@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace MobX.Utilities.Editor.Helper
 {
-    public static partial class GUIHelper
+    public static partial class GUIUtility
     {
         /*
          * Message
@@ -32,7 +32,7 @@ namespace MobX.Utilities.Editor.Helper
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void DrawTitle(GUIContent title)
         {
-            Rect rect = UnityEditor.EditorGUILayout.GetControlRect(GUILayout.Height(32));
+            var rect = UnityEditor.EditorGUILayout.GetControlRect(GUILayout.Height(32));
             UnityEditor.EditorGUI.LabelField(rect, title, BoldTitleStyle);
         }
 

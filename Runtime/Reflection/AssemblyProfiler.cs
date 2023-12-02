@@ -9,11 +9,11 @@ namespace MobX.Utilities.Reflection
 {
     public static class AssemblyProfiler
     {
-         /*
-         *  Assembly Filter Data   
+        /*
+         *  Assembly Filter Data
          */
 
-        private static readonly string[] bannedAssemblyPrefixes = new string[]
+        private static readonly string[] bannedAssemblyPrefixes =
         {
             "Newtonsoft",
             "netstandard",
@@ -28,7 +28,7 @@ namespace MobX.Utilities.Reflection
             "GeNa."
         };
 
-        private static readonly string[] bannedAssemblyNames = new string[]
+        private static readonly string[] bannedAssemblyNames =
         {
             "mcs",
             "AssetStoreTools",
@@ -40,15 +40,16 @@ namespace MobX.Utilities.Reflection
          */
 
         /// <summary>
-        /// Method will initialize and filter all available assemblies only leaving custom assemblies.
-        /// Precompiled unity and system assemblies as well as some other known assemblies will be excluded by default.
+        ///     Method will initialize and filter all available assemblies only leaving custom assemblies.
+        ///     Precompiled unity and system assemblies as well as some other known assemblies will be excluded by default.
         /// </summary>
         /// <param name="excludeNames">Custom array of names of assemblies that should be excluded from the result</param>
         /// <param name="excludePrefixes">Custom array of prefixes for names of assemblies that should be excluded from the result</param>
         public static Assembly[] GetFilteredAssemblies(string[] excludeNames = null,
             string[] excludePrefixes = null)
         {
-            return GetFilteredAssembliesInternal(excludeNames ?? Array.Empty<string>(), excludePrefixes ?? Array.Empty<string>());
+            return GetFilteredAssembliesInternal(excludeNames ?? Array.Empty<string>(),
+                excludePrefixes ?? Array.Empty<string>());
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -58,19 +59,19 @@ namespace MobX.Utilities.Reflection
             {
                 throw new ArgumentNullException(nameof(excludeNames));
             }
-            
+
             if (excludePrefixes == null)
             {
                 throw new ArgumentNullException(nameof(excludePrefixes));
             }
 
-            var filteredAssemblies = new List<Assembly>(30);
+            var filteredAssemblies = new List<Assembly>(64);
             var assemblies = AppDomain.CurrentDomain.GetAssemblies();
-            
+
             for (var i = 0; i < assemblies.Length; i++)
             {
                 var assembly = assemblies[i];
-                
+
                 if (assembly.IsAssemblyValid(excludeNames, excludePrefixes))
                 {
                     filteredAssemblies.Add(assemblies[i]);

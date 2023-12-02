@@ -1,16 +1,15 @@
 using JetBrains.Annotations;
-using MobX.Utilities.Inspector;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace MobX.Utilities.Editor.Types
 {
-    [HideMonoScript]
     public class Note : ScriptableObject
     {
 #pragma warning disable
         [TextArea(0, 30)]
         [UsedImplicitly]
-        [Label("Developer Note")]
+        [LabelText("Developer Note")]
         [SerializeField] private string note;
 #pragma warning restore
     }

@@ -9,7 +9,7 @@ using Object = UnityEngine.Object;
 
 namespace MobX.Utilities.Editor.Helper
 {
-    public static partial class GUIHelper
+    public static partial class GUIUtility
     {
         /*
          * Size
@@ -107,7 +107,7 @@ namespace MobX.Utilities.Editor.Helper
         {
             type ??= target.GetType();
             var name = type.GetCustomAttribute<AddComponentMenu>()?.componentMenu?.Split('/').Last() ??
-                type.Name.Humanize();
+                       type.Name.Humanize();
             return new GUIContent(" " + name, UnityEditor.AssetPreview.GetMiniThumbnail(target));
         }
 
@@ -159,7 +159,7 @@ namespace MobX.Utilities.Editor.Helper
          * Async
          */
 
-        public async static Task CompleteGUI()
+        public static async Task CompleteGUI()
         {
             await Task.Delay(25);
         }
@@ -233,7 +233,7 @@ namespace MobX.Utilities.Editor.Helper
         public static float LineHeight()
         {
             return UnityEditor.EditorGUIUtility.singleLineHeight +
-                UnityEditor.EditorGUIUtility.standardVerticalSpacing;
+                   UnityEditor.EditorGUIUtility.standardVerticalSpacing;
         }
     }
 }

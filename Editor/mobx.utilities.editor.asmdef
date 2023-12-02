@@ -2,7 +2,8 @@
     "name": "mobx.utilities.editor",
     "rootNamespace": "MobX.Utilities",
     "references": [
-        "GUID:451c7863c31cdec4fbc99d53f3082b53"
+        "GUID:451c7863c31cdec4fbc99d53f3082b53",
+        "GUID:75469ad4d38634e559750d17036d5f7c"
     ],
     "includePlatforms": [
         "Editor"

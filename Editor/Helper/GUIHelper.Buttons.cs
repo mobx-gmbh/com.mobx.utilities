@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace MobX.Utilities.Editor.Helper
 {
-    public static partial class GUIHelper
+    public static partial class GUIUtility
     {
         /*
          * Buttons
@@ -13,12 +13,16 @@ namespace MobX.Utilities.Editor.Helper
         public static Func<bool> OptionsButton => optionsButton ??= CreateButton("≡", "Show more options", 3, 2, 1, 2);
         public static Func<bool> ClearButton => clearButton ??= CreateButton("Ͼ", "Clear", 3, 2, 1, 2);
         public static Func<bool> AddButton => addButton ??= CreateButton("+", "Add a new object", 3, 2, 1, 2);
-        public static Func<bool> RemoveButton => removeButton ??= CreateButton("-", "Remove the selected object", 3, 2, 1, 2);
-        public static Func<bool> SelectButton => selectButton ??= CreateButton("⊙", "Select the current object", 3, 2, 1, 2);
+        public static Func<bool> RemoveButton =>
+            removeButton ??= CreateButton("-", "Remove the selected object", 3, 2, 1, 2);
+        public static Func<bool> SelectButton =>
+            selectButton ??= CreateButton("⊙", "Select the current object", 3, 2, 1, 2);
 
-        public static Func<bool> DownloadButton => downloadButton ??= CreateButton("↓", "Download selected option", 3, 2, 1, 2);
+        public static Func<bool> DownloadButton =>
+            downloadButton ??= CreateButton("↓", "Download selected option", 3, 2, 1, 2);
 
-        public static Func<bool> DeleteButton => deleteButton ??= CreateButton("X", "Delete the selected object", 3, 2, 1, 2);
+        public static Func<bool> DeleteButton =>
+            deleteButton ??= CreateButton("X", "Delete the selected object", 3, 2, 1, 2);
 
         /*
          * Cache
@@ -48,7 +52,7 @@ namespace MobX.Utilities.Editor.Helper
                 alignment = TextAnchor.MiddleCenter,
                 padding = new RectOffset(left, right, top, bottom)
             };
-            GUILayoutOption[] options = new[]
+            GUILayoutOption[] options =
             {
                 GUILayout.Width(size)
             };

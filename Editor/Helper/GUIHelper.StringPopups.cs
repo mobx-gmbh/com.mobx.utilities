@@ -2,7 +2,7 @@
 
 namespace MobX.Utilities.Editor.Helper
 {
-    public static partial class GUIHelper
+    public static partial class GUIUtility
     {
         public static int StringPopupMask(Rect rect, int mask, string[] available)
         {

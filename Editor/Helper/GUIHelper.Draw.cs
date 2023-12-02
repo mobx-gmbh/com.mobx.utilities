@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace MobX.Utilities.Editor.Helper
 {
-    public static partial class GUIHelper
+    public static partial class GUIUtility
     {
         /*
          * Lines
@@ -30,7 +30,7 @@ namespace MobX.Utilities.Editor.Helper
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void DrawLine(Color color, int thickness = 1, int padding = 1, bool space = false)
         {
-            Rect rect = UnityEditor.EditorGUILayout.GetControlRect(GUILayout.Height(padding + thickness));
+            var rect = UnityEditor.EditorGUILayout.GetControlRect(GUILayout.Height(padding + thickness));
             rect.height = thickness;
             rect.y += padding * .5f;
             rect.x -= 3;
@@ -41,12 +41,13 @@ namespace MobX.Utilities.Editor.Helper
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void DrawFullLine(Color? color = null, int thickness = 1, int padding = 1)
         {
-            Rect rect = UnityEditor.EditorGUILayout.GetControlRect(GUILayout.Height(padding + thickness));
+            var rect = UnityEditor.EditorGUILayout.GetControlRect(GUILayout.Height(padding + thickness));
             rect.height = thickness;
             rect.y += padding * .5f;
             rect.x = 0;
             rect.width = GetViewWidth();
-            UnityEditor.EditorGUI.DrawRect(rect, color ?? (UnityEditor.EditorGUIUtility.isProSkin ? LightColor : DarkColor));
+            UnityEditor.EditorGUI.DrawRect(rect,
+                color ?? (UnityEditor.EditorGUIUtility.isProSkin ? LightColor : DarkColor));
         }
 
         /*
@@ -56,7 +57,7 @@ namespace MobX.Utilities.Editor.Helper
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void DrawTexture(Texture2D texture, int scale = 70)
         {
-            Rect controlRect = UnityEditor.EditorGUILayout.GetControlRect(false, scale);
+            var controlRect = UnityEditor.EditorGUILayout.GetControlRect(false, scale);
             var rect = new Rect(controlRect.x, controlRect.y, scale, scale);
             UnityEditor.EditorGUI.DrawTextureTransparent(rect, texture ? texture : Texture2D.linearGrayTexture);
         }
@@ -65,7 +66,7 @@ namespace MobX.Utilities.Editor.Helper
         public static void DrawTextures(Texture2D[] textures, int scale = 70)
         {
             UnityEditor.EditorGUILayout.BeginHorizontal();
-            Rect controlRect = UnityEditor.EditorGUILayout.GetControlRect(false, scale);
+            var controlRect = UnityEditor.EditorGUILayout.GetControlRect(false, scale);
             for (var i = 0; i < textures.Length; i++)
             {
                 var x = controlRect.x + scale * i;
@@ -88,7 +89,8 @@ namespace MobX.Utilities.Editor.Helper
                 UnityEditor.EditorGUI.DrawRect(stepRect, color);
             }
 
-            UnityEditor.EditorGUI.DrawRect(new Rect(rect.x + steps * stepWidth, rect.y, rect.width - steps * stepWidth, rect.height), to);
+            UnityEditor.EditorGUI.DrawRect(
+                new Rect(rect.x + steps * stepWidth, rect.y, rect.width - steps * stepWidth, rect.height), to);
         }
     }
 }

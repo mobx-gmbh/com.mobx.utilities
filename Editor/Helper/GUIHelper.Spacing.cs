@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace MobX.Utilities.Editor.Helper
 {
-    public static partial class GUIHelper
+    public static partial class GUIUtility
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void IndentSpace()

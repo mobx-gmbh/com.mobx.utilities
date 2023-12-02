@@ -1,8 +1,8 @@
-﻿using MobX.Utilities.Editor.Helper;
-using MobX.Utilities.Editor.Inspector;
+﻿using MobX.Utilities.Editor.Inspector;
 using System;
 using System.Linq;
 using UnityEngine;
+using GUIUtility = MobX.Utilities.Editor.Helper.GUIUtility;
 
 namespace MobX.Utilities.Editor.Windows
 {
@@ -142,14 +142,14 @@ namespace MobX.Utilities.Editor.Windows
             {
                 UnityEditor.EditorGUI.indentLevel++;
                 UnityEditor.EditorGUI.indentLevel++;
-                GUIHelper.Space();
-                var newSearchOptions = GUIHelper.DrawFlagsEnumAsToggle(SearchOptions, true);
+                GUIUtility.Space();
+                var newSearchOptions = GUIUtility.DrawFlagsEnumAsToggle(SearchOptions, true);
                 if (newSearchOptions != SearchOptions)
                 {
                     changed = true;
                 }
                 SearchOptions = newSearchOptions;
-                GUIHelper.Space();
+                GUIUtility.Space();
                 UnityEditor.EditorGUI.indentLevel--;
                 UnityEditor.EditorGUI.indentLevel--;
             }
@@ -158,7 +158,7 @@ namespace MobX.Utilities.Editor.Windows
             {
                 UnityEditor.EditorGUI.indentLevel++;
                 UnityEditor.EditorGUI.indentLevel++;
-                GUIHelper.Space();
+                GUIUtility.Space();
 
                 var enableMulti = EnableMultiAssetCreation;
                 var newEnableMulti = UnityEditor.EditorGUILayout.Toggle("Multi Asset Creation", enableMulti);
@@ -168,7 +168,7 @@ namespace MobX.Utilities.Editor.Windows
                 }
                 EnableMultiAssetCreation = newEnableMulti;
 
-                GUIHelper.Space();
+                GUIUtility.Space();
                 UnityEditor.EditorGUI.indentLevel--;
                 UnityEditor.EditorGUI.indentLevel--;
             }
@@ -177,20 +177,20 @@ namespace MobX.Utilities.Editor.Windows
             {
                 UnityEditor.EditorGUI.indentLevel++;
                 UnityEditor.EditorGUI.indentLevel++;
-                GUIHelper.Space();
+                GUIUtility.Space();
 
                 _serializedObject.Update();
                 UnityEditor.EditorGUILayout.PropertyField(_serializedPropertyPrefixes);
                 UnityEditor.EditorGUILayout.PropertyField(_serializedPropertyNames);
                 _serializedObject.ApplyModifiedProperties();
-                GUIHelper.Space();
+                GUIUtility.Space();
                 UnityEditor.EditorGUI.indentLevel--;
                 UnityEditor.EditorGUI.indentLevel--;
             }
 
             GUILayout.FlexibleSpace();
-            GUIHelper.DrawLine();
-            GUIHelper.Space();
+            GUIUtility.DrawLine();
+            GUIUtility.Space();
 
             GUILayout.BeginHorizontal();
             GUILayout.FlexibleSpace();
@@ -206,7 +206,7 @@ namespace MobX.Utilities.Editor.Windows
             }
             GUILayout.FlexibleSpace();
             GUILayout.EndHorizontal();
-            GUIHelper.Space();
+            GUIUtility.Space();
 
             if (changed)
             {

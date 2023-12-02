@@ -785,6 +785,50 @@ namespace MobX.Utilities
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static string GetGenericTypeName(this Type type)
+        {
+            if (type.IsGenericType)
+            {
+                var builder = StringBuilderPool.Get();
+                var argBuilder = StringBuilderPool.Get();
+
+                var arguments = type.GetGenericArguments();
+
+                foreach (var typeArg in arguments)
+                {
+                    var arg = GetGenericTypeName(typeArg);
+
+                    if (argBuilder.Length > 0)
+                    {
+                        argBuilder.AppendFormat(", {0}", arg);
+                    }
+                    else
+                    {
+                        argBuilder.Append(arg);
+                    }
+                }
+
+                if (argBuilder.Length > 0)
+                {
+                    UnityEngine.Debug.Assert(type.FullName != null, "type.FullName != null");
+                    builder.AppendFormat("{0}<{1}>", type.FullName!.Split('`')[0], argBuilder);
+                }
+
+                var retType = builder.ToString();
+
+                StringBuilderPool.Release(builder);
+                StringBuilderPool.Release(argBuilder);
+                return retType.Replace('+', '.');
+            }
+
+            UnityEngine.Debug.Assert(type.FullName != null,
+                $"type.FullName != null | {type.Name}, {type.DeclaringType}");
+
+            var returnValue = type.FullName!.Replace('+', '.');
+            return returnValue;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static string HumanizedName(this Type type)
         {
             if (typeCache.TryGetValue(type, out var value))

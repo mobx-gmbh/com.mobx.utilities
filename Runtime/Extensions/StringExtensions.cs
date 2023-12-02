@@ -225,8 +225,8 @@ namespace MobX.Utilities
                 {
                     if (i < target.Length - 1)
                     {
-                        if (char.IsUpper(target[i]) && !char.IsUpper(target[i + 1])
-                            || char.IsUpper(target[i]) && !char.IsUpper(target[i - 1]))
+                        if ((char.IsUpper(target[i]) && !char.IsUpper(target[i + 1]))
+                            || (char.IsUpper(target[i]) && !char.IsUpper(target[i - 1])))
                         {
                             if (i > 1)
                             {
@@ -292,6 +292,12 @@ namespace MobX.Utilities
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static StringBuilder AppendIf(this StringBuilder stringBuilder, char value, bool condition)
+        {
+            return condition ? stringBuilder.Append(value) : stringBuilder;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static StringBuilder AppendIf(this StringBuilder stringBuilder, string value, bool condition)
         {
             return condition ? stringBuilder.Append(value) : stringBuilder;
         }

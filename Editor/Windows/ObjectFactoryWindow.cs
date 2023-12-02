@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using UnityEditorInternal;
 using UnityEngine;
+using GUIUtility = MobX.Utilities.Editor.Helper.GUIUtility;
 using Object = UnityEngine.Object;
 
 namespace MobX.Utilities.Editor.Windows
@@ -129,7 +130,7 @@ namespace MobX.Utilities.Editor.Windows
             var clicked = (CreatableObject) reorderable.list[reorderable.index];
             _fileName = clicked.DefaultFileName;
 
-            if (_isMouseEvent && GUIHelper.IsDoubleClick(clicked))
+            if (_isMouseEvent && GUIUtility.IsDoubleClick(clicked))
             {
                 CreateAssets();
             }
@@ -211,12 +212,12 @@ namespace MobX.Utilities.Editor.Windows
         private void DrawElementCallback(Rect rect, int index, bool isActive, bool isFocused)
         {
             var creatable = (CreatableObject) _displayedList.list[index];
-            var lineRect = new Rect(0, rect.y, GUIHelper.GetViewWidth(), 1);
+            var lineRect = new Rect(0, rect.y, GUIUtility.GetViewWidth(), 1);
             UnityEditor.EditorGUI.DrawRect(lineRect, new Color(0f, 0f, 0f, 0.2f));
 
             if (index.IsEven())
             {
-                var backgroundRect = new Rect(0, rect.y, GUIHelper.GetViewWidth(), rect.height);
+                var backgroundRect = new Rect(0, rect.y, GUIUtility.GetViewWidth(), rect.height);
                 UnityEditor.EditorGUI.DrawRect(backgroundRect, new Color(0f, 0f, 0f, 0.03f));
             }
 
@@ -254,7 +255,7 @@ namespace MobX.Utilities.Editor.Windows
         private void DrawColumnDescriptions()
         {
             var rectOffset = COLUMN_WIDTH;
-            var rect = GUIHelper.GetControlRect();
+            var rect = GUIUtility.GetControlRect();
             UnityEditor.EditorGUI.LabelField(rect, "Name");
 
             if (ObjectFactorySettings.SearchOptions.HasFlagUnsafe(SearchOptions.AssemblyName))
@@ -321,8 +322,8 @@ namespace MobX.Utilities.Editor.Windows
                         OnSelectCallback(_displayedList);
                     }
 
-                    GUIHelper.BoldLabel(_displayedList.list[index].ToString());
-                    GUIHelper.DrawLine(new Color(0f, 0f, 0f, 0.3f));
+                    GUIUtility.BoldLabel(_displayedList.list[index].ToString());
+                    GUIUtility.DrawLine(new Color(0f, 0f, 0f, 0.3f));
                     DrawColumnDescriptions();
                 }
 
@@ -480,10 +481,10 @@ namespace MobX.Utilities.Editor.Windows
 
         private void DrawHeader()
         {
-            GUIHelper.Space();
+            GUIUtility.Space();
             UnityEditor.EditorGUILayout.BeginHorizontal();
             GUI.SetNextControlName(nameof(_searchFilter));
-            var newFilter = GUIHelper.SearchBar(_searchFilter);
+            var newFilter = GUIUtility.SearchBar(_searchFilter);
             if (newFilter != _searchFilter)
             {
                 ResetFocus();
@@ -496,12 +497,12 @@ namespace MobX.Utilities.Editor.Windows
                 _setInitialFocus = false;
             }
 
-            if (GUIHelper.OptionsButton())
+            if (GUIUtility.OptionsButton())
             {
                 ObjectFactorySettings.OpenWindow();
             }
 
-            if (GUIHelper.RefreshButton())
+            if (GUIUtility.RefreshButton())
             {
                 Initialize();
             }
@@ -511,9 +512,9 @@ namespace MobX.Utilities.Editor.Windows
 
         private void DrawFooter()
         {
-            GUIHelper.DrawLine();
+            GUIUtility.DrawLine();
             GUILayout.BeginHorizontal();
-            GUIHelper.BoldLabel(EditorHelper.GetCurrentAssetDirectory());
+            GUIUtility.BoldLabel(EditorHelper.GetCurrentAssetDirectory());
 
             if (!_isMultiSelect)
             {

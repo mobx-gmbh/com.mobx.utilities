@@ -11,7 +11,6 @@ namespace MobX.Utilities.Editor.Inspector
         Default = 0,
         Line = 1,
         Dark = 2,
-        Title = 3,
         Simple = 4
     }
 
@@ -236,8 +235,6 @@ namespace MobX.Utilities.Editor.Inspector
                     return LineFoldout(value, title, tooltip, color);
                 case FoldoutStyle.Dark:
                     return DarkFoldout(value, title, tooltip);
-                case FoldoutStyle.Title:
-                    return TitleFoldout(value, title, tooltip);
                 case FoldoutStyle.Simple:
                     return FoldoutSimple(value, title, tooltip);
                 default:
@@ -323,29 +320,10 @@ namespace MobX.Utilities.Editor.Inspector
             var widthRect = new Rect(0, lastRect.y, GetViewWidth(), lastRect.height + 2);
             var foldoutRect = new Rect(20, lastRect.y + 1, GetViewWidth() - 10, lastRect.height);
             UnityEditor.EditorGUI.DrawRect(new Rect(0, lastRect.y, GetViewWidth(), 1), new Color(0f, 0f, 0f, 0.4f));
-            UnityEditor.EditorGUI.DrawRect(widthRect, new Color(0f, 0f, 0f, 0.3f));
+            UnityEditor.EditorGUI.DrawRect(widthRect, new Color(0f, 0f, 0f, 0.24f));
             EmptyContent.text = label;
             EmptyContent.tooltip = tooltip;
             var result = UnityEditor.EditorGUI.Foldout(foldoutRect, value, EmptyContent, true);
-            if (result != value)
-            {
-                SaveState();
-            }
-            return result;
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private bool TitleFoldout(bool value, string label, string tooltip = "")
-        {
-            UnityEditor.EditorGUILayout.LabelField("");
-            var lastRect = GetLastRect();
-            var widthRect = new Rect(0, lastRect.y, GetViewWidth(), lastRect.height + 6);
-            var foldoutRect = new Rect(20, lastRect.y - 2, GetViewWidth() - 10, lastRect.height + 8);
-            UnityEditor.EditorGUI.DrawRect(new Rect(0, lastRect.y, GetViewWidth(), 1), new Color(0f, 0f, 0f, 0.4f));
-            UnityEditor.EditorGUI.DrawRect(widthRect, new Color(0f, 0f, 0f, 0.25f));
-            EmptyContent.text = label;
-            EmptyContent.tooltip = tooltip;
-            var result = UnityEditor.EditorGUI.Foldout(foldoutRect, value, EmptyContent, true, BoldFoldoutStyle);
             if (result != value)
             {
                 SaveState();

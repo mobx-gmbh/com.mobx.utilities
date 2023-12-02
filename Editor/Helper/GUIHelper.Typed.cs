@@ -6,7 +6,7 @@ using Object = UnityEngine.Object;
 
 namespace MobX.Utilities.Editor.Helper
 {
-    public static partial class GUIHelper
+    public static partial class GUIUtility
     {
         public static Action<object> CreateDrawer(GUIContent label, [NotNull] Type type,
             params GUILayoutOption[] options)

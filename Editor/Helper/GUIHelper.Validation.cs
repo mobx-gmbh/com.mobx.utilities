@@ -4,7 +4,7 @@ using Object = UnityEngine.Object;
 
 namespace MobX.Utilities.Editor.Helper
 {
-    public static partial class GUIHelper
+    public static partial class GUIUtility
     {
         /// <summary>
         ///     Destroy the target object but display a validation dialogue
@@ -23,7 +23,8 @@ namespace MobX.Utilities.Editor.Helper
             }
 
             var message = $"Do you want to delete: {target.name} \nThis operation cannot be undone!";
-            var result = UnityEditor.EditorUtility.DisplayDialog("Delete Object", message, "Delete", "Cancel Operation");
+            var result =
+                UnityEditor.EditorUtility.DisplayDialog("Delete Object", message, "Delete", "Cancel Operation");
 
             if (result)
             {
@@ -35,7 +36,8 @@ namespace MobX.Utilities.Editor.Helper
 
         public static void DrawException(Exception exception)
         {
-            UnityEditor.EditorGUILayout.HelpBox($"Exception while processing GUI:\n{exception}", UnityEditor.MessageType.Error);
+            UnityEditor.EditorGUILayout.HelpBox($"Exception while processing GUI:\n{exception}",
+                UnityEditor.MessageType.Error);
         }
     }
 }
