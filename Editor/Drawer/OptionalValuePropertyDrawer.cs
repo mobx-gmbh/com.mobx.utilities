@@ -68,7 +68,8 @@ namespace MobX.Utilities.Editor.Drawer
         {
             var labelWidth = UnityEditor.EditorGUIUtility.labelWidth + 2;
             var boolRect = position.WithWidth(labelWidth);
-            var valueRect = new Rect(position.x + labelWidth, position.y, position.width - labelWidth, position.height);
+            var valueRect = new Rect(position.x + labelWidth - UnityEditor.EditorGUI.indentLevel * 14, position.y,
+                position.width - labelWidth, position.height);
             enabledProperty.boolValue = UnityEditor.EditorGUI.ToggleLeft(boolRect, label, enabledProperty.boolValue);
             enabledProperty.serializedObject.ApplyModifiedProperties();
             GUIUtility.BeginEnabledOverride(enabledProperty.boolValue);

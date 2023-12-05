@@ -228,7 +228,6 @@ namespace MobX.Utilities.Editor.ScriptGeneration
                 "Boolean" => "bool",
                 "Char" => "char",
                 "String" => "string",
-                "Object" => "object",
                 var _ => typeName
             };
         }
