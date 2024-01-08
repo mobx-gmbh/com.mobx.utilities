@@ -140,7 +140,7 @@ namespace MobX.Utilities
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static T CastTo<T>(this object value)
+        public static T CastExplicit<T>(this object value)
         {
             return (T) value;
         }

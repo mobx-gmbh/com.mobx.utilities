@@ -7,7 +7,7 @@ namespace MobX.Utilities.Types
     {
         #region Properties
 
-        public int Iterations => _iterations;
+        public int Iterations { get; private set; }
 
         #endregion
 
@@ -15,7 +15,6 @@ namespace MobX.Utilities.Types
         #region Fields
 
         private int _value;
-        private int _iterations;
         private readonly int _startValue;
         private readonly Func<int> _min;
         private readonly Func<int> _max;
@@ -28,7 +27,8 @@ namespace MobX.Utilities.Types
         #region Factory
 
         /// <summary>
-        /// Create a new <see cref="DynamicLoop"/> that will dynamically adjust its range based on the min and max provider methods.
+        ///     Create a new <see cref="DynamicLoop" /> that will dynamically adjust its range based on the min and max provider
+        ///     methods.
         /// </summary>
         public static DynamicLoop Create(int startValue, Func<int> minFunc, Func<int> maxFunc)
         {
@@ -36,8 +36,9 @@ namespace MobX.Utilities.Types
         }
 
         /// <summary>
-        /// Create a new <see cref="DynamicLoop"/> that will dynamically adjust its range based on the passed and max provider method.
-        /// Min value for the loop is zero.
+        ///     Create a new <see cref="DynamicLoop" /> that will dynamically adjust its range based on the passed and max provider
+        ///     method.
+        ///     Min value for the loop is zero.
         /// </summary>
         public static DynamicLoop Create(int startValue, Func<int> maxFunc)
         {
@@ -45,7 +46,7 @@ namespace MobX.Utilities.Types
         }
 
         /// <summary>
-        /// Create a new <see cref="DynamicLoop"/> that will dynamically adjust its range for the passed collection.
+        ///     Create a new <see cref="DynamicLoop" /> that will dynamically adjust its range for the passed collection.
         /// </summary>
         public static DynamicLoop Create<T>(int startValue, IList<T> list)
         {
@@ -53,7 +54,8 @@ namespace MobX.Utilities.Types
         }
 
         /// <summary>
-        /// Create a new <see cref="DynamicLoop"/> that will dynamically adjust its range based on the min and max provider methods.
+        ///     Create a new <see cref="DynamicLoop" /> that will dynamically adjust its range based on the min and max provider
+        ///     methods.
         /// </summary>
         public static DynamicLoop Create(Func<int> minFunc, Func<int> maxFunc)
         {
@@ -61,8 +63,9 @@ namespace MobX.Utilities.Types
         }
 
         /// <summary>
-        /// Create a new <see cref="DynamicLoop"/> that will dynamically adjust its range based on the passed and max provider method.
-        /// Min value for the loop is zero.
+        ///     Create a new <see cref="DynamicLoop" /> that will dynamically adjust its range based on the passed and max provider
+        ///     method.
+        ///     Min value for the loop is zero.
         /// </summary>
         public static DynamicLoop Create(Func<int> maxFunc)
         {
@@ -70,7 +73,7 @@ namespace MobX.Utilities.Types
         }
 
         /// <summary>
-        /// Create a new <see cref="DynamicLoop"/> that will dynamically adjust its range for the passed collection.
+        ///     Create a new <see cref="DynamicLoop" /> that will dynamically adjust its range for the passed collection.
         /// </summary>
         public static DynamicLoop Create<T>(IList<T> list)
         {
@@ -79,11 +82,11 @@ namespace MobX.Utilities.Types
 
         private DynamicLoop(int value, Func<int> min, Func<int> max)
         {
-            this._value = value;
-            this._min = min;
-            this._max = max;
-            _startValue = value;
-            _iterations = 0;
+            _value = value;
+            _min = min;
+            _max = max;
+            _startValue = value.Clamp(min(), max());
+            Iterations = 0;
         }
 
         public override string ToString()
@@ -102,7 +105,7 @@ namespace MobX.Utilities.Types
             looping.ValidateIndex();
             if (looping._value == looping._startValue)
             {
-                looping._iterations++;
+                looping.Iterations++;
             }
 
             return looping;
@@ -114,7 +117,7 @@ namespace MobX.Utilities.Types
             looping.ValidateIndex();
             if (looping._value == looping._startValue)
             {
-                looping._iterations--;
+                looping.Iterations--;
             }
 
             return looping;

@@ -20,14 +20,14 @@ namespace MobX.Utilities.Types
 
         public bool ExpiredOrNotRunning => _targetTime <= Time.time;
 
-        public float? RemainingTime => IsRunning ? _targetTime - Time.time : null;
+        public float RemainingTime => IsRunning ? _targetTime - Time.time : 0;
 
         public float Delta(float fallback = 0)
         {
             if (IsRunning)
             {
                 var totalDuration = _targetTime - _startTime;
-                var passedTime = totalDuration - RemainingTime!.Value;
+                var passedTime = totalDuration - RemainingTime;
                 return passedTime / totalDuration;
             }
             return fallback;
@@ -39,5 +39,10 @@ namespace MobX.Utilities.Types
         }
 
         public static Timer None => new();
+
+        public static Timer Run(float durationInSeconds)
+        {
+            return new Timer(durationInSeconds);
+        }
     }
 }

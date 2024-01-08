@@ -31,6 +31,10 @@ namespace MobX.Utilities.Editor.Addressables
                 }
                 var entry = settings.CreateOrMoveEntry(guid, group);
                 var move = UnityEditor.AddressableAssets.Settings.AddressableAssetSettings.ModificationEvent.EntryMoved;
+                if (attribute.CreateLabel)
+                {
+                    entry.SetLabel(attribute.GroupName, true, true);
+                }
                 settings.SetDirty(move, entry, true);
             }
 

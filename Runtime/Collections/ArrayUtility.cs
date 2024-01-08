@@ -59,7 +59,7 @@ namespace MobX.Utilities.Collections
             var result = new TTo[array.Length];
             for (var i = 0; i < array.Length; i++)
             {
-                result[i] = array[i].CastTo<TTo>();
+                result[i] = array[i].CastExplicit<TTo>();
             }
 
             return result;

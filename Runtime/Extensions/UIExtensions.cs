@@ -28,6 +28,25 @@ namespace MobX.Utilities
             return inside;
         }
 
+        public static Rect GetScreenCoordinatesOfCorners(this RectTransform uiElement)
+        {
+            var worldCorners = new Vector3[4];
+            uiElement.GetWorldCorners(worldCorners);
+            var result = new Rect(
+                worldCorners[0].x,
+                worldCorners[0].y,
+                worldCorners[2].x - worldCorners[0].x,
+                worldCorners[2].y - worldCorners[0].y);
+            return result;
+        }
+
+        public static Vector2 GetPixelPositionOfRect(this RectTransform uiElement)
+        {
+            var screenRect = GetScreenCoordinatesOfCorners(uiElement);
+
+            return new Vector2(screenRect.center.x, screenRect.center.y);
+        }
+
         #endregion
     }
 }
