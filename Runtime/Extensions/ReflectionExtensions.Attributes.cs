@@ -29,7 +29,7 @@ namespace MobX.Utilities
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static IEnumerable<T> TryGetCustomAttributes<T>(this ICustomAttributeProvider provider,
+        public static IEnumerable<T> GetCustomAttributes<T>(this ICustomAttributeProvider provider,
             bool inherited = false)
             where T : Attribute
         {
@@ -76,7 +76,7 @@ namespace MobX.Utilities
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool HasAttribute<T>(this MemberInfo memberInfo) where T : Attribute
         {
-            return memberInfo.GetCustomAttributes<T>().Any();
+            return CustomAttributeExtensions.GetCustomAttributes<T>(memberInfo).Any();
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

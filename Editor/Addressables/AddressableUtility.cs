@@ -17,7 +17,8 @@ namespace MobX.Utilities.Editor.Addressables
             {
                 var path = UnityEditor.AssetDatabase.GUIDToAssetPath(guid);
                 var asset = UnityEditor.AssetDatabase.LoadAssetAtPath<ScriptableObject>(path);
-                var attribute = asset.GetType().GetCustomAttributes<AddressablesGroupAttribute>(true).FirstOrDefault();
+                var attribute = CustomAttributeExtensions
+                    .GetCustomAttributes<AddressablesGroupAttribute>(asset.GetType(), true).FirstOrDefault();
                 if (attribute == null)
                 {
                     continue;
