@@ -184,7 +184,8 @@ namespace MobX.Utilities
             }
 
             var type = target.GetType();
-            var field = type.GetField(fieldName, BindingFlags.Instance | BindingFlags.NonPublic);
+            var field = type.GetField(fieldName,
+                BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy);
             if (field == null)
             {
                 throw new ArgumentException($"Field '{fieldName}' not found on type '{type.Name}'.",

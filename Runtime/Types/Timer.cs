@@ -8,7 +8,7 @@ namespace MobX.Utilities.Types
         private readonly float _targetTime;
         private readonly float _startTime;
 
-        public Timer(float delayInSeconds)
+        private Timer(float delayInSeconds)
         {
             _startTime = Time.time;
             _targetTime = _startTime + delayInSeconds;
@@ -35,12 +35,12 @@ namespace MobX.Utilities.Types
 
         public override string ToString()
         {
-            return $"{nameof(Timer)}: {_targetTime}";
+            return $"{nameof(Timer)}: {RemainingTime}";
         }
 
         public static Timer None => new();
 
-        public static Timer Run(float durationInSeconds)
+        public static Timer FromSeconds(float durationInSeconds)
         {
             return new Timer(durationInSeconds);
         }
