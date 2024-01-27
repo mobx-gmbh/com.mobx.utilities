@@ -43,6 +43,27 @@ namespace MobX.Utilities.Libraries
             return Range(min, max);
         }
 
+        public static Vector3 CreateRandomDeviationVector(Vector3 originalVector, float deviationAmount = .5f)
+        {
+            // Ensure the original vector is normalized
+            originalVector.Normalize();
+
+            // Create a random deviation vector
+            var deviationVector = new Vector3(
+                Range(-deviationAmount, deviationAmount),
+                Range(-deviationAmount, deviationAmount),
+                Range(-deviationAmount, deviationAmount)
+            );
+
+            // Combine the original vector with the deviation vector
+            var randomVector = originalVector + deviationVector;
+
+            // Normalize the resulting vector
+            randomVector.Normalize();
+
+            return randomVector;
+        }
+
         public static Vector3 Vector()
         {
             return new Vector3(Float(-1, 1), Float(-1, 1), Float(-1, 1));
