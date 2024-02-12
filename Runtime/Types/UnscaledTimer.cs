@@ -40,7 +40,7 @@ namespace MobX.Utilities.Types
 
         public static UnscaledTimer None => new();
 
-        public static UnscaledTimer Run(float durationInSeconds)
+        public static UnscaledTimer FromSeconds(float durationInSeconds)
         {
             return new UnscaledTimer(durationInSeconds);
         }
